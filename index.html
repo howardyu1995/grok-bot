@@ -1,0 +1,1407 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="直式乘法填空（蟲蝕算）：填入被隱藏的數字，練習乘法與位值概念">
+  <title>直式乘法填空｜蟲蝕算</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --sky: #e8f4fc;
+      --sky-deep: #cfe8f7;
+      --mint: #d8f3e8;
+      --ink: #1a3348;
+      --ink-soft: #4a667a;
+      --accent: #1f9d8a;
+      --accent-hot: #168574;
+      --accent-soft: #b8ebe0;
+      --coral: #e86a5c;
+      --coral-soft: #fde4e0;
+      --sun: #f0b429;
+      --sun-soft: #fff3d0;
+      --paper: #fffcf7;
+      --line: #d2e4ef;
+      --digit-bg: #f3fafd;
+      --digit-border: #9bc4d8;
+      --focus: #1f9d8a;
+      --wrong: #e86a5c;
+      --ok: #1f9d8a;
+      --shadow: 0 18px 40px rgba(26, 51, 72, 0.12);
+      --radius: 22px;
+      --cell: clamp(42px, 9vw, 56px);
+      --gap: 8px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      min-height: 100dvh;
+    }
+
+    body {
+      font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(ellipse 90% 55% at 10% -10%, rgba(31, 157, 138, 0.18), transparent 55%),
+        radial-gradient(ellipse 70% 50% at 95% 5%, rgba(240, 180, 41, 0.16), transparent 50%),
+        radial-gradient(circle at 70% 90%, rgba(232, 106, 92, 0.08), transparent 40%),
+        linear-gradient(165deg, var(--sky) 0%, #f7fbfe 45%, var(--mint) 100%);
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 1rem 0.75rem 2rem;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image:
+        radial-gradient(circle at 20% 30%, rgba(255,255,255,0.45) 0 2px, transparent 3px),
+        radial-gradient(circle at 70% 60%, rgba(255,255,255,0.35) 0 1.5px, transparent 2.5px),
+        radial-gradient(circle at 40% 80%, rgba(31,157,138,0.08) 0 2px, transparent 3px);
+      background-size: 48px 48px, 64px 64px, 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .app {
+      position: relative;
+      z-index: 1;
+      width: min(520px, 100%);
+      display: flex;
+      flex-direction: column;
+      gap: 0.9rem;
+    }
+
+    .brand {
+      text-align: center;
+      animation: rise-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+    .brand-mark {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.55rem;
+      margin-bottom: 0.35rem;
+    }
+
+    .brand-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      background: linear-gradient(145deg, var(--accent), #2bb8a0);
+      color: white;
+      display: grid;
+      place-items: center;
+      font-family: "Fredoka", sans-serif;
+      font-weight: 700;
+      font-size: 1.15rem;
+      box-shadow: 0 8px 18px rgba(31, 157, 138, 0.35);
+      animation: bob 3.2s ease-in-out infinite;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-family: "Fredoka", "Noto Sans TC", sans-serif;
+      font-weight: 700;
+      font-size: clamp(1.55rem, 5.5vw, 2rem);
+      letter-spacing: 0.02em;
+      color: var(--ink);
+      line-height: 1.15;
+    }
+
+    .brand p {
+      margin: 0.25rem 0 0;
+      color: var(--ink-soft);
+      font-size: 0.92rem;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.55rem;
+      animation: rise-in 0.55s 0.06s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+    .stat {
+      background: rgba(255, 252, 247, 0.88);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(155, 196, 216, 0.45);
+      border-radius: 16px;
+      padding: 0.65rem 0.5rem;
+      text-align: center;
+      box-shadow: 0 8px 20px rgba(26, 51, 72, 0.06);
+    }
+
+    .stat-label {
+      font-size: 0.72rem;
+      color: var(--ink-soft);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 0.15rem;
+    }
+
+    .stat-value {
+      font-family: "Fredoka", sans-serif;
+      font-weight: 600;
+      font-size: 1.35rem;
+      color: var(--ink);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .stat-value.accent { color: var(--accent-hot); }
+    .stat-value.sun { color: #c98a00; }
+    .stat-value.coral { color: var(--coral); }
+
+    .panel {
+      background: var(--paper);
+      border: 1px solid rgba(155, 196, 216, 0.5);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 1.1rem 1rem 1.2rem;
+      animation: rise-in 0.55s 0.12s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .difficulty {
+      display: flex;
+      gap: 0.35rem;
+      flex-wrap: wrap;
+    }
+
+    .chip {
+      border: 1.5px solid var(--line);
+      background: white;
+      color: var(--ink-soft);
+      border-radius: 999px;
+      padding: 0.35rem 0.7rem;
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.15s;
+      font-family: inherit;
+    }
+
+    .chip:hover { border-color: var(--accent); color: var(--accent-hot); }
+    .chip.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+    }
+    .chip:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .sound-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      border: none;
+      background: var(--sky);
+      color: var(--ink-soft);
+      border-radius: 999px;
+      padding: 0.35rem 0.7rem;
+      font-size: 0.8rem;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .sound-toggle[aria-pressed="true"] {
+      background: var(--accent-soft);
+      color: var(--accent-hot);
+    }
+
+    .workspace {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.35rem;
+      min-height: 280px;
+      padding: 0.5rem 0 0.25rem;
+    }
+
+    .equation-label {
+      font-size: 0.82rem;
+      color: var(--ink-soft);
+      margin-bottom: 0.35rem;
+    }
+
+    .mul-board {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: var(--gap);
+      font-family: "Fredoka", "Noto Sans TC", sans-serif;
+      font-weight: 600;
+      font-size: calc(var(--cell) * 0.58);
+      line-height: 1;
+      user-select: none;
+      width: max-content;
+      max-width: 100%;
+    }
+
+    .mul-row {
+      display: grid;
+      gap: var(--gap);
+      align-items: center;
+      justify-content: end;
+    }
+
+    .mul-row.factor {
+      position: relative;
+    }
+
+    .op-cell {
+      display: grid;
+      place-items: center;
+      width: var(--cell);
+      height: var(--cell);
+      color: var(--accent-hot);
+      font-size: 1.35em;
+    }
+
+    .digit, .blank {
+      width: var(--cell);
+      height: var(--cell);
+      display: grid;
+      place-items: center;
+      border-radius: 12px;
+    }
+
+    .digit {
+      background: transparent;
+      color: var(--ink);
+    }
+
+    .digit.ghost {
+      color: transparent;
+    }
+
+    .blank {
+      appearance: none;
+      -webkit-appearance: none;
+      border: 2.5px solid var(--digit-border);
+      background: var(--digit-bg);
+      color: var(--ink);
+      font: inherit;
+      font-size: calc(var(--cell) * 0.55);
+      text-align: center;
+      caret-color: var(--accent);
+      box-shadow: inset 0 2px 4px rgba(26, 51, 72, 0.04);
+      transition:
+        border-color 0.15s ease,
+        background 0.15s ease,
+        box-shadow 0.15s ease,
+        transform 0.15s ease;
+      padding: 0;
+      margin: 0;
+    }
+
+    .blank:hover:not(:disabled) {
+      border-color: var(--accent);
+      background: #eefaf7;
+    }
+
+    .blank:focus {
+      outline: none;
+      border-color: var(--focus);
+      background: #e7f8f4;
+      box-shadow:
+        0 0 0 4px rgba(31, 157, 138, 0.22),
+        inset 0 2px 4px rgba(26, 51, 72, 0.04);
+      transform: translateY(-1px);
+    }
+
+    .blank.correct {
+      border-color: var(--ok);
+      background: #e4f8f2;
+      color: var(--accent-hot);
+    }
+
+    .blank.wrong {
+      border-color: var(--wrong);
+      background: var(--coral-soft);
+      color: var(--wrong);
+      animation: shake 0.45s ease;
+    }
+
+    .blank.hinted {
+      border-color: var(--sun);
+      background: var(--sun-soft);
+      color: #a87800;
+      box-shadow: 0 0 0 4px rgba(240, 180, 41, 0.25);
+    }
+
+    .blank:disabled {
+      opacity: 0.95;
+      cursor: default;
+    }
+
+    .rule {
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--ink) 6%, var(--ink) 94%, transparent);
+      border-radius: 999px;
+      margin: 0.2rem 0;
+      width: 100%;
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr 1fr;
+      gap: 0.55rem;
+      margin-top: 1.15rem;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 14px;
+      padding: 0.78rem 0.6rem;
+      font-family: inherit;
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: transform 0.12s ease, box-shadow 0.15s ease, background 0.15s ease, opacity 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .btn:active { transform: scale(0.97); }
+    .btn:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+    }
+    .btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(160deg, #2bb8a0, var(--accent-hot));
+      color: white;
+      box-shadow: 0 10px 22px rgba(31, 157, 138, 0.32);
+    }
+    .btn-primary:hover:not(:disabled) {
+      box-shadow: 0 12px 26px rgba(31, 157, 138, 0.42);
+    }
+
+    .btn-secondary {
+      background: white;
+      color: var(--ink);
+      border: 1.5px solid var(--line);
+    }
+    .btn-secondary:hover:not(:disabled) {
+      border-color: var(--accent);
+      color: var(--accent-hot);
+    }
+
+    .btn-ghost {
+      background: var(--sky);
+      color: var(--ink-soft);
+    }
+    .btn-ghost:hover:not(:disabled) {
+      background: var(--accent-soft);
+      color: var(--accent-hot);
+    }
+
+    .feedback {
+      min-height: 1.5rem;
+      text-align: center;
+      margin-top: 0.85rem;
+      font-weight: 700;
+      font-size: 1rem;
+      transition: color 0.2s, opacity 0.2s;
+    }
+
+    .feedback.ok { color: var(--accent-hot); }
+    .feedback.bad { color: var(--coral); }
+    .feedback.info { color: var(--ink-soft); font-weight: 500; }
+
+    .solution {
+      margin-top: 0.9rem;
+      border-top: 1px dashed var(--line);
+      padding-top: 0.9rem;
+      display: none;
+    }
+
+    .solution.open { display: block; animation: fade-up 0.35s ease both; }
+
+    .solution h3 {
+      margin: 0 0 0.55rem;
+      font-family: "Fredoka", sans-serif;
+      font-size: 1.05rem;
+      color: var(--ink);
+    }
+
+    .solution-eq {
+      font-family: "Fredoka", sans-serif;
+      font-size: 1.15rem;
+      font-weight: 600;
+      margin-bottom: 0.55rem;
+      color: var(--accent-hot);
+    }
+
+    .carry-board {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.35rem;
+      font-family: "Fredoka", sans-serif;
+      background: var(--sky);
+      border-radius: 14px;
+      padding: 0.75rem 0.9rem;
+      overflow-x: auto;
+    }
+
+    .carry-row {
+      display: flex;
+      gap: 0.35rem;
+      align-items: center;
+      justify-content: flex-end;
+    }
+
+    .carry-digit {
+      width: 28px;
+      height: 28px;
+      display: grid;
+      place-items: center;
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+
+    .carry-digit.carry {
+      color: var(--coral);
+      font-size: 0.72rem;
+      height: 20px;
+    }
+
+    .carry-note {
+      margin: 0.6rem 0 0;
+      font-size: 0.85rem;
+      color: var(--ink-soft);
+      line-height: 1.55;
+    }
+
+    .footer-hint {
+      text-align: center;
+      font-size: 0.78rem;
+      color: var(--ink-soft);
+      opacity: 0.9;
+      animation: rise-in 0.55s 0.18s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+    .confetti-layer {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 50;
+    }
+
+    .petal {
+      position: absolute;
+      top: -20px;
+      width: 12px;
+      height: 16px;
+      border-radius: 60% 40% 60% 40%;
+      opacity: 0.95;
+      animation: fall linear forwards;
+    }
+
+    @keyframes rise-in {
+      from { opacity: 0; transform: translateY(14px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fade-up {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes bob {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-4px); }
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-6px); }
+      40% { transform: translateX(6px); }
+      60% { transform: translateX(-4px); }
+      80% { transform: translateX(4px); }
+    }
+
+    @keyframes fall {
+      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+      85% { opacity: 1; }
+      100% { transform: translateY(105vh) rotate(720deg); opacity: 0; }
+    }
+
+    @media (max-width: 420px) {
+      .actions {
+        grid-template-columns: 1fr 1fr;
+      }
+      .actions .btn-primary {
+        grid-column: 1 / -1;
+      }
+      .stat-value { font-size: 1.15rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+      .blank.wrong { animation: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app" id="app">
+    <header class="brand">
+      <div class="brand-mark">
+        <div class="brand-icon" aria-hidden="true">×</div>
+        <h1>直式乘法填空</h1>
+      </div>
+      <p>蟲蝕算挑戰：找出被藏起來的數字</p>
+    </header>
+
+    <section class="stats" aria-label="遊戲統計">
+      <div class="stat">
+        <div class="stat-label">計分</div>
+        <div class="stat-value accent" id="score">0</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">連勝</div>
+        <div class="stat-value sun" id="streak">0</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">計時</div>
+        <div class="stat-value coral" id="timer">0:00</div>
+      </div>
+    </section>
+
+    <main class="panel">
+      <div class="toolbar">
+        <div class="difficulty" role="group" aria-label="難度">
+          <button type="button" class="chip active" data-diff="easy">簡單</button>
+          <button type="button" class="chip" data-diff="medium">中等</button>
+          <button type="button" class="chip" data-diff="hard">困難</button>
+        </div>
+        <button type="button" class="sound-toggle" id="soundBtn" aria-pressed="true" title="音效開關">
+          🔊 音效
+        </button>
+      </div>
+
+      <p class="equation-label" id="eqLabel">兩位數 × 一位數</p>
+
+      <div class="workspace">
+        <div class="mul-board" id="board" aria-label="直式乘法題目"></div>
+      </div>
+
+      <div class="actions">
+        <button type="button" class="btn btn-primary" id="checkBtn">檢查答案</button>
+        <button type="button" class="btn btn-secondary" id="hintBtn">提示</button>
+        <button type="button" class="btn btn-ghost" id="nextBtn">下一題</button>
+        <button type="button" class="btn btn-ghost" id="solveBtn" style="grid-column: 1 / -1;">顯示解析</button>
+      </div>
+
+      <div class="feedback info" id="feedback" role="status" aria-live="polite">填入空格中的數字，再按「檢查答案」</div>
+
+      <section class="solution" id="solution" aria-live="polite">
+        <h3>完整解析</h3>
+        <div class="solution-eq" id="solutionEq"></div>
+        <div class="carry-board" id="carryBoard"></div>
+        <p class="carry-note" id="carryNote"></p>
+      </section>
+    </main>
+
+    <p class="footer-hint">輸入一位數字會自動跳到下一格 · 可用鍵盤左右鍵移動</p>
+  </div>
+
+  <div class="confetti-layer" id="confetti" aria-hidden="true"></div>
+
+  <script>
+    (() => {
+      "use strict";
+
+      /* ---------- DOM ---------- */
+      const boardEl = document.getElementById("board");
+      const feedbackEl = document.getElementById("feedback");
+      const solutionEl = document.getElementById("solution");
+      const solutionEqEl = document.getElementById("solutionEq");
+      const carryBoardEl = document.getElementById("carryBoard");
+      const carryNoteEl = document.getElementById("carryNote");
+      const scoreEl = document.getElementById("score");
+      const streakEl = document.getElementById("streak");
+      const timerEl = document.getElementById("timer");
+      const eqLabelEl = document.getElementById("eqLabel");
+      const confettiEl = document.getElementById("confetti");
+      const soundBtn = document.getElementById("soundBtn");
+      const checkBtn = document.getElementById("checkBtn");
+      const hintBtn = document.getElementById("hintBtn");
+      const nextBtn = document.getElementById("nextBtn");
+      const solveBtn = document.getElementById("solveBtn");
+
+      /* ---------- State ---------- */
+      const DIFFICULTY = {
+        easy:   { label: "兩位數 × 一位數", aMin: 12, aMax: 99, bMin: 2, bMax: 9, hideMin: 2, hideMax: 3 },
+        medium: { label: "兩位數 × 兩位數", aMin: 12, aMax: 99, bMin: 12, bMax: 99, hideMin: 3, hideMax: 5 },
+        hard:   { label: "三位數 × 一位數", aMin: 102, aMax: 999, bMin: 3, bMax: 9, hideMin: 4, hideMax: 6 },
+      };
+
+      const state = {
+        difficulty: "easy",
+        multiplicand: 0,
+        multiplier: 0,
+        product: 0,
+        blanks: [],       // { id, value, row, col, input }
+        score: 0,
+        streak: 0,
+        bestStreak: Number(localStorage.getItem("mul-worm-best") || 0),
+        elapsed: 0,
+        timerId: null,
+        solved: false,
+        soundOn: localStorage.getItem("mul-worm-sound") !== "0",
+        audioCtx: null,
+      };
+
+      /* ---------- Audio (Web Audio API) ---------- */
+      function ensureAudio() {
+        if (!state.audioCtx) {
+          const AC = window.AudioContext || window.webkitAudioContext;
+          if (!AC) return null;
+          state.audioCtx = new AC();
+        }
+        if (state.audioCtx.state === "suspended") {
+          state.audioCtx.resume().catch(() => {});
+        }
+        return state.audioCtx;
+      }
+
+      function tone(freq, start, dur, type = "sine", gain = 0.08) {
+        const ctx = ensureAudio();
+        if (!ctx || !state.soundOn) return;
+        const osc = ctx.createOscillator();
+        const g = ctx.createGain();
+        osc.type = type;
+        osc.frequency.value = freq;
+        g.gain.setValueAtTime(0.0001, ctx.currentTime + start);
+        g.gain.exponentialRampToValueAtTime(gain, ctx.currentTime + start + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + start + dur);
+        osc.connect(g);
+        g.connect(ctx.destination);
+        osc.start(ctx.currentTime + start);
+        osc.stop(ctx.currentTime + start + dur + 0.02);
+      }
+
+      function playSuccess() {
+        tone(523.25, 0, 0.12, "triangle", 0.09);
+        tone(659.25, 0.1, 0.12, "triangle", 0.09);
+        tone(783.99, 0.2, 0.14, "triangle", 0.1);
+        tone(1046.5, 0.34, 0.22, "sine", 0.08);
+      }
+
+      function playError() {
+        tone(220, 0, 0.12, "square", 0.05);
+        tone(165, 0.1, 0.18, "square", 0.045);
+      }
+
+      function playHint() {
+        tone(880, 0, 0.08, "sine", 0.05);
+        tone(1174.7, 0.08, 0.1, "sine", 0.04);
+      }
+
+      function playClick() {
+        tone(660, 0, 0.04, "triangle", 0.03);
+      }
+
+      /* ---------- Utilities ---------- */
+      const randInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+
+      function digitsOf(n) {
+        return String(n).split("").map(Number);
+      }
+
+      function padLeft(arr, len, fill = null) {
+        const out = arr.slice();
+        while (out.length < len) out.unshift(fill);
+        return out;
+      }
+
+      function formatTime(sec) {
+        const m = Math.floor(sec / 60);
+        const s = sec % 60;
+        return `${m}:${String(s).padStart(2, "0")}`;
+      }
+
+      /* ---------- Puzzle generation ---------- */
+      /**
+       * Build a puzzle with unique recoverable blanks.
+       * Strategy: hide digits such that at least one operand digit remains
+       * visible in each number OR the product constraints uniquely determine
+       * remaining digits. We verify uniqueness by brute-force search over
+       * digit assignments for blank positions.
+       */
+      function generatePuzzle(diffKey) {
+        const cfg = DIFFICULTY[diffKey];
+        let attempts = 0;
+
+        while (attempts < 80) {
+          attempts += 1;
+          const a = randInt(cfg.aMin, cfg.aMax);
+          const b = randInt(cfg.bMin, cfg.bMax);
+          const p = a * b;
+          const puzzle = buildMaskedPuzzle(a, b, p, cfg);
+          if (puzzle && hasUniqueSolution(puzzle)) {
+            return puzzle;
+          }
+        }
+
+        // Fallback: mild, guaranteed-unique puzzle
+        const a = randInt(cfg.aMin, cfg.aMax);
+        const b = randInt(cfg.bMin, Math.min(cfg.bMax, 9));
+        const p = a * b;
+        return buildMaskedPuzzle(a, b, p, { ...cfg, hideMin: 2, hideMax: 2 }, true);
+      }
+
+      function buildMaskedPuzzle(a, b, p, cfg, force = false) {
+        const aDigs = digitsOf(a);
+        const bDigs = digitsOf(b);
+        const pDigs = digitsOf(p);
+        const width = Math.max(aDigs.length, bDigs.length, pDigs.length);
+
+        // Positions: rows 0=multiplicand, 1=multiplier, 2=product
+        const cells = [];
+        const pushRow = (row, digs) => {
+          const padded = padLeft(digs, width, null);
+          padded.forEach((d, col) => {
+            if (d !== null) cells.push({ row, col, value: d });
+          });
+        };
+        pushRow(0, aDigs);
+        pushRow(1, bDigs);
+        pushRow(2, pDigs);
+
+        const hideCount = force
+          ? Math.min(2, cells.length - 1)
+          : randInt(cfg.hideMin, Math.min(cfg.hideMax, cells.length - 2));
+
+        // Prefer hiding a mix of product + operand digits, keep at least 1 visible per row when possible
+        const indices = cells.map((_, i) => i);
+        shuffle(indices);
+
+        const hidden = new Set();
+        for (const i of indices) {
+          if (hidden.size >= hideCount) break;
+          // Don't hide every digit of a row if that would leave 0 clues and make search huge
+          const cell = cells[i];
+          const rowCells = cells.filter((c) => c.row === cell.row);
+          const remainingVisible = rowCells.filter((c) => {
+            const idx = cells.indexOf(c);
+            return idx !== i && !hidden.has(idx);
+          }).length;
+          if (remainingVisible === 0 && rowCells.length > 1 && !force) continue;
+          hidden.add(i);
+        }
+
+        if (hidden.size < Math.min(2, cells.length - 1) && !force) return null;
+
+        return {
+          a, b, p,
+          aDigs, bDigs, pDigs,
+          width,
+          cells,
+          hidden: [...hidden].sort((x, y) => x - y),
+        };
+      }
+
+      function shuffle(arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+      }
+
+      function hasUniqueSolution(puzzle) {
+        const { cells, hidden, width } = puzzle;
+        const values = cells.map((c) => c.value);
+        const blankIdx = hidden.slice();
+
+        // Reconstruct a, b from digit grids and check a*b === p
+        const countSolutions = (depth) => {
+          if (depth === blankIdx.length) {
+            const grid = Array.from({ length: 3 }, () => Array(width).fill(null));
+            cells.forEach((c, i) => {
+              grid[c.row][c.col] = values[i];
+            });
+            const numFrom = (row) => {
+              let n = 0;
+              let started = false;
+              for (let col = 0; col < width; col++) {
+                const d = grid[row][col];
+                if (d === null) {
+                  if (started) return NaN;
+                  continue;
+                }
+                if (!started && d === 0 && col < width - 1) {
+                  // leading zero invalid unless single digit (won't happen here)
+                  return NaN;
+                }
+                started = true;
+                n = n * 10 + d;
+              }
+              return n;
+            };
+            const A = numFrom(0);
+            const B = numFrom(1);
+            const P = numFrom(2);
+            if (!Number.isFinite(A) || !Number.isFinite(B) || !Number.isFinite(P)) return 0;
+            if (A <= 0 || B <= 0) return 0;
+            return A * B === P ? 1 : 0;
+          }
+
+          let found = 0;
+          const idx = blankIdx[depth];
+          const cell = cells[idx];
+          // Leading digit can't be 0
+          const isLeading = (() => {
+            const rowCells = cells.filter((c) => c.row === cell.row);
+            const minCol = Math.min(...rowCells.map((c) => c.col));
+            return cell.col === minCol;
+          })();
+          const startD = isLeading ? 1 : 0;
+          for (let d = startD; d <= 9; d++) {
+            values[idx] = d;
+            found += countSolutions(depth + 1);
+            if (found > 1) return found;
+          }
+          values[idx] = cells[idx].value; // restore
+          return found;
+        };
+
+        // Cap search: if too many blanks, uniqueness check may be slow — skip extreme cases
+        if (blankIdx.length > 6) return false;
+        return countSolutions(0) === 1;
+      }
+
+      /* ---------- Render ---------- */
+      function renderPuzzle(puzzle) {
+        state.multiplicand = puzzle.a;
+        state.multiplier = puzzle.b;
+        state.product = puzzle.p;
+        state.blanks = [];
+        state.solved = false;
+        solutionEl.classList.remove("open");
+        feedbackEl.className = "feedback info";
+        feedbackEl.textContent = "填入空格中的數字，再按「檢查答案」";
+        checkBtn.disabled = false;
+        hintBtn.disabled = false;
+
+        const { aDigs, bDigs, pDigs, width, cells, hidden } = puzzle;
+        const hiddenSet = new Set(hidden);
+        const cellMap = new Map(cells.map((c, i) => [`${c.row},${c.col}`, { ...c, i }]));
+
+        boardEl.innerHTML = "";
+        const cols = width + 1; // +1 for × column
+
+        // Multiplicand row (no operator)
+        boardEl.appendChild(makeRow(0, aDigs, width, cellMap, hiddenSet, false));
+
+        // Multiplier row with ×
+        boardEl.appendChild(makeRow(1, bDigs, width, cellMap, hiddenSet, true));
+
+        // Rule aligned to digit columns
+        const rule = document.createElement("div");
+        rule.className = "rule";
+        rule.style.width = `calc(${cols} * var(--cell) + ${cols - 1} * var(--gap))`;
+        rule.setAttribute("aria-hidden", "true");
+        boardEl.appendChild(rule);
+
+        // Product row
+        boardEl.appendChild(makeRow(2, pDigs, width, cellMap, hiddenSet, false));
+
+        // Focus first blank
+        requestAnimationFrame(() => {
+          const first = boardEl.querySelector(".blank");
+          if (first) first.focus();
+        });
+      }
+
+      function makeRow(row, digs, width, cellMap, hiddenSet, withOp) {
+        const rowEl = document.createElement("div");
+        rowEl.className = "mul-row" + (withOp ? " factor" : "");
+        rowEl.style.gridTemplateColumns = `repeat(${width + 1}, var(--cell))`;
+
+        // Operator / spacer in first column
+        const op = document.createElement("div");
+        op.className = "op-cell";
+        op.textContent = withOp ? "×" : "";
+        if (withOp) op.setAttribute("aria-label", "乘號");
+        else op.setAttribute("aria-hidden", "true");
+        rowEl.appendChild(op);
+
+        const padded = padLeft(digs, width, null);
+        padded.forEach((d, col) => {
+          if (d === null) {
+            const ghost = document.createElement("div");
+            ghost.className = "digit ghost";
+            ghost.setAttribute("aria-hidden", "true");
+            rowEl.appendChild(ghost);
+            return;
+          }
+
+          const meta = cellMap.get(`${row},${col}`);
+          if (meta && hiddenSet.has(meta.i)) {
+            const input = document.createElement("input");
+            input.type = "text";
+            input.inputMode = "numeric";
+            input.pattern = "[0-9]*";
+            input.maxLength = 1;
+            input.className = "blank";
+            input.autocomplete = "off";
+            input.enterKeyHint = "next";
+            input.setAttribute("aria-label", rowLabel(row, col, width));
+            input.dataset.answer = String(d);
+            input.dataset.blankId = String(state.blanks.length);
+
+            const blank = { id: state.blanks.length, value: d, row, col, input };
+            state.blanks.push(blank);
+
+            input.addEventListener("input", onBlankInput);
+            input.addEventListener("keydown", onBlankKeydown);
+            input.addEventListener("focus", () => input.select());
+            rowEl.appendChild(input);
+          } else {
+            const digit = document.createElement("div");
+            digit.className = "digit";
+            digit.textContent = String(d);
+            rowEl.appendChild(digit);
+          }
+        });
+
+        return rowEl;
+      }
+
+      function rowLabel(row, col, width) {
+        const names = ["被乘數", "乘數", "積"];
+        const place = width - col; // 1 = 個位
+        const placeNames = ["", "個位", "十位", "百位", "千位", "萬位"];
+        const placeName = placeNames[place] || `右起第 ${place} 位`;
+        return `${names[row]}的${placeName}`;
+      }
+
+      /* ---------- Input handling ---------- */
+      function onBlankInput(e) {
+        const input = e.target;
+        let v = input.value.replace(/\D/g, "");
+        if (v.length > 1) v = v.slice(-1);
+        input.value = v;
+        input.classList.remove("wrong", "hinted", "correct");
+
+        if (v) {
+          playClick();
+          focusNextBlank(input);
+        }
+      }
+
+      function onBlankKeydown(e) {
+        const input = e.target;
+        const blanks = state.blanks.map((b) => b.input);
+        const idx = blanks.indexOf(input);
+
+        if (e.key === "Backspace" && !input.value && idx > 0) {
+          e.preventDefault();
+          blanks[idx - 1].focus();
+          blanks[idx - 1].select();
+          return;
+        }
+        if (e.key === "ArrowLeft" && idx > 0) {
+          e.preventDefault();
+          blanks[idx - 1].focus();
+          return;
+        }
+        if (e.key === "ArrowRight" && idx < blanks.length - 1) {
+          e.preventDefault();
+          blanks[idx + 1].focus();
+          return;
+        }
+        if (e.key === "Enter") {
+          e.preventDefault();
+          checkAnswer();
+        }
+      }
+
+      function focusNextBlank(current) {
+        const blanks = state.blanks.map((b) => b.input);
+        const idx = blanks.indexOf(current);
+        for (let i = idx + 1; i < blanks.length; i++) {
+          if (!blanks[i].disabled) {
+            blanks[i].focus();
+            return;
+          }
+        }
+      }
+
+      /* ---------- Check / Hint / Solution ---------- */
+      function checkAnswer() {
+        if (state.solved) return;
+        ensureAudio();
+
+        const empties = state.blanks.filter((b) => b.input.value === "");
+        if (empties.length) {
+          feedbackEl.className = "feedback bad";
+          feedbackEl.textContent = `還有 ${empties.length} 個空格尚未填寫`;
+          empties[0].input.focus();
+          playError();
+          return;
+        }
+
+        let allCorrect = true;
+        let wrongCount = 0;
+
+        state.blanks.forEach((b) => {
+          const ok = b.input.value === String(b.value);
+          b.input.classList.remove("wrong", "correct", "hinted");
+          if (ok) {
+            b.input.classList.add("correct");
+          } else {
+            b.input.classList.add("wrong");
+            allCorrect = false;
+            wrongCount += 1;
+            // re-trigger shake
+            void b.input.offsetWidth;
+            b.input.classList.add("wrong");
+          }
+        });
+
+        if (allCorrect) {
+          onSuccess();
+        } else {
+          state.streak = 0;
+          streakEl.textContent = "0";
+          feedbackEl.className = "feedback bad";
+          feedbackEl.textContent = `有 ${wrongCount} 格不正確，再試試看！`;
+          playError();
+          const firstWrong = state.blanks.find((b) => b.input.classList.contains("wrong"));
+          if (firstWrong) firstWrong.input.focus();
+        }
+      }
+
+      function onSuccess() {
+        state.solved = true;
+        stopTimer();
+        state.streak += 1;
+        if (state.streak > state.bestStreak) {
+          state.bestStreak = state.streak;
+          localStorage.setItem("mul-worm-best", String(state.bestStreak));
+        }
+
+        const timeBonus = Math.max(0, 30 - state.elapsed);
+        const streakBonus = Math.min(state.streak * 2, 20);
+        const gained = 10 + timeBonus + streakBonus;
+        state.score += gained;
+        scoreEl.textContent = String(state.score);
+        streakEl.textContent = String(state.streak);
+
+        state.blanks.forEach((b) => {
+          b.input.classList.remove("wrong", "hinted");
+          b.input.classList.add("correct");
+          b.input.disabled = true;
+        });
+        checkBtn.disabled = true;
+        hintBtn.disabled = true;
+
+        feedbackEl.className = "feedback ok";
+        feedbackEl.textContent = `太棒了！答對了！+${gained} 分`;
+        playSuccess();
+        launchConfetti();
+      }
+
+      function giveHint() {
+        if (state.solved) return;
+        ensureAudio();
+
+        const candidates = state.blanks.filter(
+          (b) => !b.input.disabled && b.input.value !== String(b.value)
+        );
+        if (!candidates.length) {
+          feedbackEl.className = "feedback info";
+          feedbackEl.textContent = "所有空格都已正確填好，可以檢查答案了！";
+          return;
+        }
+
+        // Prefer empty blanks
+        const empty = candidates.filter((b) => b.input.value === "");
+        const target = (empty.length ? empty : candidates)[randInt(0, (empty.length ? empty : candidates).length - 1)];
+
+        target.input.value = String(target.value);
+        target.input.classList.remove("wrong");
+        target.input.classList.add("hinted");
+        target.input.focus();
+
+        // Small score cost
+        state.score = Math.max(0, state.score - 2);
+        scoreEl.textContent = String(state.score);
+
+        feedbackEl.className = "feedback info";
+        feedbackEl.textContent = "已提示一格正確數字（−2 分）";
+        playHint();
+      }
+
+      function showSolution() {
+        const a = state.multiplicand;
+        const b = state.multiplier;
+        const p = state.product;
+        solutionEqEl.textContent = `${a} × ${b} = ${p}`;
+
+        // Reveal blanks without awarding score if not solved
+        if (!state.solved) {
+          state.blanks.forEach((b) => {
+            b.input.value = String(b.value);
+            b.input.classList.remove("wrong");
+            b.input.classList.add("hinted");
+            b.input.disabled = true;
+          });
+          state.solved = true;
+          stopTimer();
+          state.streak = 0;
+          streakEl.textContent = "0";
+          checkBtn.disabled = true;
+          hintBtn.disabled = true;
+          feedbackEl.className = "feedback info";
+          feedbackEl.textContent = "已顯示完整答案與解析";
+        }
+
+        renderCarryExplanation(a, b, p);
+        solutionEl.classList.add("open");
+        solutionEl.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }
+
+      function renderCarryExplanation(a, b, p) {
+        carryBoardEl.innerHTML = "";
+        const aDigs = digitsOf(a);
+        const bStr = String(b);
+        const isSingle = b < 10;
+
+        if (isSingle) {
+          const steps = multiplyWithCarry(aDigs, b);
+          // carry row
+          const carryRow = document.createElement("div");
+          carryRow.className = "carry-row";
+          carryRow.appendChild(spacer());
+          const maxLen = Math.max(aDigs.length, steps.productDigs.length);
+          const carries = padLeft(steps.carries, maxLen, 0);
+          carries.forEach((c) => {
+            const el = document.createElement("div");
+            el.className = "carry-digit carry";
+            el.textContent = c ? String(c) : "";
+            carryRow.appendChild(el);
+          });
+          carryBoardEl.appendChild(carryRow);
+
+          // multiplicand
+          carryBoardEl.appendChild(labeledDigitRow("", padLeft(aDigs, maxLen, null)));
+          // multiplier
+          carryBoardEl.appendChild(labeledDigitRow("×", padLeft([b], maxLen, null)));
+          // product
+          const prodRow = labeledDigitRow("=", padLeft(steps.productDigs, maxLen, null));
+          carryBoardEl.appendChild(prodRow);
+
+          const notes = steps.notes.length
+            ? steps.notes.join("；") + "。"
+            : "每一位相乘皆小於 10，沒有進位。";
+          carryNoteEl.textContent = `從個位開始：${notes} 最後得到積 ${p}。`;
+        } else {
+          // Two-digit multiplier: show partial products
+          const bDigs = digitsOf(b);
+          const ones = bDigs[bDigs.length - 1];
+          const tens = bDigs[bDigs.length - 2];
+          const partial1 = a * ones;
+          const partial2 = a * tens;
+
+          const width = digitsOf(p).length;
+          carryBoardEl.appendChild(labeledDigitRow("", padLeft(aDigs, width, null)));
+          carryBoardEl.appendChild(labeledDigitRow("×", padLeft(bDigs, width, null)));
+
+          const p1 = labeledDigitRow("", padLeft(digitsOf(partial1), width, null));
+          carryBoardEl.appendChild(p1);
+          const p2Digs = digitsOf(partial2).concat([null]); // shift one place (tens)
+          const p2 = labeledDigitRow("+", padLeft(p2Digs, width, null));
+          carryBoardEl.appendChild(p2);
+          carryBoardEl.appendChild(labeledDigitRow("=", padLeft(digitsOf(p), width, null)));
+
+          carryNoteEl.textContent =
+            `先算 ${a} × ${ones} = ${partial1}（個位部分積）；` +
+            `再算 ${a} × ${tens} = ${partial2}，向左移一位（十位部分積）；` +
+            `兩部分積相加得 ${p}。`;
+        }
+      }
+
+      function spacer() {
+        const el = document.createElement("div");
+        el.className = "carry-digit";
+        el.style.width = "20px";
+        return el;
+      }
+
+      function labeledDigitRow(label, digs) {
+        const row = document.createElement("div");
+        row.className = "carry-row";
+        const lab = document.createElement("div");
+        lab.className = "carry-digit";
+        lab.style.width = "20px";
+        lab.textContent = label;
+        row.appendChild(lab);
+        digs.forEach((d) => {
+          const el = document.createElement("div");
+          el.className = "carry-digit";
+          el.textContent = d === null ? "" : String(d);
+          row.appendChild(el);
+        });
+        return row;
+      }
+
+      function multiplyWithCarry(aDigs, b) {
+        const productDigs = [];
+        const carries = []; // carry INTO each position (same length as product, left-aligned later)
+        const notes = [];
+        let carry = 0;
+        const tempCarries = []; // carry generated at each digit from right
+
+        for (let i = aDigs.length - 1; i >= 0; i--) {
+          const prod = aDigs[i] * b + carry;
+          const digit = prod % 10;
+          const nextCarry = Math.floor(prod / 10);
+          productDigs.unshift(digit);
+          tempCarries.unshift(carry);
+          if (nextCarry > 0 || carry > 0) {
+            const parts = [`${aDigs[i]}×${b}`];
+            if (carry) parts.push(`進位 ${carry}`);
+            parts.push(`= ${prod}`);
+            if (nextCarry) parts.push(`寫下 ${digit}、進位 ${nextCarry}`);
+            else parts.push(`寫下 ${digit}`);
+            notes.push(parts.join(""));
+          }
+          carry = nextCarry;
+        }
+        if (carry > 0) {
+          productDigs.unshift(carry);
+          tempCarries.unshift(0);
+          notes.push(`最後進位寫下 ${carry}`);
+        }
+        return { productDigs, carries: tempCarries, notes };
+      }
+
+      /* ---------- Confetti / petals ---------- */
+      function launchConfetti() {
+        const colors = ["#1f9d8a", "#f0b429", "#e86a5c", "#5dade2", "#82e0aa", "#f5b7b1"];
+        const count = 42;
+        for (let i = 0; i < count; i++) {
+          const petal = document.createElement("div");
+          petal.className = "petal";
+          petal.style.left = `${Math.random() * 100}%`;
+          petal.style.background = colors[i % colors.length];
+          petal.style.animationDuration = `${2.2 + Math.random() * 1.8}s`;
+          petal.style.animationDelay = `${Math.random() * 0.4}s`;
+          petal.style.transform = `rotate(${Math.random() * 360}deg)`;
+          petal.style.width = `${8 + Math.random() * 8}px`;
+          petal.style.height = `${10 + Math.random() * 10}px`;
+          confettiEl.appendChild(petal);
+          setTimeout(() => petal.remove(), 4500);
+        }
+      }
+
+      /* ---------- Timer ---------- */
+      function startTimer() {
+        stopTimer();
+        state.elapsed = 0;
+        timerEl.textContent = "0:00";
+        state.timerId = setInterval(() => {
+          state.elapsed += 1;
+          timerEl.textContent = formatTime(state.elapsed);
+        }, 1000);
+      }
+
+      function stopTimer() {
+        if (state.timerId) {
+          clearInterval(state.timerId);
+          state.timerId = null;
+        }
+      }
+
+      /* ---------- New puzzle ---------- */
+      function nextPuzzle() {
+        ensureAudio();
+        playClick();
+        eqLabelEl.textContent = DIFFICULTY[state.difficulty].label;
+        const puzzle = generatePuzzle(state.difficulty);
+        renderPuzzle(puzzle);
+        startTimer();
+      }
+
+      /* ---------- Event bindings ---------- */
+      checkBtn.addEventListener("click", () => {
+        ensureAudio();
+        checkAnswer();
+      });
+      hintBtn.addEventListener("click", giveHint);
+      nextBtn.addEventListener("click", nextPuzzle);
+      solveBtn.addEventListener("click", () => {
+        ensureAudio();
+        showSolution();
+      });
+
+      document.querySelectorAll(".chip[data-diff]").forEach((chip) => {
+        chip.addEventListener("click", () => {
+          document.querySelectorAll(".chip[data-diff]").forEach((c) => c.classList.remove("active"));
+          chip.classList.add("active");
+          state.difficulty = chip.dataset.diff;
+          nextPuzzle();
+        });
+      });
+
+      soundBtn.setAttribute("aria-pressed", state.soundOn ? "true" : "false");
+      soundBtn.textContent = state.soundOn ? "🔊 音效" : "🔇 靜音";
+      soundBtn.addEventListener("click", () => {
+        state.soundOn = !state.soundOn;
+        localStorage.setItem("mul-worm-sound", state.soundOn ? "1" : "0");
+        soundBtn.setAttribute("aria-pressed", state.soundOn ? "true" : "false");
+        soundBtn.textContent = state.soundOn ? "🔊 音效" : "🔇 靜音";
+        if (state.soundOn) {
+          ensureAudio();
+          playClick();
+        }
+      });
+
+      // Unlock audio on first interaction
+      ["pointerdown", "keydown"].forEach((evt) => {
+        window.addEventListener(evt, () => ensureAudio(), { once: true, passive: true });
+      });
+
+      // Cleanup
+      window.addEventListener("beforeunload", stopTimer);
+
+      /* ---------- Boot ---------- */
+      nextPuzzle();
+    })();
+  </script>
+</body>
+</html>
