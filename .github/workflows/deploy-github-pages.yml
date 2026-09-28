@@ -1,0 +1,47 @@
+# 將 repo 內的靜態 HTML 部署到 GitHub Pages
+# 首次使用：Repo Settings → Pages → Build and deployment → Source 選「GitHub Actions」
+name: Deploy GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  # 合併前也可在 Actions 頁手動跑一次做測試
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Prepare static site files
+        run: |
+          mkdir -p _site
+          # 複製所有 HTML（含氣壓模型、首頁等）
+          cp -v *.html _site/
+          # 若有額外靜態資源可在此擴充，例如：cp -r assets _site/
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
