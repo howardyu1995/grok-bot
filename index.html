@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="五位數密碼鎖解密挑戰：60 秒內依指令拼出正確五位數">
+    <title>解密五位數密碼鎖</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Noto+Sans+TC:wght@400;700;900&display=swap');
+
+        :root {
+            --bg-deep: #0b1220;
+            --bg-panel: #152033;
+            --bg-panel-light: #1c2a42;
+            --accent: #3b82f6;
+            --accent-hot: #2563eb;
+            --lcd-bg: #043b2e;
+            --lcd-fg: #34d399;
+            --danger: #f87171;
+            --warn: #fbbf24;
+            --ok: #34d399;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background:
+                radial-gradient(ellipse 80% 50% at 50% -20%, rgba(37, 99, 235, 0.18), transparent 55%),
+                radial-gradient(circle at 85% 80%, rgba(16, 185, 129, 0.08), transparent 40%),
+                linear-gradient(160deg, #070d18 0%, var(--bg-deep) 45%, #0e1a2e 100%);
+            font-family: 'Noto Sans TC', 'Microsoft JhengHei', sans-serif;
+            color: #e2e8f0;
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            padding: 1rem 0;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(148, 163, 184, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(148, 163, 184, 0.03) 1px, transparent 1px);
+            background-size: 32px 32px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .lock-container {
+            background: linear-gradient(155deg, var(--bg-panel-light), var(--bg-panel));
+            box-shadow:
+                0 25px 50px -12px rgba(0, 0, 0, 0.55),
+                inset 0 1px 0 rgba(255, 255, 255, 0.06);
+            position: relative;
+            z-index: 1;
+        }
+
+        .lcd-screen {
+            font-family: 'Orbitron', sans-serif;
+            background:
+                linear-gradient(180deg, rgba(6, 95, 70, 0.35), transparent 40%),
+                var(--lcd-bg);
+            color: var(--lcd-fg);
+            text-shadow: 0 0 12px rgba(52, 211, 153, 0.45);
+            border: 3px inset #065f46;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .lcd-screen::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0, 0, 0, 0.06) 2px,
+                rgba(0, 0, 0, 0.06) 4px
+            );
+            pointer-events: none;
+        }
+
+        .digit-card {
+            transition: transform 0.18s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+                        background-color 0.15s ease,
+                        border-color 0.15s ease,
+                        opacity 0.15s ease,
+                        box-shadow 0.15s ease;
+            cursor: pointer;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            animation: card-in 0.35s ease both;
+        }
+
+        .digit-card:nth-child(1) { animation-delay: 0.02s; }
+        .digit-card:nth-child(2) { animation-delay: 0.05s; }
+        .digit-card:nth-child(3) { animation-delay: 0.08s; }
+        .digit-card:nth-child(4) { animation-delay: 0.11s; }
+        .digit-card:nth-child(5) { animation-delay: 0.14s; }
+        .digit-card:nth-child(6) { animation-delay: 0.17s; }
+        .digit-card:nth-child(7) { animation-delay: 0.2s; }
+
+        .digit-card:hover:not(.selected):not(:disabled) {
+            border-color: #64748b;
+            transform: translateY(-3px);
+        }
+
+        .digit-card:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 3px;
+        }
+
+        .digit-card:active:not(.selected) {
+            transform: scale(0.92);
+        }
+
+        .digit-card.selected {
+            background-color: var(--accent);
+            color: white;
+            border-color: #60a5fa;
+            transform: translateY(-8px);
+            box-shadow: 0 10px 18px -4px rgba(59, 130, 246, 0.45);
+            opacity: 0.95;
+        }
+
+        .digit-card:disabled {
+            cursor: not-allowed;
+            opacity: 0.35;
+        }
+
+        .timer-bar {
+            height: 6px;
+            background: var(--ok);
+            transition: width 0.1s linear, background-color 0.3s;
+            border-radius: inherit;
+        }
+
+        .slot-digit {
+            transition: border-color 0.2s ease, opacity 0.2s ease, transform 0.2s ease;
+        }
+
+        .slot-digit.filled {
+            animation: slot-pop 0.22s ease;
+        }
+
+        @keyframes card-in {
+            from {
+                opacity: 0;
+                transform: translateY(12px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes slot-pop {
+            0% { transform: scale(0.6); opacity: 0.4; }
+            70% { transform: scale(1.12); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-10px); }
+            40% { transform: translateX(10px); }
+            60% { transform: translateX(-10px); }
+            80% { transform: translateX(10px); }
+        }
+
+        .shake {
+            animation: shake 0.4s ease-in-out;
+        }
+
+        @keyframes success {
+            0% { transform: scale(1); }
+            50% {
+                transform: scale(1.04);
+                background-color: #059669;
+                box-shadow: 0 0 28px rgba(16, 185, 129, 0.55);
+            }
+            100% { transform: scale(1); }
+        }
+
+        .success-glow {
+            animation: success 0.6s ease-in-out;
+        }
+
+        @keyframes overlay-in {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .overlay {
+            background: rgba(11, 18, 32, 0.94);
+            backdrop-filter: blur(12px);
+            animation: overlay-in 0.25s ease;
+        }
+
+        .icon-btn {
+            transition: background-color 0.15s ease, color 0.15s ease;
+        }
+
+        .icon-btn:focus-visible,
+        button:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+        }
+
+        .kbd-hint kbd {
+            font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+            font-size: 0.65rem;
+            padding: 0.1rem 0.35rem;
+            border-radius: 0.25rem;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid #334155;
+            color: #94a3b8;
+        }
+
+        @keyframes feedback-flash {
+            0% { opacity: 0.35; transform: scale(0.96); }
+            40% { opacity: 1; transform: scale(1.04); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        .feedback-flash {
+            animation: feedback-flash 0.35s ease;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .digit-card,
+            .slot-digit.filled,
+            .shake,
+            .success-glow,
+            .overlay,
+            .feedback-flash {
+                animation: none !important;
+                transition: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="lock-container p-6 md:p-8 rounded-3xl w-full max-w-md mx-4 border border-slate-600/60 relative overflow-hidden" role="application" aria-label="五位數密碼鎖遊戲">
+        <!-- 頂部資訊欄 -->
+        <div class="flex justify-between items-center mb-3 gap-2">
+            <div class="bg-slate-900/60 px-3 py-1.5 rounded-lg text-xs font-bold text-slate-400 border border-slate-700/80">
+                分數: <span id="score" class="text-blue-400 tabular-nums">0</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <div class="bg-slate-900/60 px-3 py-1.5 rounded-lg text-xs font-bold text-slate-400 border border-slate-700/80">
+                    連勝: <span id="streak" class="text-emerald-400 tabular-nums">0</span>
+                </div>
+                <div class="bg-slate-900/60 px-3 py-1.5 rounded-lg text-xs font-bold text-slate-400 border border-slate-700/80">
+                    關卡: <span id="round" class="text-blue-400 tabular-nums">1</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex justify-between items-center mb-3 text-[10px] text-slate-500 font-bold">
+            <span>最高分: <span id="high-score" class="text-slate-400 tabular-nums">0</span></span>
+            <button type="button" id="sound-toggle" class="icon-btn px-2 py-1 rounded-md border border-slate-700 bg-slate-900/50 hover:bg-slate-800 text-slate-400" aria-pressed="true" aria-label="切換音效" title="切換音效">
+                🔊 音效
+            </button>
+        </div>
+
+        <!-- 倒數計時條 (60秒總時限) -->
+        <div class="w-full bg-slate-900 rounded-full h-1.5 mb-2 overflow-hidden" role="progressbar" aria-valuemin="0" aria-valuemax="60" aria-valuenow="60" id="timer-bar-wrap">
+            <div id="timer-progress" class="timer-bar w-full"></div>
+        </div>
+        <div class="flex justify-between mb-4">
+            <span class="text-[10px] text-slate-600 font-bold hidden sm:inline kbd-hint">
+                快捷鍵: <kbd>0</kbd>–<kbd>9</kbd> <kbd>⌫</kbd> <kbd>Enter</kbd>
+            </span>
+            <span id="timer-text" class="text-[10px] font-mono text-slate-500 font-bold ml-auto tabular-nums" aria-live="polite">剩餘時間: 60.0s</span>
+        </div>
+
+        <!-- LCD 顯示螢幕 -->
+        <div class="lcd-screen p-4 md:p-6 rounded-2xl mb-8 text-center relative" aria-live="polite">
+            <div id="hint-text" class="text-sm md:text-base mb-4 opacity-90 font-bold tracking-wider relative z-10">點擊開始按鈕</div>
+            <div id="display-answer" class="text-3xl md:text-4xl font-bold h-12 flex justify-center items-center mb-2 gap-1 md:gap-2 relative z-10" aria-label="目前輸入">
+                <span class="slot-digit w-8 md:w-10 border-b-4 border-emerald-500/30 flex items-center justify-center h-full" data-slot="0"></span>
+                <span class="slot-digit w-8 md:w-10 border-b-4 border-emerald-500/30 flex items-center justify-center h-full" data-slot="1"></span>
+                <span class="slot-digit w-8 md:w-10 border-b-4 border-emerald-500/30 flex items-center justify-center h-full" data-slot="2"></span>
+                <span class="slot-digit w-8 md:w-10 border-b-4 border-emerald-500/30 flex items-center justify-center h-full" data-slot="3"></span>
+                <span class="slot-digit w-8 md:w-10 border-b-4 border-emerald-500/30 flex items-center justify-center h-full" data-slot="4"></span>
+            </div>
+            <div id="feedback-msg" class="text-sm font-sans min-h-[1.25rem] mt-2 font-bold relative z-10" role="status"></div>
+        </div>
+
+        <!-- 數字卡片投放區 -->
+        <div class="text-center mb-4">
+            <span class="text-slate-500 text-xs font-bold uppercase tracking-widest">可用數字卡</span>
+            <p class="text-[10px] text-slate-600 mt-1">再點已選卡片可取消</p>
+        </div>
+        <div id="cards-container" class="flex justify-center flex-wrap gap-2 md:gap-3 mb-8 min-h-[80px]" role="group" aria-label="可選數字卡片">
+            <!-- 由 JavaScript 動態生成卡片 -->
+        </div>
+
+        <!-- 功能按鈕 -->
+        <div class="grid grid-cols-3 gap-3">
+            <button type="button" id="btn-undo" class="bg-slate-700 hover:bg-slate-600 active:bg-slate-800 py-3 md:py-4 rounded-xl font-bold transition-all text-slate-200 shadow-lg disabled:opacity-40 disabled:pointer-events-none" disabled>
+                退格
+            </button>
+            <button type="button" id="btn-clear" class="bg-slate-700 hover:bg-slate-600 active:bg-slate-800 py-3 md:py-4 rounded-xl font-bold transition-all text-slate-200 shadow-lg">
+                清除
+            </button>
+            <button type="button" id="btn-submit" class="bg-blue-600 hover:bg-blue-500 active:bg-blue-700 py-3 md:py-4 rounded-xl font-bold transition-all text-white shadow-lg shadow-blue-900/25">
+                解鎖
+            </button>
+        </div>
+
+        <!-- 遊戲結束/開始 遮罩 -->
+        <div id="game-overlay" class="overlay absolute inset-0 rounded-3xl flex flex-col items-center justify-center z-50">
+            <!-- 遊戲結束畫面 -->
+            <div id="game-over-content" class="text-center hidden px-6" role="dialog" aria-labelledby="game-over-title">
+                <h2 id="game-over-title" class="text-4xl font-black mb-4 text-white tracking-tight">遊戲結束</h2>
+                <div class="bg-slate-800/60 p-6 rounded-2xl border border-slate-700 mb-6">
+                    <p class="text-slate-400 text-sm uppercase tracking-widest mb-1">最終得分報告</p>
+                    <p id="final-score" class="text-5xl font-black text-blue-400 tracking-tighter tabular-nums">0</p>
+                    <p id="final-round" class="text-slate-400 text-xs mt-2">成功挑戰關卡: 0</p>
+                    <p id="new-record" class="text-emerald-400 text-xs mt-3 font-bold hidden">🎉 新紀錄！</p>
+                </div>
+                <button type="button" id="btn-restart" class="bg-blue-600 hover:bg-blue-500 px-10 py-4 rounded-xl font-bold transition-all text-white shadow-xl">
+                    重新挑戰
+                </button>
+            </div>
+            <!-- 初始開始畫面 -->
+            <div id="start-content" class="text-center px-6" role="dialog" aria-labelledby="start-title">
+                <h1 id="start-title" class="text-3xl md:text-4xl font-black mb-3 text-white tracking-tight">五位數解密員</h1>
+                <p class="text-slate-400 mb-2 text-xs">最高分: <span id="start-high-score" class="text-blue-400 font-bold tabular-nums">0</span></p>
+                <p class="text-slate-400 mb-8 max-w-[280px] mx-auto text-sm leading-relaxed">
+                    你有 60 秒時間。根據指令從可用卡片中挑選並拼湊出正確的<span class="text-emerald-400 font-bold">五位數</span>。注意：首位數不能為 0！答對不增加時間。
+                </p>
+                <button type="button" id="btn-start" class="bg-emerald-600 hover:bg-emerald-500 px-12 py-4 rounded-xl font-bold transition-all text-white shadow-xl">
+                    開始挑戰 (60s)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            'use strict';
+
+            // —— 音效系統 (Web Audio API) ——
+            let audioCtx = null;
+            let soundEnabled = true;
+
+            function initAudio() {
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+            }
+
+            function playSynthSound(type) {
+                if (!soundEnabled || !audioCtx) return;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                const now = audioCtx.currentTime;
+
+                if (type === 'click') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(800, now);
+                    osc.frequency.exponentialRampToValueAtTime(400, now + 0.1);
+                    gain.gain.setValueAtTime(0.1, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                    osc.start(now);
+                    osc.stop(now + 0.1);
+                } else if (type === 'success') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(523.25, now);
+                    osc.frequency.setValueAtTime(659.25, now + 0.1);
+                    osc.frequency.setValueAtTime(783.99, now + 0.2);
+                    gain.gain.setValueAtTime(0.1, now);
+                    gain.gain.linearRampToValueAtTime(0, now + 0.4);
+                    osc.start(now);
+                    osc.stop(now + 0.4);
+                } else if (type === 'fail') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(110, now);
+                    osc.frequency.linearRampToValueAtTime(55, now + 0.3);
+                    gain.gain.setValueAtTime(0.1, now);
+                    gain.gain.linearRampToValueAtTime(0, now + 0.3);
+                    osc.start(now);
+                    osc.stop(now + 0.3);
+                } else if (type === 'undo') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(420, now);
+                    osc.frequency.exponentialRampToValueAtTime(280, now + 0.08);
+                    gain.gain.setValueAtTime(0.06, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+                    osc.start(now);
+                    osc.stop(now + 0.08);
+                }
+            }
+
+            // —— 遊戲常數與狀態 ——
+            const TOTAL_TIME = 60;
+            const TARGET_LENGTH = 5;
+            const HIGH_SCORE_KEY = 'fiveDigitLockHighScore';
+            const SOUND_KEY = 'fiveDigitLockSound';
+
+            let score = 0;
+            let round = 1;
+            let streak = 0;
+            let highScore = 0;
+            let availableDigits = [];
+            let playerSelection = [];
+            let correctAnswer = '';
+            let timeLeft = TOTAL_TIME;
+            let timerInterval = null;
+            let gameActive = false;
+            let checkingAnswer = false;
+            let levelTransitioning = false;
+
+            const rules = [
+                { id: 'max', text: '拼出「最大」的五位數' },
+                { id: 'min', text: '拼出「最小」的五位數' },
+                { id: 'max_even', text: '拼出「最大」的「偶數」' },
+                { id: 'min_even', text: '拼出「最小」的「偶數」' },
+                { id: 'max_odd', text: '拼出「最大」的「奇數」' },
+                { id: 'min_odd', text: '拼出「最小」的「奇數」' }
+            ];
+
+            // DOM 快取
+            const $ = (id) => document.getElementById(id);
+            const els = {
+                overlay: $('game-overlay'),
+                startContent: $('start-content'),
+                gameOverContent: $('game-over-content'),
+                score: $('score'),
+                round: $('round'),
+                streak: $('streak'),
+                highScore: $('high-score'),
+                startHighScore: $('start-high-score'),
+                timerProgress: $('timer-progress'),
+                timerBarWrap: $('timer-bar-wrap'),
+                timerText: $('timer-text'),
+                hintText: $('hint-text'),
+                displayAnswer: $('display-answer'),
+                feedbackMsg: $('feedback-msg'),
+                cardsContainer: $('cards-container'),
+                finalScore: $('final-score'),
+                finalRound: $('final-round'),
+                newRecord: $('new-record'),
+                soundToggle: $('sound-toggle'),
+                btnUndo: $('btn-undo'),
+                btnClear: $('btn-clear'),
+                btnSubmit: $('btn-submit'),
+                btnStart: $('btn-start'),
+                btnRestart: $('btn-restart'),
+                lcd: document.querySelector('.lcd-screen')
+            };
+
+            function loadPrefs() {
+                try {
+                    highScore = parseInt(localStorage.getItem(HIGH_SCORE_KEY) || '0', 10) || 0;
+                    const soundPref = localStorage.getItem(SOUND_KEY);
+                    soundEnabled = soundPref === null ? true : soundPref === '1';
+                } catch (_) {
+                    highScore = 0;
+                    soundEnabled = true;
+                }
+                updateHighScoreUI();
+                updateSoundToggleUI();
+            }
+
+            function saveHighScore() {
+                if (score > highScore) {
+                    highScore = score;
+                    try {
+                        localStorage.setItem(HIGH_SCORE_KEY, String(highScore));
+                    } catch (_) { /* ignore quota */ }
+                    updateHighScoreUI();
+                    return true;
+                }
+                return false;
+            }
+
+            function updateHighScoreUI() {
+                els.highScore.innerText = highScore;
+                els.startHighScore.innerText = highScore;
+            }
+
+            function updateSoundToggleUI() {
+                els.soundToggle.setAttribute('aria-pressed', soundEnabled ? 'true' : 'false');
+                els.soundToggle.innerText = soundEnabled ? '🔊 音效' : '🔇 靜音';
+            }
+
+            function startGame() {
+                initAudio();
+                if (timerInterval) {
+                    clearInterval(timerInterval);
+                    timerInterval = null;
+                }
+                els.overlay.classList.add('hidden');
+                els.startContent.classList.add('hidden');
+                els.gameOverContent.classList.add('hidden');
+                els.newRecord.classList.add('hidden');
+                score = 0;
+                round = 1;
+                streak = 0;
+                timeLeft = TOTAL_TIME;
+                gameActive = true;
+                checkingAnswer = false;
+                levelTransitioning = false;
+                els.timerProgress.style.backgroundColor = '#10b981';
+                updateUI();
+                startGlobalTimer();
+                nextLevel();
+            }
+
+            function nextLevel() {
+                playerSelection = [];
+                checkingAnswer = false;
+                levelTransitioning = false;
+                generateProblem();
+                renderCards();
+                updateDisplaySlots();
+                updateUndoButton();
+                showFeedback('');
+            }
+
+            function generateProblem() {
+                // 隨著關卡推進增加干擾項
+                const cardCount = round > 4 ? 7 : (round > 2 ? 6 : 5);
+                const pool = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+                availableDigits = [];
+
+                for (let i = 0; i < cardCount; i++) {
+                    const idx = Math.floor(Math.random() * pool.length);
+                    availableDigits.push(pool.splice(idx, 1)[0]);
+                }
+
+                const ruleObj = rules[Math.floor(Math.random() * rules.length)];
+                els.hintText.innerText = ruleObj.text;
+
+                const allPerms = getPermutations(availableDigits, TARGET_LENGTH);
+                const validNumbers = allPerms
+                    .filter((n) => n[0] !== '0')
+                    .map((n) => parseInt(n, 10));
+
+                // 無法產出合法答案則重新生成
+                if (validNumbers.length === 0) {
+                    return generateProblem();
+                }
+
+                let result = null;
+                const rid = ruleObj.id;
+
+                if (rid === 'max') {
+                    result = Math.max(...validNumbers);
+                } else if (rid === 'min') {
+                    result = Math.min(...validNumbers);
+                } else if (rid === 'max_even') {
+                    const evens = validNumbers.filter((n) => n % 2 === 0);
+                    result = evens.length ? Math.max(...evens) : null;
+                } else if (rid === 'min_even') {
+                    const evens = validNumbers.filter((n) => n % 2 === 0);
+                    result = evens.length ? Math.min(...evens) : null;
+                } else if (rid === 'max_odd') {
+                    const odds = validNumbers.filter((n) => n % 2 !== 0);
+                    result = odds.length ? Math.max(...odds) : null;
+                } else if (rid === 'min_odd') {
+                    const odds = validNumbers.filter((n) => n % 2 !== 0);
+                    result = odds.length ? Math.min(...odds) : null;
+                }
+
+                if (result === null || result === undefined || !Number.isFinite(result)) {
+                    return generateProblem();
+                }
+
+                correctAnswer = String(result);
+                // 五位排列且禁首位 0，結果必為五位字串；否則重算
+                if (correctAnswer.length !== TARGET_LENGTH) {
+                    return generateProblem();
+                }
+            }
+
+            function getPermutations(arr, k) {
+                const results = [];
+                function permute(current, remaining) {
+                    if (current.length === k) {
+                        results.push(current.join(''));
+                        return;
+                    }
+                    for (let i = 0; i < remaining.length; i++) {
+                        const nextCurrent = current.concat(remaining[i]);
+                        const nextRemaining = remaining.slice(0, i).concat(remaining.slice(i + 1));
+                        permute(nextCurrent, nextRemaining);
+                    }
+                }
+                permute([], arr);
+                return results;
+            }
+
+            function renderCards() {
+                els.cardsContainer.innerHTML = '';
+                availableDigits.forEach((digit, index) => {
+                    const card = document.createElement('button');
+                    card.type = 'button';
+                    card.className =
+                        'digit-card w-12 h-16 md:w-14 md:h-[4.5rem] flex items-center justify-center text-2xl md:text-3xl font-black bg-slate-800 border-2 border-slate-600 rounded-xl shadow-lg text-slate-300';
+                    card.innerText = String(digit);
+                    card.dataset.index = String(index);
+                    card.dataset.digit = String(digit);
+                    card.setAttribute('aria-label', `數字 ${digit}`);
+                    card.setAttribute('aria-pressed', 'false');
+                    card.addEventListener('click', () => toggleDigit(index, card));
+                    els.cardsContainer.appendChild(card);
+                });
+            }
+
+            function toggleDigit(index, element) {
+                if (!gameActive || levelTransitioning || checkingAnswer) return;
+
+                const selectedIdx = playerSelection.findIndex((s) => s.index === index);
+                if (selectedIdx !== -1) {
+                    // 允許取消任一已選卡片（並維持其餘順序）
+                    playSynthSound('undo');
+                    playerSelection.splice(selectedIdx, 1);
+                    element.classList.remove('selected');
+                    element.setAttribute('aria-pressed', 'false');
+                    updateDisplaySlots();
+                    updateUndoButton();
+                    showFeedback('');
+                    return;
+                }
+
+                if (playerSelection.length >= TARGET_LENGTH) {
+                    showFeedback('已滿五位，請先退格或清除', true);
+                    return;
+                }
+
+                playSynthSound('click');
+                playerSelection.push({ digit: availableDigits[index], index, element });
+                element.classList.add('selected');
+                element.setAttribute('aria-pressed', 'true');
+                updateDisplaySlots();
+                updateUndoButton();
+                showFeedback('');
+            }
+
+            function selectDigitByValue(digitValue) {
+                if (!gameActive || levelTransitioning || checkingAnswer) return;
+                if (playerSelection.length >= TARGET_LENGTH) return;
+
+                const cards = els.cardsContainer.querySelectorAll('.digit-card');
+                for (const card of cards) {
+                    if (card.classList.contains('selected')) continue;
+                    if (Number(card.dataset.digit) === digitValue) {
+                        toggleDigit(Number(card.dataset.index), card);
+                        return;
+                    }
+                }
+            }
+
+            function updateDisplaySlots() {
+                const spans = els.displayAnswer.querySelectorAll('.slot-digit');
+                spans.forEach((span, i) => {
+                    const prev = span.innerText;
+                    if (playerSelection[i]) {
+                        const next = String(playerSelection[i].digit);
+                        span.innerText = next;
+                        span.style.opacity = '1';
+                        span.classList.remove('border-emerald-500/30');
+                        span.classList.add('border-emerald-400');
+                        if (prev !== next) {
+                            span.classList.remove('filled');
+                            // 強制重播動畫
+                            void span.offsetWidth;
+                            span.classList.add('filled');
+                        }
+                    } else {
+                        span.innerText = '';
+                        span.style.opacity = '0.3';
+                        span.classList.add('border-emerald-500/30');
+                        span.classList.remove('border-emerald-400', 'filled');
+                    }
+                });
+            }
+
+            function updateUndoButton() {
+                els.btnUndo.disabled = !gameActive || playerSelection.length === 0 || levelTransitioning;
+            }
+
+            function undoLast() {
+                if (!gameActive || levelTransitioning || checkingAnswer) return;
+                if (playerSelection.length === 0) return;
+                playSynthSound('undo');
+                const last = playerSelection.pop();
+                last.element.classList.remove('selected');
+                last.element.setAttribute('aria-pressed', 'false');
+                updateDisplaySlots();
+                updateUndoButton();
+                showFeedback('');
+            }
+
+            function clearInput(options) {
+                if (!gameActive || levelTransitioning) return;
+                const silent = options && options.silent;
+                if (!silent) playSynthSound('click');
+                playerSelection.forEach((item) => {
+                    item.element.classList.remove('selected');
+                    item.element.setAttribute('aria-pressed', 'false');
+                });
+                playerSelection = [];
+                updateDisplaySlots();
+                updateUndoButton();
+                if (!silent) showFeedback('');
+            }
+
+            function checkAnswer() {
+                if (!gameActive || levelTransitioning || checkingAnswer) return;
+                if (playerSelection.length < TARGET_LENGTH) {
+                    showFeedback('尚未輸入完成', true);
+                    return;
+                }
+
+                checkingAnswer = true;
+                const attempt = playerSelection.map((s) => String(s.digit)).join('');
+
+                if (attempt[0] === '0') {
+                    showFeedback('首位數不可為 0', true);
+                    handleWrong();
+                    return;
+                }
+
+                if (attempt === correctAnswer) {
+                    handleCorrect();
+                } else {
+                    showFeedback('解碼錯誤', true);
+                    handleWrong();
+                }
+            }
+
+            function handleCorrect() {
+                playSynthSound('success');
+                streak += 1;
+                const speedBonus = Math.floor((timeLeft / TOTAL_TIME) * 50);
+                const streakBonus = Math.min((streak - 1) * 10, 50);
+                const roundScore = 100 + speedBonus + streakBonus;
+                score += roundScore;
+                round += 1;
+                levelTransitioning = true;
+
+                const streakMsg = streakBonus > 0 ? `（連勝+${streakBonus}）` : '';
+                showFeedback(`解碼成功！+${roundScore}${streakMsg}`, false);
+                els.lcd.classList.add('success-glow');
+
+                setTimeout(() => {
+                    els.lcd.classList.remove('success-glow');
+                    updateUI();
+                    if (gameActive) nextLevel();
+                }, 600);
+            }
+
+            function handleWrong() {
+                playSynthSound('fail');
+                streak = 0;
+                updateUI();
+                els.lcd.classList.add('shake');
+                setTimeout(() => {
+                    els.lcd.classList.remove('shake');
+                    checkingAnswer = false;
+                    if (gameActive) clearInput({ silent: true });
+                }, 400);
+            }
+
+            function startGlobalTimer() {
+                if (timerInterval) clearInterval(timerInterval);
+                const tickRate = 100;
+                els.timerProgress.style.width = '100%';
+                els.timerBarWrap.setAttribute('aria-valuenow', String(TOTAL_TIME));
+
+                timerInterval = setInterval(() => {
+                    timeLeft -= tickRate / 1000;
+
+                    if (timeLeft <= 0) {
+                        timeLeft = 0;
+                        clearInterval(timerInterval);
+                        timerInterval = null;
+                        renderTimerUI();
+                        gameOver();
+                        return;
+                    }
+
+                    renderTimerUI();
+                }, tickRate);
+            }
+
+            function renderTimerUI() {
+                const percent = (timeLeft / TOTAL_TIME) * 100;
+                els.timerProgress.style.width = percent + '%';
+                els.timerText.innerText = `剩餘時間: ${timeLeft.toFixed(1)}s`;
+                els.timerBarWrap.setAttribute('aria-valuenow', timeLeft.toFixed(1));
+
+                if (timeLeft <= 10) els.timerProgress.style.backgroundColor = '#ef4444';
+                else if (timeLeft <= 30) els.timerProgress.style.backgroundColor = '#f59e0b';
+                else els.timerProgress.style.backgroundColor = '#10b981';
+            }
+
+            function gameOver() {
+                gameActive = false;
+                checkingAnswer = false;
+                levelTransitioning = false;
+                playSynthSound('fail');
+                const isNewRecord = saveHighScore();
+                els.finalScore.innerText = score;
+                els.finalRound.innerText = `成功挑戰關卡: ${Math.max(0, round - 1)}`;
+                els.newRecord.classList.toggle('hidden', !isNewRecord);
+                els.overlay.classList.remove('hidden');
+                els.gameOverContent.classList.remove('hidden');
+                els.startContent.classList.add('hidden');
+                updateUndoButton();
+            }
+
+            function updateUI() {
+                els.score.innerText = score;
+                els.round.innerText = round;
+                els.streak.innerText = streak;
+            }
+
+            function showFeedback(msg, isError) {
+                els.feedbackMsg.innerText = msg;
+                els.feedbackMsg.className =
+                    `text-sm font-sans min-h-[1.25rem] mt-2 font-bold relative z-10 ${isError ? 'text-red-400' : 'text-emerald-400'}`;
+                if (msg) {
+                    els.feedbackMsg.classList.remove('feedback-flash');
+                    void els.feedbackMsg.offsetWidth;
+                    els.feedbackMsg.classList.add('feedback-flash');
+                }
+            }
+
+            // —— 事件綁定 ——
+            els.btnStart.addEventListener('click', startGame);
+            els.btnRestart.addEventListener('click', startGame);
+            els.btnClear.addEventListener('click', clearInput);
+            els.btnUndo.addEventListener('click', undoLast);
+            els.btnSubmit.addEventListener('click', checkAnswer);
+
+            els.soundToggle.addEventListener('click', () => {
+                soundEnabled = !soundEnabled;
+                try {
+                    localStorage.setItem(SOUND_KEY, soundEnabled ? '1' : '0');
+                } catch (_) { /* ignore */ }
+                updateSoundToggleUI();
+                if (soundEnabled) {
+                    initAudio();
+                    playSynthSound('click');
+                }
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (!gameActive) {
+                    if ((e.key === 'Enter' || e.key === ' ') && !els.overlay.classList.contains('hidden')) {
+                        e.preventDefault();
+                        startGame();
+                    }
+                    return;
+                }
+                if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
+
+                if (e.key >= '0' && e.key <= '9') {
+                    e.preventDefault();
+                    selectDigitByValue(Number(e.key));
+                } else if (e.key === 'Backspace') {
+                    e.preventDefault();
+                    undoLast();
+                } else if (e.key === 'Escape') {
+                    e.preventDefault();
+                    clearInput();
+                } else if (e.key === 'Enter') {
+                    e.preventDefault();
+                    checkAnswer();
+                }
+            });
+
+            loadPrefs();
+        })();
+    </script>
+</body>
+</html>
