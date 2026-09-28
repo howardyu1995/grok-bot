@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>氣壓原理互動模型｜飲品盒為什麼會凹陷？</title>
+  <!-- p5.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/p5@1.11.3/lib/p5.min.js"></script>
+  <style>
+    /* ===== 整體版面：明亮、適合小學生 ===== */
+    :root {
+      --bg-top: #e8f6ef;
+      --bg-bottom: #d6eef8;
+      --panel: #ffffff;
+      --accent: #2a9d8f;
+      --accent-dark: #1f7a6f;
+      --danger: #e76f51;
+      --danger-dark: #d45a3c;
+      --ink: #1e3a4c;
+      --muted: #4a6a7a;
+      --shadow: 0 8px 24px rgba(30, 58, 76, 0.12);
+      --radius: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      min-height: 100%;
+      font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+      color: var(--ink);
+      background: linear-gradient(165deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 12px 12px 28px;
+    }
+
+    header {
+      width: min(960px, 100%);
+      text-align: center;
+      margin-bottom: 8px;
+    }
+
+    header h1 {
+      margin: 0 0 6px;
+      font-size: clamp(1.35rem, 3.5vw, 1.85rem);
+      font-weight: 800;
+      letter-spacing: 0.02em;
+    }
+
+    header p.subtitle {
+      margin: 0;
+      font-size: clamp(0.95rem, 2.4vw, 1.1rem);
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    /* 畫布容器 */
+    #canvas-wrap {
+      width: min(960px, 100%);
+      background: var(--panel);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      border: 3px solid #b8e0d2;
+    }
+
+    #canvas-wrap canvas {
+      display: block;
+      width: 100% !important;
+      height: auto !important;
+      touch-action: none;
+    }
+
+    /* 控制面板 */
+    .controls {
+      width: min(960px, 100%);
+      margin-top: 14px;
+      background: var(--panel);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 3px solid #b8dceb;
+      padding: 16px 18px 18px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .guide-box {
+      background: linear-gradient(90deg, #fff8e7, #e8f8f2);
+      border-radius: 14px;
+      padding: 12px 14px;
+      border-left: 6px solid #f4a261;
+      font-size: clamp(1rem, 2.6vw, 1.15rem);
+      line-height: 1.55;
+      font-weight: 600;
+      min-height: 3.2em;
+    }
+
+    .guide-box .label {
+      display: inline-block;
+      background: #f4a261;
+      color: #fff;
+      font-size: 0.85rem;
+      padding: 2px 10px;
+      border-radius: 999px;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+
+    .tip-box {
+      background: #eef6ff;
+      border-radius: 14px;
+      padding: 10px 14px;
+      font-size: clamp(0.92rem, 2.3vw, 1.05rem);
+      color: var(--muted);
+      line-height: 1.5;
+      border: 2px dashed #9ec9e8;
+    }
+
+    .tip-box strong {
+      color: #2a6f97;
+    }
+
+    .pressure-readout {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 18px;
+      justify-content: center;
+      align-items: center;
+      font-size: clamp(1rem, 2.5vw, 1.2rem);
+      font-weight: 700;
+      padding: 8px 4px;
+    }
+
+    .pressure-readout .in {
+      color: #d62828;
+    }
+
+    .pressure-readout .out {
+      color: #1d6fb8;
+    }
+
+    .pressure-readout .vs {
+      color: var(--ink);
+      font-size: 1.4em;
+      font-weight: 900;
+    }
+
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+    }
+
+    button {
+      font-family: inherit;
+      font-size: clamp(1.05rem, 2.8vw, 1.25rem);
+      font-weight: 800;
+      border: none;
+      border-radius: 999px;
+      padding: 14px 28px;
+      min-height: 52px;
+      cursor: pointer;
+      transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.15s ease;
+      box-shadow: 0 4px 0 rgba(0, 0, 0, 0.12);
+      touch-action: manipulation;
+    }
+
+    button:active {
+      transform: translateY(3px);
+      box-shadow: 0 1px 0 rgba(0, 0, 0, 0.12);
+    }
+
+    button:focus-visible {
+      outline: 3px solid #f4a261;
+      outline-offset: 3px;
+    }
+
+    #btn-suck {
+      background: var(--danger);
+      color: #fff;
+      flex: 1 1 180px;
+      max-width: 280px;
+    }
+
+    #btn-suck:hover {
+      background: var(--danger-dark);
+    }
+
+    #btn-reset {
+      background: var(--accent);
+      color: #fff;
+      flex: 1 1 140px;
+      max-width: 200px;
+    }
+
+    #btn-reset:hover {
+      background: var(--accent-dark);
+    }
+
+    .slider-block {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 4px 2px 0;
+    }
+
+    .slider-block label {
+      font-size: clamp(1rem, 2.5vw, 1.15rem);
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .slider-block label span {
+      color: var(--accent-dark);
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 14px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #c8e6c9, #81c784);
+      outline: none;
+      cursor: pointer;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #2a9d8f;
+      border: 4px solid #fff;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      cursor: grab;
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #2a9d8f;
+      border: 4px solid #fff;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      cursor: grab;
+    }
+
+    footer.credit {
+      margin-top: 14px;
+      font-size: 0.85rem;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    @media (max-width: 520px) {
+      button {
+        max-width: none !important;
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🍋 氣壓原理互動模型</h1>
+    <p class="subtitle">為什麼吸出空氣後，飲品盒會凹陷？</p>
+  </header>
+
+  <div id="canvas-wrap"></div>
+
+  <section class="controls" aria-label="互動控制面板">
+    <div class="guide-box" id="guide-text">
+      <span class="label">想一想</span>
+      試一試把空氣吸出來，看看會發生什麼事！
+    </div>
+
+    <div class="pressure-readout" id="pressure-readout" aria-live="polite">
+      <span class="in">盒內氣壓：100%</span>
+      <span class="vs">＝</span>
+      <span class="out">盒外氣壓：100%</span>
+    </div>
+
+    <div class="btn-row">
+      <button type="button" id="btn-suck">💨 吸出空氣</button>
+      <button type="button" id="btn-reset">🔄 重置</button>
+    </div>
+
+    <div class="slider-block">
+      <label for="air-slider">已吸出的空氣量：<span id="air-percent">0%</span></label>
+      <input
+        type="range"
+        id="air-slider"
+        min="0"
+        max="100"
+        value="0"
+        step="1"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        aria-valuenow="0"
+      />
+    </div>
+
+    <div class="tip-box" id="tip-box">
+      <strong>我發現：</strong>
+      大氣壓就像隱形的手，從四面八方輕輕推著東西。
+      當盒子裡面的氣壓變小，外面的大氣壓就會把盒子壓凹喔！
+    </div>
+  </section>
+
+  <p class="credit">適合香港小五｜常識科・氣壓單元</p>
+
+  <script>
+    /**
+     * =========================================================
+     * 氣壓原理互動模型（p5.js）
+     * 主題：吸出飲品盒空氣後，為什麼盒子會凹陷？
+     * 教學邏輯：
+     *   吸出空氣 → 盒內空氣減少 → 盒內氣壓下降
+     *   → 盒外氣壓 > 盒內氣壓 → 大氣壓把盒子壓凹
+     * =========================================================
+     */
+
+    // ---------- 狀態變數 ----------
+    // airRemoved：已吸出空氣量（0~1），由滑桿／按鈕控制
+    // displayAir：畫面實際平滑插值後的數值（讓動畫流暢）
+    let airRemoved = 0;
+    let displayAir = 0;
+
+    // 盒外氣壓固定為 1（代表正常大氣壓）
+    const OUTER_PRESSURE = 1;
+
+    // 動畫與視覺常數
+    const LERP_SPEED = 0.08; // 平滑插值速度
+
+    // DOM 控制項
+    let slider, airPercentLabel, guideText, pressureReadout, tipBox;
+    let btnSuck, btnReset;
+
+    // 畫布基準尺寸（會依視窗縮放）
+    let canvasW = 900;
+    let canvasH = 460;
+
+    // 泡泡粒子（吸氣時的視覺回饋）
+    let bubbles = [];
+
+    // ---------- p5 生命週期 ----------
+    function setup() {
+      // 依容器寬度建立響應式畫布
+      const wrap = document.getElementById("canvas-wrap");
+      canvasW = Math.min(960, wrap.clientWidth || window.innerWidth - 24);
+      canvasH = Math.max(360, Math.round(canvasW * 0.52));
+
+      const cnv = createCanvas(canvasW, canvasH);
+      cnv.parent("canvas-wrap");
+
+      // 綁定 HTML 控制項
+      slider = document.getElementById("air-slider");
+      airPercentLabel = document.getElementById("air-percent");
+      guideText = document.getElementById("guide-text");
+      pressureReadout = document.getElementById("pressure-readout");
+      tipBox = document.getElementById("tip-box");
+      btnSuck = document.getElementById("btn-suck");
+      btnReset = document.getElementById("btn-reset");
+
+      slider.addEventListener("input", onSliderChange);
+      btnSuck.addEventListener("click", onSuckClick);
+      btnReset.addEventListener("click", onResetClick);
+
+      // 視窗尺寸改變時重設畫布
+      window.addEventListener("resize", onWindowResize);
+
+      updateUI();
+      textFont('"Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif');
+    }
+
+    function draw() {
+      // 平滑過渡到目標空氣量（讓盒子凹陷自然）
+      displayAir = lerp(displayAir, airRemoved, LERP_SPEED);
+      if (abs(displayAir - airRemoved) < 0.001) {
+        displayAir = airRemoved;
+      }
+
+      drawBackground();
+      drawScene();
+      updateBubbles();
+      drawBubbles();
+      drawLegend();
+      updateUI();
+    }
+
+    // ---------- 視窗縮放 ----------
+    function onWindowResize() {
+      const wrap = document.getElementById("canvas-wrap");
+      canvasW = Math.min(960, wrap.clientWidth || window.innerWidth - 24);
+      canvasH = Math.max(360, Math.round(canvasW * 0.52));
+      resizeCanvas(canvasW, canvasH);
+    }
+
+    // ---------- 控制邏輯 ----------
+    function onSliderChange() {
+      airRemoved = constrain(Number(slider.value) / 100, 0, 1);
+      slider.setAttribute("aria-valuenow", String(slider.value));
+      if (airRemoved > 0.08) {
+        spawnBubbles(2);
+      }
+    }
+
+    /** 「吸出空氣」：每次增加約 25%，並產生泡泡 */
+    function onSuckClick() {
+      airRemoved = constrain(airRemoved + 0.25, 0, 1);
+      slider.value = String(Math.round(airRemoved * 100));
+      slider.setAttribute("aria-valuenow", slider.value);
+      spawnBubbles(10);
+    }
+
+    function onResetClick() {
+      airRemoved = 0;
+      slider.value = "0";
+      slider.setAttribute("aria-valuenow", "0");
+      bubbles = [];
+    }
+
+    /**
+     * 盒內氣壓：空氣愈少，氣壓愈低
+     * 假設近似線性：inner = 1 - airRemoved
+     */
+    function getInnerPressure() {
+      return 1 - displayAir;
+    }
+
+    // ---------- UI 文字更新 ----------
+    function updateUI() {
+      if (!slider) return;
+
+      const pct = Math.round(airRemoved * 100);
+      airPercentLabel.textContent = pct + "%";
+
+      const innerPct = Math.round(getInnerPressure() * 100);
+      const outerPct = 100;
+
+      // 比較符號：＝ / ＜
+      let compare = "＝";
+      let compareWord = "相等";
+      if (innerPct < outerPct - 1) {
+        compare = "＜";
+        compareWord = "較小";
+      }
+
+      pressureReadout.innerHTML =
+        `<span class="in">盒內氣壓：${innerPct}%</span>` +
+        `<span class="vs">${compare}</span>` +
+        `<span class="out">盒外氣壓：${outerPct}%</span>`;
+
+      // 教學引導文字
+      if (airRemoved < 0.05) {
+        guideText.innerHTML =
+          `<span class="label">想一想</span>` +
+          `試一試把空氣吸出來，看看會發生什麼事！`;
+        tipBox.innerHTML =
+          `<strong>我發現：</strong>` +
+          `大氣壓就像隱形的手，從四面八方輕輕推著東西。` +
+          `當盒子裡面的氣壓變小，外面的大氣壓就會把盒子壓凹喔！`;
+      } else if (airRemoved < 0.45) {
+        guideText.innerHTML =
+          `<span class="label">觀察中</span>` +
+          `盒內的空氣開始變少了，注意紅色箭頭變短了嗎？`;
+        tipBox.innerHTML =
+          `<strong>我發現：</strong>` +
+          `盒內氣壓（${innerPct}%）已經${compareWord}於盒外氣壓（${outerPct}%）。` +
+          `空氣愈少，氣壓就愈低！`;
+      } else {
+        guideText.innerHTML =
+          `<span class="label">原來如此</span>` +
+          `盒內的空氣變少了，氣壓下降。外面的大氣壓比較大，就把盒子壓凹了！`;
+        tipBox.innerHTML =
+          `<strong>我發現（課本重點）：</strong>` +
+          `吸出空氣後 → 盒內空氣減少 → 盒內氣壓下降 → ` +
+          `盒外氣壓大於盒內氣壓 → 盒子被大氣壓壓凹。`;
+      }
+    }
+
+    // ---------- 背景 ----------
+    function drawBackground() {
+      // 柔和天空漸層
+      for (let y = 0; y < height; y++) {
+        const t = y / height;
+        const r = lerp(232, 214, t);
+        const g = lerp(246, 238, t);
+        const b = lerp(239, 248, t);
+        stroke(r, g, b);
+        line(0, y, width, y);
+      }
+
+      // 輕微地面
+      noStroke();
+      fill(190, 220, 200, 90);
+      rect(0, height * 0.82, width, height * 0.18);
+    }
+
+    // ---------- 主場景 ----------
+    function drawScene() {
+      const cx = width * 0.5;
+      const cy = height * 0.52;
+
+      // 依畫布比例縮放盒子
+      const boxW = width * 0.22;
+      const boxH = height * 0.48;
+
+      drawTable(cx, cy + boxH * 0.55);
+      drawPressureArrows(cx, cy, boxW, boxH);
+      drawDrinkBox(cx, cy, boxW, boxH);
+      drawStraw(cx, cy, boxW, boxH);
+      drawTitleOnCanvas();
+    }
+
+    function drawTitleOnCanvas() {
+      noStroke();
+      fill(30, 58, 76, 180);
+      textAlign(CENTER, TOP);
+      textSize(constrain(width * 0.028, 14, 22));
+      textStyle(BOLD);
+      text("檸檬茶鋁箔包", width * 0.5, height * 0.04);
+      textStyle(NORMAL);
+    }
+
+    function drawTable(cx, topY) {
+      // 簡單桌面線條，讓盒子有「放在桌上」的感覺
+      noStroke();
+      fill(160, 190, 175, 120);
+      ellipse(cx, topY + 18, width * 0.55, 28);
+    }
+
+    /**
+     * 繪製檸檬茶鋁箔包
+     * dent：左右向內凹陷程度（由 displayAir 決定）
+     */
+    function drawDrinkBox(cx, cy, boxW, boxH) {
+      const dent = displayAir * boxW * 0.28; // 最大凹陷量
+      const top = cy - boxH / 2;
+      const bottom = cy + boxH / 2;
+      const left = cx - boxW / 2;
+      const right = cx + boxW / 2;
+
+      // 陰影
+      noStroke();
+      fill(40, 70, 60, 35);
+      beginShape();
+      vertex(left + 10, bottom + 6);
+      vertex(right + 10, bottom + 6);
+      quadraticVertex(cx + 10, bottom + 22, left + 10, bottom + 6);
+      endShape(CLOSE);
+      ellipse(cx + 6, bottom + 10, boxW * 0.9, 16);
+
+      // 盒子本體（左右中段向內凹）
+      const midY1 = cy - boxH * 0.15;
+      const midY2 = cy + boxH * 0.2;
+
+      // 盒身漸層感：先畫主體
+      fill(255, 236, 150);
+      stroke(210, 160, 40);
+      strokeWeight(2.5);
+      beginShape();
+      // 左側輪廓（中段凹入）
+      vertex(left, top + 8);
+      bezierVertex(left, midY1, left + dent, midY1, left + dent, cy);
+      bezierVertex(left + dent, midY2, left, midY2, left, bottom - 6);
+      // 底邊
+      vertex(right, bottom - 6);
+      // 右側輪廓（中段凹入）
+      bezierVertex(right, midY2, right - dent, midY2, right - dent, cy);
+      bezierVertex(right - dent, midY1, right, midY1, right, top + 8);
+      endShape(CLOSE);
+
+      // 頂蓋（鋁箔感）
+      fill(220, 228, 235);
+      stroke(160, 170, 180);
+      strokeWeight(2);
+      beginShape();
+      vertex(left + 4, top + 10);
+      vertex(right - 4, top + 10);
+      vertex(right - 14, top - boxH * 0.06);
+      vertex(left + 14, top - boxH * 0.06);
+      endShape(CLOSE);
+
+      // 品牌標籤區
+      noStroke();
+      const labelInset = dent * 0.5;
+      fill(255, 120, 90);
+      rectMode(CENTER);
+      rect(cx, cy - boxH * 0.05, boxW * 0.72 - labelInset, boxH * 0.28, 10);
+
+      fill(255);
+      textAlign(CENTER, CENTER);
+      textSize(constrain(boxW * 0.16, 12, 22));
+      textStyle(BOLD);
+      text("檸檬茶", cx, cy - boxH * 0.08);
+      textSize(constrain(boxW * 0.09, 10, 14));
+      textStyle(NORMAL);
+      text("Lemon Tea", cx, cy + boxH * 0.02);
+
+      // 底部裝飾條
+      fill(46, 157, 143);
+      rect(cx, bottom - boxH * 0.08, boxW * 0.85 - dent * 0.3, boxH * 0.08, 4);
+
+      // 凹陷時加一點「皺摺」線，加強壓扁感覺
+      if (displayAir > 0.15) {
+        stroke(200, 150, 50, 120 + displayAir * 80);
+        strokeWeight(1.5);
+        noFill();
+        const wrinkle = dent * 0.35;
+        for (let i = -1; i <= 1; i++) {
+          const wx = cx + i * boxW * 0.12;
+          beginShape();
+          vertex(wx, midY1);
+          quadraticVertex(wx + wrinkle * (i === 0 ? 1 : i), cy, wx, midY2);
+          endShape();
+        }
+      }
+    }
+
+    /** 吸管：插在盒頂，吸氣時微微抖動 */
+    function drawStraw(cx, cy, boxW, boxH) {
+      const top = cy - boxH / 2;
+      const shake = displayAir > 0.01 && abs(airRemoved - displayAir) > 0.01
+        ? sin(frameCount * 0.45) * 2
+        : 0;
+
+      push();
+      translate(cx + boxW * 0.12 + shake, top - boxH * 0.02);
+
+      // 吸管主體
+      stroke(80, 180, 200);
+      strokeWeight(constrain(boxW * 0.045, 5, 9));
+      strokeCap(ROUND);
+      line(0, 0, 0, -boxH * 0.35);
+      // 彎折段
+      line(0, -boxH * 0.35, boxW * 0.18, -boxH * 0.48);
+
+      // 吸管頭
+      noStroke();
+      fill(255, 100, 120);
+      circle(boxW * 0.18, -boxH * 0.48, constrain(boxW * 0.07, 7, 12));
+      pop();
+    }
+
+    /**
+     * 氣壓箭頭
+     * 紅色 = 盒內氣壓（由內向外推）
+     * 藍色 = 盒外氣壓（由外向內壓）
+     * 箭頭長度隨壓力變化
+     */
+    function drawPressureArrows(cx, cy, boxW, boxH) {
+      const innerP = getInnerPressure();
+      const outerP = OUTER_PRESSURE;
+
+      // 基礎長度
+      const baseLen = width * 0.09;
+      const innerLen = baseLen * (0.25 + innerP * 0.75);
+      const outerLen = baseLen * (0.25 + outerP * 0.75);
+
+      const gap = boxW * 0.55 + displayAir * boxW * 0.08;
+      const arrowY = cy;
+
+      // 左側：藍箭頭向右（外壓），紅箭頭向左（內壓）
+      drawArrow(
+        cx - gap - outerLen, arrowY,
+        cx - gap, arrowY,
+        color(29, 111, 184),
+        outerLen
+      );
+      drawArrow(
+        cx - gap + 8, arrowY - 22,
+        cx - gap + 8 - innerLen, arrowY - 22,
+        color(214, 40, 40),
+        innerLen
+      );
+
+      // 右側：藍箭頭向左（外壓），紅箭頭向右（內壓）
+      drawArrow(
+        cx + gap + outerLen, arrowY,
+        cx + gap, arrowY,
+        color(29, 111, 184),
+        outerLen
+      );
+      drawArrow(
+        cx + gap - 8, arrowY - 22,
+        cx + gap - 8 + innerLen, arrowY - 22,
+        color(214, 40, 40),
+        innerLen
+      );
+
+      // 箭頭旁文字標籤
+      noStroke();
+      textAlign(CENTER, CENTER);
+      textSize(constrain(width * 0.022, 11, 16));
+      textStyle(BOLD);
+
+      fill(29, 111, 184);
+      text("盒外氣壓", cx - gap - outerLen * 0.5, arrowY + 28);
+      text("盒外氣壓", cx + gap + outerLen * 0.5, arrowY + 28);
+
+      fill(214, 40, 40);
+      text("盒內氣壓", cx - gap - innerLen * 0.3, arrowY - 42);
+      text("盒內氣壓", cx + gap + innerLen * 0.3, arrowY - 42);
+
+      // 力量比較提示（吸出空氣後顯示）
+      if (displayAir > 0.2) {
+        fill(30, 58, 76, 200);
+        textSize(constrain(width * 0.024, 12, 18));
+        text("大氣壓把盒子往內壓 →", width * 0.5, height * 0.14);
+      }
+    }
+
+    /** 畫一支帶箭頭的線 */
+    function drawArrow(x1, y1, x2, y2, col, lenHint) {
+      const dx = x2 - x1;
+      const dy = y2 - y1;
+      const angle = atan2(dy, dx);
+      const len = dist(x1, y1, x2, y2);
+      if (len < 4) return;
+
+      const weight = map(lenHint || len, 10, width * 0.12, 3, 7, true);
+
+      stroke(col);
+      strokeWeight(weight);
+      strokeCap(ROUND);
+      line(x1, y1, x2, y2);
+
+      // 箭頭三角
+      push();
+      translate(x2, y2);
+      rotate(angle);
+      noStroke();
+      fill(col);
+      const ah = weight * 2.2;
+      triangle(0, 0, -ah * 1.6, ah * 0.7, -ah * 1.6, -ah * 0.7);
+      pop();
+    }
+
+    /** 圖例 */
+    function drawLegend() {
+      const x = width * 0.04;
+      const y = height * 0.78;
+      const boxW = constrain(width * 0.28, 160, 260);
+
+      noStroke();
+      fill(255, 255, 255, 210);
+      rect(x, y, boxW, 70, 12);
+
+      // 紅線
+      stroke(214, 40, 40);
+      strokeWeight(4);
+      line(x + 14, y + 24, x + 40, y + 24);
+      noStroke();
+      fill(214, 40, 40);
+      textAlign(LEFT, CENTER);
+      textSize(constrain(width * 0.02, 11, 15));
+      textStyle(BOLD);
+      text("紅色＝盒內氣壓", x + 48, y + 24);
+
+      // 藍線
+      stroke(29, 111, 184);
+      strokeWeight(4);
+      line(x + 14, y + 50, x + 40, y + 50);
+      noStroke();
+      fill(29, 111, 184);
+      text("藍色＝盒外氣壓", x + 48, y + 50);
+    }
+
+    // ---------- 吸氣泡泡特效 ----------
+    function spawnBubbles(n) {
+      const cx = width * 0.5 + width * 0.026;
+      const cy = height * 0.52 - height * 0.24;
+      for (let i = 0; i < n; i++) {
+        bubbles.push({
+          x: cx + random(-8, 16),
+          y: cy + random(-10, 10),
+          r: random(4, 10),
+          vx: random(0.5, 2.2),
+          vy: random(-3.5, -1.2),
+          life: 1,
+        });
+      }
+    }
+
+    function updateBubbles() {
+      for (let i = bubbles.length - 1; i >= 0; i--) {
+        const b = bubbles[i];
+        b.x += b.vx;
+        b.y += b.vy;
+        b.life -= 0.02;
+        if (b.life <= 0) bubbles.splice(i, 1);
+      }
+    }
+
+    function drawBubbles() {
+      noStroke();
+      for (const b of bubbles) {
+        fill(120, 200, 230, b.life * 200);
+        circle(b.x, b.y, b.r);
+        fill(255, 255, 255, b.life * 160);
+        circle(b.x - b.r * 0.2, b.y - b.r * 0.2, b.r * 0.35);
+      }
+    }
+  </script>
+</body>
+</html>
