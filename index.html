@@ -1229,7 +1229,7 @@
           const notes = steps.notes.length
             ? steps.notes.join("；") + "。"
             : "每一位相乘皆小於 10，沒有進位。";
-          carryNoteEl.textContent = `從個位開始：${notes} 最後得到積 ${p}。`;
+          carryNoteEl.textContent = notes + ` 最後得到積 ${p}。`;
         } else {
           // Two-digit multiplier: show partial products
           const bDigs = digitsOf(b);
@@ -1282,30 +1282,31 @@
 
       function multiplyWithCarry(aDigs, b) {
         const productDigs = [];
-        const carries = []; // carry INTO each position (same length as product, left-aligned later)
         const notes = [];
         let carry = 0;
-        const tempCarries = []; // carry generated at each digit from right
+        const tempCarries = []; // carry INTO each digit (from right), left-aligned later
 
         for (let i = aDigs.length - 1; i >= 0; i--) {
+          const place = aDigs.length - 1 - i; // 0=個位
+          const placeName = ["個位", "十位", "百位", "千位"][place] || `第 ${place + 1} 位`;
           const prod = aDigs[i] * b + carry;
           const digit = prod % 10;
           const nextCarry = Math.floor(prod / 10);
           productDigs.unshift(digit);
           tempCarries.unshift(carry);
-          if (nextCarry > 0 || carry > 0) {
-            let note = `${aDigs[i]} × ${b}`;
-            if (carry) note += ` + 進位 ${carry}`;
-            note += ` = ${prod} → 寫下 ${digit}`;
-            if (nextCarry) note += `、進位 ${nextCarry}`;
-            notes.push(note);
-          }
+
+          let note = `${placeName}：${aDigs[i]} × ${b}`;
+          if (carry) note += ` + 進位 ${carry}`;
+          note += ` = ${prod} → 寫下 ${digit}`;
+          if (nextCarry) note += `、進位 ${nextCarry}`;
+          notes.push(note);
+
           carry = nextCarry;
         }
         if (carry > 0) {
           productDigs.unshift(carry);
           tempCarries.unshift(0);
-          notes.push(`最後進位寫下 ${carry}`);
+          notes.push(`最高位進位：寫下 ${carry}`);
         }
         return { productDigs, carries: tempCarries, notes };
       }
@@ -1351,6 +1352,7 @@
       function nextPuzzle() {
         ensureAudio();
         playClick();
+        confettiEl.innerHTML = "";
         eqLabelEl.textContent = DIFFICULTY[state.difficulty].label;
         const puzzle = generatePuzzle(state.difficulty);
         renderPuzzle(puzzle);
