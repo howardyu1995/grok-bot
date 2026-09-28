@@ -1,0 +1,1281 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>氣壓原理互動模型｜飲品盒為什麼會凹陷？</title>
+  <!-- p5.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/p5@1.11.3/lib/p5.min.js"></script>
+  <style>
+    /* ===== 整體版面：明亮、適合小學生 ===== */
+    :root {
+      --bg-top: #e8f6ef;
+      --bg-bottom: #d6eef8;
+      --panel: #ffffff;
+      --accent: #2a9d8f;
+      --accent-dark: #1f7a6f;
+      --danger: #e76f51;
+      --danger-dark: #d45a3c;
+      --ink: #1e3a4c;
+      --muted: #4a6a7a;
+      --myth: #7b4b94;
+      --shadow: 0 8px 24px rgba(30, 58, 76, 0.12);
+      --radius: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      min-height: 100%;
+      font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+      color: var(--ink);
+      background: linear-gradient(165deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 12px 12px 28px;
+    }
+
+    header {
+      width: min(960px, 100%);
+      text-align: center;
+      margin-bottom: 8px;
+    }
+
+    header h1 {
+      margin: 0 0 6px;
+      font-size: clamp(1.35rem, 3.5vw, 1.85rem);
+      font-weight: 800;
+      letter-spacing: 0.02em;
+    }
+
+    header p.subtitle {
+      margin: 0;
+      font-size: clamp(0.95rem, 2.4vw, 1.1rem);
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    #canvas-wrap {
+      width: min(960px, 100%);
+      background: var(--panel);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      border: 3px solid #b8e0d2;
+    }
+
+    #canvas-wrap canvas {
+      display: block;
+      width: 100% !important;
+      height: auto !important;
+      touch-action: none;
+    }
+
+    .controls {
+      width: min(960px, 100%);
+      margin-top: 14px;
+      background: var(--panel);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 3px solid #b8dceb;
+      padding: 16px 18px 18px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .guide-box {
+      background: linear-gradient(90deg, #fff8e7, #e8f8f2);
+      border-radius: 14px;
+      padding: 12px 14px;
+      border-left: 6px solid #f4a261;
+      font-size: clamp(1rem, 2.6vw, 1.15rem);
+      line-height: 1.55;
+      font-weight: 600;
+      min-height: 3.2em;
+    }
+
+    .guide-box .label {
+      display: inline-block;
+      background: #f4a261;
+      color: #fff;
+      font-size: 0.85rem;
+      padding: 2px 10px;
+      border-radius: 999px;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+
+    /* 因果分步進度條 */
+    .step-strip {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px;
+    }
+
+    .step-chip {
+      border: 2px solid #c5e4ef;
+      background: #f4fafc;
+      color: var(--muted);
+      border-radius: 12px;
+      padding: 8px 4px;
+      text-align: center;
+      font-size: clamp(0.72rem, 1.8vw, 0.88rem);
+      font-weight: 700;
+      line-height: 1.25;
+      min-height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.15s ease;
+    }
+
+    .step-chip.done {
+      background: #e4f6ef;
+      border-color: #7ec8b3;
+      color: var(--accent-dark);
+    }
+
+    .step-chip.active {
+      background: #fff3e0;
+      border-color: #f4a261;
+      color: #b35a12;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(244, 162, 97, 0.25);
+    }
+
+    .pressure-readout {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 18px;
+      justify-content: center;
+      align-items: center;
+      font-size: clamp(1rem, 2.5vw, 1.2rem);
+      font-weight: 700;
+      padding: 4px;
+    }
+
+    .pressure-readout .in { color: #d62828; }
+    .pressure-readout .out { color: #1d6fb8; }
+    .pressure-readout .vs {
+      color: var(--ink);
+      font-size: 1.4em;
+      font-weight: 900;
+    }
+
+    .particle-readout {
+      text-align: center;
+      font-size: clamp(0.95rem, 2.3vw, 1.1rem);
+      font-weight: 700;
+      color: #2a6f97;
+    }
+
+    .particle-readout span {
+      color: #e76f51;
+      font-size: 1.15em;
+    }
+
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    button {
+      font-family: inherit;
+      font-size: clamp(1rem, 2.6vw, 1.2rem);
+      font-weight: 800;
+      border: none;
+      border-radius: 999px;
+      padding: 13px 22px;
+      min-height: 50px;
+      cursor: pointer;
+      transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.15s ease;
+      box-shadow: 0 4px 0 rgba(0, 0, 0, 0.12);
+      touch-action: manipulation;
+    }
+
+    button:active {
+      transform: translateY(3px);
+      box-shadow: 0 1px 0 rgba(0, 0, 0, 0.12);
+    }
+
+    button:focus-visible {
+      outline: 3px solid #f4a261;
+      outline-offset: 3px;
+    }
+
+    button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    #btn-suck {
+      background: var(--danger);
+      color: #fff;
+      flex: 1 1 150px;
+      max-width: 220px;
+    }
+    #btn-suck:hover:not(:disabled) { background: var(--danger-dark); }
+
+    #btn-steps {
+      background: #3d8ec9;
+      color: #fff;
+      flex: 1 1 160px;
+      max-width: 240px;
+    }
+    #btn-steps:hover:not(:disabled) { background: #2f78ad; }
+
+    #btn-next {
+      background: #f4a261;
+      color: #fff;
+      flex: 1 1 130px;
+      max-width: 180px;
+      display: none;
+    }
+    #btn-next:hover:not(:disabled) { background: #e08f4d; }
+    #btn-next.show { display: inline-flex; align-items: center; justify-content: center; }
+
+    #btn-reset {
+      background: var(--accent);
+      color: #fff;
+      flex: 1 1 120px;
+      max-width: 160px;
+    }
+    #btn-reset:hover:not(:disabled) { background: var(--accent-dark); }
+
+    .slider-block {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 2px 2px 0;
+    }
+
+    .slider-block label {
+      font-size: clamp(1rem, 2.5vw, 1.15rem);
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .slider-block label span { color: var(--accent-dark); }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 14px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #c8e6c9, #81c784);
+      outline: none;
+      cursor: pointer;
+    }
+
+    input[type="range"]:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #2a9d8f;
+      border: 4px solid #fff;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      cursor: grab;
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #2a9d8f;
+      border: 4px solid #fff;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      cursor: grab;
+    }
+
+    .tip-box {
+      background: #eef6ff;
+      border-radius: 14px;
+      padding: 10px 14px;
+      font-size: clamp(0.92rem, 2.3vw, 1.05rem);
+      color: var(--muted);
+      line-height: 1.5;
+      border: 2px dashed #9ec9e8;
+    }
+
+    .tip-box strong { color: #2a6f97; }
+
+    /* 迷思澄清卡 */
+    .myth-box {
+      display: none;
+      background: linear-gradient(135deg, #f8eefc, #fff6e8);
+      border: 3px solid #c9a0d8;
+      border-radius: 16px;
+      padding: 12px 14px;
+      font-size: clamp(0.95rem, 2.4vw, 1.08rem);
+      line-height: 1.55;
+      color: var(--ink);
+    }
+
+    .myth-box.show { display: block; }
+
+    .myth-box .myth-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 800;
+      color: var(--myth);
+      margin-bottom: 6px;
+      font-size: 1.05em;
+    }
+
+    .myth-box .wrong {
+      color: #b23a3a;
+      font-weight: 700;
+      text-decoration: line-through;
+      text-decoration-thickness: 2px;
+    }
+
+    .myth-box .right {
+      color: var(--accent-dark);
+      font-weight: 800;
+    }
+
+    footer.credit {
+      margin-top: 14px;
+      font-size: 0.85rem;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    @media (max-width: 560px) {
+      button { max-width: none !important; width: 100%; }
+      .step-strip { grid-template-columns: repeat(3, 1fr); }
+      .step-chip:nth-child(4),
+      .step-chip:nth-child(5) { grid-column: span 1; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🍋 氣壓原理互動模型</h1>
+    <p class="subtitle">為什麼吸出空氣後，飲品盒會凹陷？</p>
+  </header>
+
+  <div id="canvas-wrap"></div>
+
+  <section class="controls" aria-label="互動控制面板">
+    <div class="guide-box" id="guide-text">
+      <span class="label">想一想</span>
+      試一試「分步看原理」，一步一步找出盒子凹陷的原因！
+    </div>
+
+    <!-- 五步因果鏈 -->
+    <div class="step-strip" id="step-strip" aria-label="因果分步進度">
+      <div class="step-chip" data-step="1">① 吸出<br>空氣</div>
+      <div class="step-chip" data-step="2">② 粒子<br>變少</div>
+      <div class="step-chip" data-step="3">③ 氣壓<br>下降</div>
+      <div class="step-chip" data-step="4">④ 外壓<br>更大</div>
+      <div class="step-chip" data-step="5">⑤ 盒子<br>壓凹</div>
+    </div>
+
+    <div class="pressure-readout" id="pressure-readout" aria-live="polite">
+      <span class="in">盒內氣壓：100%</span>
+      <span class="vs">＝</span>
+      <span class="out">盒外氣壓：100%</span>
+    </div>
+
+    <div class="particle-readout" id="particle-readout">
+      盒內空氣粒子：約 <span id="particle-count">24</span> 個
+    </div>
+
+    <div class="btn-row">
+      <button type="button" id="btn-steps" onclick="onStartSteps()">▶️ 分步看原理</button>
+      <button type="button" id="btn-next" onclick="onNextStep()">下一步 ➡️</button>
+      <button type="button" id="btn-suck" onclick="onSuckClick()">💨 吸出空氣</button>
+      <button type="button" id="btn-reset" onclick="onResetClick()">🔄 重置</button>
+    </div>
+
+    <div class="slider-block">
+      <label for="air-slider">已吸出的空氣量：<span id="air-percent">0%</span></label>
+      <input
+        type="range"
+        id="air-slider"
+        min="0"
+        max="100"
+        value="0"
+        step="1"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        aria-valuenow="0"
+      />
+    </div>
+
+    <div class="tip-box" id="tip-box">
+      <strong>我發現：</strong>
+      黃色小點點代表空氣粒子。粒子愈多，撞盒子的力量愈大，盒內氣壓就愈高！
+    </div>
+
+    <div class="myth-box" id="myth-box" aria-live="polite">
+      <div class="myth-title">💡 迷思澄清</div>
+      <div>
+        <span class="wrong">常見誤會：是吸管把盒子「吸癟」的？</span><br />
+        <span class="right">正解：不是！</span>
+        吸管只是把空氣吸走；真正把盒子壓凹的，是外面的大氣壓！
+      </div>
+    </div>
+  </section>
+
+  <p class="credit">適合香港小五｜常識科・氣壓單元</p>
+
+  <script>
+    /**
+     * =========================================================
+     * 氣壓原理互動模型（p5.js）
+     * 三大教學強化：
+     *  1) 粒子視角：盒內空氣粒子增減
+     *  2) 因果分步：吸氣→粒子少→氣壓降→外壓大→壓凹
+     *  3) 迷思澄清：不是吸管吸癟，是大氣壓壓凹
+     * =========================================================
+     */
+
+    // ---------- 狀態 ----------
+    let airRemoved = 0;   // 目標：已吸出空氣量 0~1
+    let displayAir = 0;   // 平滑顯示值
+    const OUTER_PRESSURE = 1;
+    const LERP_SPEED = 0.08;
+    const MAX_PARTICLES = 24; // 滿空氣時的粒子數
+
+    // DOM
+    let slider, airPercentLabel, guideText, pressureReadout, tipBox;
+    let particleCountEl, mythBox, btnSuck, btnReset, btnSteps, btnNext;
+    let stepChips = [];
+    let controlsReady = false;
+
+    let canvasW = 900;
+    let canvasH = 480;
+
+    // 特效／粒子
+    let bubbles = [];          // 吸管口泡泡
+    let airParticles = [];     // 盒內空氣粒子
+    let escapingParticles = []; // 正被吸走的粒子
+
+    // 因果分步
+    // focus: straw | particles | inner | outer | dent
+    const CAUSAL_STEPS = [
+      {
+        id: 1,
+        targetAir: 0.2,
+        label: "分步①",
+        guide: "吸管正在把空氣吸出來——注意黃色粒子沿著吸管跑出去！",
+        tip: "第一步：吸出空氣。空氣並沒有消失，而是被吸到盒子外面。",
+        focus: "straw",
+        showMyth: false,
+      },
+      {
+        id: 2,
+        targetAir: 0.4,
+        label: "分步②",
+        guide: "盒內的空氣粒子變少了！撞到盒壁的次數也跟著變少。",
+        tip: "第二步：粒子變少 → 撞擊變少。這就是「空氣減少」的樣子。",
+        focus: "particles",
+        showMyth: false,
+      },
+      {
+        id: 3,
+        targetAir: 0.55,
+        label: "分步③",
+        guide: "因為撞擊變少，盒內氣壓下降了——紅色箭頭變短了！",
+        tip: "第三步：空氣愈少，盒內氣壓愈低。看紅色箭頭的長度變化。",
+        focus: "inner",
+        showMyth: false,
+      },
+      {
+        id: 4,
+        targetAir: 0.7,
+        label: "分步④",
+        guide: "外面的大氣壓幾乎沒變，藍色箭頭比紅色箭頭更長、力量更大！",
+        tip: "第四步：盒外氣壓 ＞ 盒內氣壓。力量不平衡，盒子就撐不住了。",
+        focus: "outer",
+        showMyth: false,
+      },
+      {
+        id: 5,
+        targetAir: 0.85,
+        label: "分步⑤",
+        guide: "外面的大氣壓把盒子壓凹了！想一想：真的是吸管「吸癟」的嗎？",
+        tip: "第五步：盒子被大氣壓壓凹。請看下面的「迷思澄清」。",
+        focus: "dent",
+        showMyth: true,
+      },
+    ];
+
+    let stepMode = false;     // 是否在分步模式
+    let currentStep = 0;      // 0=未開始, 1~5=進行中
+    let autoPlay = false;     // 自動播放分步
+    let stepTimer = 0;        // 自動播放計時（幀）
+    const STEP_HOLD_FRAMES = 180; // 每步停留約 3 秒，方便課堂觀察
+    let highlightPulse = 0;   // 高亮脈衝動畫
+
+    // ---------- 控制綁定 ----------
+    function bindControls() {
+      if (controlsReady) return;
+      slider = document.getElementById("air-slider");
+      airPercentLabel = document.getElementById("air-percent");
+      guideText = document.getElementById("guide-text");
+      pressureReadout = document.getElementById("pressure-readout");
+      tipBox = document.getElementById("tip-box");
+      particleCountEl = document.getElementById("particle-count");
+      mythBox = document.getElementById("myth-box");
+      btnSuck = document.getElementById("btn-suck");
+      btnReset = document.getElementById("btn-reset");
+      btnSteps = document.getElementById("btn-steps");
+      btnNext = document.getElementById("btn-next");
+      stepChips = Array.from(document.querySelectorAll(".step-chip"));
+      if (!slider || !btnSuck || !btnReset) return;
+
+      slider.addEventListener("input", onSliderChange);
+      slider.addEventListener("change", onSliderChange);
+      window.addEventListener("resize", onWindowResize);
+      controlsReady = true;
+      updateUI();
+    }
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", bindControls);
+    } else {
+      bindControls();
+    }
+
+    // ---------- p5 ----------
+    function setup() {
+      bindControls();
+      const wrap = document.getElementById("canvas-wrap");
+      canvasW = Math.min(960, wrap.clientWidth || window.innerWidth - 24);
+      canvasH = Math.max(400, Math.round(canvasW * 0.54));
+      const cnv = createCanvas(canvasW, canvasH);
+      cnv.parent("canvas-wrap");
+      initAirParticles();
+      updateUI();
+      textFont('"Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif');
+    }
+
+    function draw() {
+      highlightPulse = (sin(frameCount * 0.12) + 1) * 0.5;
+
+      // 分步自動播放
+      if (stepMode && autoPlay && currentStep >= 1 && currentStep <= 5) {
+        stepTimer++;
+        if (stepTimer >= STEP_HOLD_FRAMES && abs(displayAir - airRemoved) < 0.02) {
+          if (currentStep < 5) {
+            goToStep(currentStep + 1);
+          } else {
+            autoPlay = false; // 停在最後一步，讓學生看迷思澄清
+            updateUI();
+          }
+        }
+      }
+
+      displayAir = lerp(displayAir, airRemoved, LERP_SPEED);
+      if (abs(displayAir - airRemoved) < 0.001) displayAir = airRemoved;
+
+      syncAirParticles();
+      updateAirParticles();
+      updateEscapingParticles();
+      updateBubbles();
+
+      drawBackground();
+      drawScene();
+      drawBubbles();
+      drawEscapingParticles();
+      drawLegend();
+      drawStepBanner();
+      updateUI();
+    }
+
+    function onWindowResize() {
+      const wrap = document.getElementById("canvas-wrap");
+      if (!wrap) return;
+      canvasW = Math.min(960, wrap.clientWidth || window.innerWidth - 24);
+      canvasH = Math.max(400, Math.round(canvasW * 0.54));
+      if (typeof resizeCanvas === "function" && typeof width === "number" && width > 0) {
+        resizeCanvas(canvasW, canvasH);
+      }
+    }
+
+    // ---------- 控制 ----------
+    function onSliderChange() {
+      if (!slider) slider = document.getElementById("air-slider");
+      // 手動拖滑桿時離開自動分步播放（保留目前步狀態標記）
+      if (stepMode && autoPlay) autoPlay = false;
+      airRemoved = Math.max(0, Math.min(1, Number(slider.value) / 100));
+      slider.setAttribute("aria-valuenow", String(slider.value));
+      if (airRemoved > 0.08 && typeof random === "function") {
+        spawnBubbles(2);
+        maybeEscapeParticle();
+      }
+      // 依滑桿位置同步分步高亮（自由探索模式）
+      if (!stepMode) syncStepFromAir();
+    }
+
+    function onSuckClick() {
+      if (!slider) slider = document.getElementById("air-slider");
+      if (stepMode && autoPlay) autoPlay = false;
+      airRemoved = Math.max(0, Math.min(1, airRemoved + 0.25));
+      slider.value = String(Math.round(airRemoved * 100));
+      slider.setAttribute("aria-valuenow", slider.value);
+      if (typeof random === "function") {
+        spawnBubbles(10);
+        for (let i = 0; i < 4; i++) maybeEscapeParticle();
+      }
+      if (!stepMode) syncStepFromAir();
+      updateUI();
+    }
+
+    function onResetClick() {
+      if (!slider) slider = document.getElementById("air-slider");
+      airRemoved = 0;
+      displayAir = 0;
+      slider.value = "0";
+      slider.setAttribute("aria-valuenow", "0");
+      bubbles = [];
+      escapingParticles = [];
+      stepMode = false;
+      autoPlay = false;
+      currentStep = 0;
+      stepTimer = 0;
+      initAirParticles();
+      updateUI();
+    }
+
+    /** 開始分步演示（自動播放） */
+    function onStartSteps() {
+      if (!slider) slider = document.getElementById("air-slider");
+      stepMode = true;
+      autoPlay = true;
+      airRemoved = 0;
+      displayAir = 0;
+      slider.value = "0";
+      bubbles = [];
+      escapingParticles = [];
+      initAirParticles();
+      goToStep(1);
+    }
+
+    /** 手動下一步 */
+    function onNextStep() {
+      if (!stepMode) {
+        onStartSteps();
+        autoPlay = false;
+        return;
+      }
+      autoPlay = false;
+      if (currentStep < 5) {
+        goToStep(currentStep + 1);
+      } else {
+        // 已完成：再按一次重播
+        onStartSteps();
+        autoPlay = false;
+      }
+    }
+
+    function goToStep(n) {
+      currentStep = n;
+      stepTimer = 0;
+      const step = CAUSAL_STEPS[n - 1];
+      airRemoved = step.targetAir;
+      if (slider) {
+        slider.value = String(Math.round(airRemoved * 100));
+        slider.setAttribute("aria-valuenow", slider.value);
+      }
+      if (typeof random === "function") {
+        spawnBubbles(6);
+        for (let i = 0; i < 3; i++) maybeEscapeParticle();
+      }
+      updateUI();
+    }
+
+    /** 自由探索時，依空氣量對應高亮步驟 */
+    function syncStepFromAir() {
+      if (airRemoved < 0.08) currentStep = 0;
+      else if (airRemoved < 0.28) currentStep = 1;
+      else if (airRemoved < 0.45) currentStep = 2;
+      else if (airRemoved < 0.6) currentStep = 3;
+      else if (airRemoved < 0.75) currentStep = 4;
+      else currentStep = 5;
+    }
+
+    function getInnerPressure() {
+      return 1 - displayAir;
+    }
+
+    function getFocus() {
+      if (currentStep >= 1 && currentStep <= 5) {
+        return CAUSAL_STEPS[currentStep - 1].focus;
+      }
+      return null;
+    }
+
+    // ---------- UI ----------
+    function updateUI() {
+      if (!slider) return;
+
+      const pct = Math.round(airRemoved * 100);
+      airPercentLabel.textContent = pct + "%";
+
+      const innerPct = Math.round(getInnerPressure() * 100);
+      const outerPct = 100;
+      let compare = "＝";
+      if (innerPct < outerPct - 1) compare = "＜";
+
+      pressureReadout.innerHTML =
+        `<span class="in">盒內氣壓：${innerPct}%</span>` +
+        `<span class="vs">${compare}</span>` +
+        `<span class="out">盒外氣壓：${outerPct}%</span>`;
+
+      // 粒子數量（依 displayAir 平滑）
+      const alive = Math.round(MAX_PARTICLES * (1 - displayAir));
+      if (particleCountEl) particleCountEl.textContent = String(alive);
+
+      // 步驟晶片
+      stepChips.forEach((chip) => {
+        const s = Number(chip.dataset.step);
+        chip.classList.toggle("active", s === currentStep);
+        chip.classList.toggle("done", currentStep > 0 && s < currentStep);
+      });
+
+      // 按鈕狀態
+      if (btnNext) {
+        btnNext.classList.toggle("show", stepMode || currentStep > 0);
+        if (stepMode && currentStep >= 5 && !autoPlay) {
+          btnNext.textContent = "再看一次 🔁";
+        } else {
+          btnNext.textContent = "下一步 ➡️";
+        }
+      }
+      if (btnSteps) {
+        btnSteps.textContent = stepMode && autoPlay ? "⏸ 播放中…" : "▶️ 分步看原理";
+        btnSteps.disabled = stepMode && autoPlay;
+      }
+
+      // 迷思澄清：第 5 步或高度凹陷時顯示
+      const showMyth =
+        (currentStep >= 5) ||
+        (airRemoved >= 0.75);
+      if (mythBox) mythBox.classList.toggle("show", showMyth);
+
+      // 引導文字
+      if (stepMode && currentStep >= 1 && currentStep <= 5) {
+        const step = CAUSAL_STEPS[currentStep - 1];
+        guideText.innerHTML =
+          `<span class="label">${step.label}</span>${step.guide}`;
+        tipBox.innerHTML = `<strong>我發現：</strong>${step.tip}`;
+      } else if (airRemoved < 0.05) {
+        guideText.innerHTML =
+          `<span class="label">想一想</span>` +
+          `試一試「分步看原理」，一步一步找出盒子凹陷的原因！`;
+        tipBox.innerHTML =
+          `<strong>我發現：</strong>` +
+          `黃色小點點代表空氣粒子。粒子愈多，撞盒子的力量愈大，盒內氣壓就愈高！`;
+      } else if (airRemoved < 0.45) {
+        guideText.innerHTML =
+          `<span class="label">觀察中</span>` +
+          `盒內粒子變少了，紅色箭頭也變短——盒內氣壓正在下降！`;
+        tipBox.innerHTML =
+          `<strong>我發現：</strong>` +
+          `空氣粒子變少 → 撞擊變少 → 盒內氣壓（${innerPct}%）小於盒外氣壓（${outerPct}%）。`;
+      } else {
+        guideText.innerHTML =
+          `<span class="label">原來如此</span>` +
+          `盒內氣壓下降，外面的大氣壓比較大，就把盒子壓凹了！`;
+        tipBox.innerHTML =
+          `<strong>我發現（課本重點）：</strong>` +
+          `吸出空氣 → 粒子變少 → 盒內氣壓下降 → 外壓大於內壓 → 大氣壓壓凹盒子。`;
+      }
+    }
+
+    // ---------- 粒子系統 ----------
+    function initAirParticles() {
+      airParticles = [];
+      for (let i = 0; i < MAX_PARTICLES; i++) {
+        airParticles.push(makeParticle(true));
+      }
+    }
+
+    function makeParticle(active) {
+      return {
+        nx: Math.random(), // 0~1 正規化座標（相對盒內）
+        ny: Math.random(),
+        vx: (Math.random() - 0.5) * 0.012,
+        vy: (Math.random() - 0.5) * 0.012,
+        r: 3.5 + Math.random() * 2.5,
+        active: !!active,
+        phase: Math.random() * Math.PI * 2,
+      };
+    }
+
+    /** 依空氣量啟用／停用粒子 */
+    function syncAirParticles() {
+      const targetAlive = Math.round(MAX_PARTICLES * (1 - displayAir));
+      let alive = airParticles.filter((p) => p.active).length;
+
+      // 需要減少：標記為 inactive（吸走時另有 escaping 動畫）
+      while (alive > targetAlive) {
+        const idx = airParticles.findIndex((p) => p.active);
+        if (idx < 0) break;
+        airParticles[idx].active = false;
+        alive--;
+      }
+      // 需要增加（重置時）
+      while (alive < targetAlive) {
+        const idx = airParticles.findIndex((p) => !p.active);
+        if (idx >= 0) {
+          airParticles[idx] = makeParticle(true);
+        } else {
+          airParticles.push(makeParticle(true));
+        }
+        alive++;
+      }
+    }
+
+    function updateAirParticles() {
+      for (const p of airParticles) {
+        if (!p.active) continue;
+        p.nx += p.vx;
+        p.ny += p.vy;
+        // 盒內彈跳（正規化邊界）
+        if (p.nx < 0.08 || p.nx > 0.92) {
+          p.vx *= -1;
+          p.nx = Math.max(0.08, Math.min(0.92, p.nx));
+        }
+        if (p.ny < 0.12 || p.ny > 0.88) {
+          p.vy *= -1;
+          p.ny = Math.max(0.12, Math.min(0.88, p.ny));
+        }
+        // 輕微擾動
+        p.vx += (Math.random() - 0.5) * 0.0008;
+        p.vy += (Math.random() - 0.5) * 0.0008;
+        p.vx = Math.max(-0.02, Math.min(0.02, p.vx));
+        p.vy = Math.max(-0.02, Math.min(0.02, p.vy));
+        p.phase += 0.05;
+      }
+    }
+
+    /** 吸氣時：把一顆粒子變成「沿吸管逃逸」 */
+    function maybeEscapeParticle() {
+      const active = airParticles.filter((p) => p.active);
+      if (active.length === 0 || typeof width !== "number") return;
+      const p = active[Math.floor(Math.random() * active.length)];
+      p.active = false;
+
+      const cx = width * 0.5;
+      const cy = height * 0.52;
+      const boxW = width * 0.22;
+      const boxH = height * 0.48;
+      const dent = displayAir * boxW * 0.28;
+      const left = cx - boxW / 2 + dent * 0.5;
+      const top = cy - boxH / 2;
+
+      escapingParticles.push({
+        x: left + p.nx * (boxW - dent),
+        y: top + p.ny * boxH,
+        tx: cx + boxW * 0.12,
+        ty: top - boxH * 0.02,
+        life: 1,
+        r: p.r,
+      });
+    }
+
+    function updateEscapingParticles() {
+      for (let i = escapingParticles.length - 1; i >= 0; i--) {
+        const e = escapingParticles[i];
+        e.x = lerp(e.x, e.tx + 30, 0.08);
+        e.y = lerp(e.y, e.ty - 40, 0.08);
+        e.life -= 0.025;
+        if (e.life <= 0) escapingParticles.splice(i, 1);
+      }
+    }
+
+    function drawEscapingParticles() {
+      noStroke();
+      for (const e of escapingParticles) {
+        fill(255, 200, 60, e.life * 220);
+        circle(e.x, e.y, e.r * 1.2);
+      }
+    }
+
+    function drawAirParticles(cx, cy, boxW, boxH, dent) {
+      const left = cx - boxW / 2;
+      const top = cy - boxH / 2;
+      const focus = getFocus();
+      const boost = focus === "particles" ? 1 + highlightPulse * 0.5 : 1;
+
+      // 粒子視角標籤
+      noStroke();
+      fill(42, 111, 151, focus === "particles" ? 230 : 160);
+      textAlign(CENTER, BOTTOM);
+      textSize(constrain(width * 0.018, 10, 14));
+      textStyle(BOLD);
+      text("粒子視角：黃色＝空氣", cx, top - 4);
+
+      noStroke();
+      for (const p of airParticles) {
+        if (!p.active) continue;
+        // 凹陷時把左右範圍往內收
+        const inset = dent * (0.3 + 0.5 * Math.sin(p.ny * Math.PI));
+        const x = left + inset + p.nx * (boxW - inset * 2);
+        const y = top + p.ny * boxH;
+        const pulse = 1 + 0.15 * Math.sin(p.phase);
+        fill(255, 190, 40, 200);
+        circle(x, y, p.r * pulse * boost);
+        fill(255, 255, 220, 160);
+        circle(x - p.r * 0.2, y - p.r * 0.2, p.r * 0.35 * boost);
+      }
+    }
+
+    // ---------- 背景／場景 ----------
+    function drawBackground() {
+      for (let y = 0; y < height; y++) {
+        const t = y / height;
+        stroke(lerp(232, 214, t), lerp(246, 238, t), lerp(239, 248, t));
+        line(0, y, width, y);
+      }
+      noStroke();
+      fill(190, 220, 200, 90);
+      rect(0, height * 0.82, width, height * 0.18);
+    }
+
+    function drawScene() {
+      const cx = width * 0.5;
+      const cy = height * 0.52;
+      const boxW = width * 0.22;
+      const boxH = height * 0.48;
+
+      drawTable(cx, cy + boxH * 0.55);
+      drawPressureArrows(cx, cy, boxW, boxH);
+      drawDrinkBox(cx, cy, boxW, boxH);
+      // 粒子畫在盒上（半透明盒身已留出可視區）
+      drawAirParticles(cx, cy, boxW, boxH, displayAir * boxW * 0.28);
+      drawStraw(cx, cy, boxW, boxH);
+      drawTitleOnCanvas();
+      drawFocusRings(cx, cy, boxW, boxH);
+    }
+
+    function drawTitleOnCanvas() {
+      noStroke();
+      fill(30, 58, 76, 180);
+      textAlign(CENTER, TOP);
+      textSize(constrain(width * 0.028, 14, 22));
+      textStyle(BOLD);
+      text("檸檬茶鋁箔包", width * 0.5, height * 0.03);
+      textStyle(NORMAL);
+    }
+
+    function drawTable(cx, topY) {
+      noStroke();
+      fill(160, 190, 175, 120);
+      ellipse(cx, topY + 18, width * 0.55, 28);
+    }
+
+    /** 依目前焦點畫高亮圈 */
+    function drawFocusRings(cx, cy, boxW, boxH) {
+      const focus = getFocus();
+      if (!focus) return;
+      const a = 80 + highlightPulse * 100;
+      noFill();
+      strokeWeight(3 + highlightPulse * 2);
+
+      if (focus === "straw") {
+        stroke(61, 142, 201, a);
+        ellipse(cx + boxW * 0.2, cy - boxH * 0.55, boxW * 0.55, boxH * 0.45);
+      } else if (focus === "particles") {
+        stroke(255, 170, 40, a);
+        ellipse(cx, cy, boxW * 1.15, boxH * 1.05);
+      } else if (focus === "dent") {
+        stroke(231, 111, 81, a);
+        ellipse(cx, cy, boxW * 1.25, boxH * 1.1);
+      }
+    }
+
+    function drawDrinkBox(cx, cy, boxW, boxH) {
+      const dent = displayAir * boxW * 0.28;
+      const top = cy - boxH / 2;
+      const bottom = cy + boxH / 2;
+      const left = cx - boxW / 2;
+      const right = cx + boxW / 2;
+      const midY1 = cy - boxH * 0.15;
+      const midY2 = cy + boxH * 0.2;
+
+      // 陰影
+      noStroke();
+      fill(40, 70, 60, 35);
+      ellipse(cx + 6, bottom + 10, boxW * 0.9, 16);
+
+      // 盒身：半透明黃，讓粒子看得見
+      fill(255, 236, 150, 165);
+      stroke(210, 160, 40);
+      strokeWeight(2.5);
+      beginShape();
+      vertex(left, top + 8);
+      bezierVertex(left, midY1, left + dent, midY1, left + dent, cy);
+      bezierVertex(left + dent, midY2, left, midY2, left, bottom - 6);
+      vertex(right, bottom - 6);
+      bezierVertex(right, midY2, right - dent, midY2, right - dent, cy);
+      bezierVertex(right - dent, midY1, right, midY1, right, top + 8);
+      endShape(CLOSE);
+
+      // 頂蓋
+      fill(220, 228, 235);
+      stroke(160, 170, 180);
+      strokeWeight(2);
+      beginShape();
+      vertex(left + 4, top + 10);
+      vertex(right - 4, top + 10);
+      vertex(right - 14, top - boxH * 0.06);
+      vertex(left + 14, top - boxH * 0.06);
+      endShape(CLOSE);
+
+      // 小標籤（偏上，避免遮太多粒子）
+      noStroke();
+      const labelInset = dent * 0.5;
+      fill(255, 120, 90, 230);
+      rectMode(CENTER);
+      rect(cx, top + boxH * 0.22, boxW * 0.62 - labelInset, boxH * 0.16, 8);
+      fill(255);
+      textAlign(CENTER, CENTER);
+      textSize(constrain(boxW * 0.12, 11, 18));
+      textStyle(BOLD);
+      text("檸檬茶", cx, top + boxH * 0.22);
+
+      // 底條
+      fill(46, 157, 143, 200);
+      rect(cx, bottom - boxH * 0.08, boxW * 0.85 - dent * 0.3, boxH * 0.08, 4);
+
+      if (displayAir > 0.15) {
+        stroke(200, 150, 50, 120 + displayAir * 80);
+        strokeWeight(1.5);
+        noFill();
+        const wrinkle = dent * 0.35;
+        for (let i = -1; i <= 1; i++) {
+          const wx = cx + i * boxW * 0.12;
+          beginShape();
+          vertex(wx, midY1);
+          quadraticVertex(wx + wrinkle * (i === 0 ? 1 : i), cy, wx, midY2);
+          endShape();
+        }
+      }
+    }
+
+    function drawStraw(cx, cy, boxW, boxH) {
+      const top = cy - boxH / 2;
+      const focus = getFocus();
+      const shake =
+        (displayAir > 0.01 && abs(airRemoved - displayAir) > 0.01) || focus === "straw"
+          ? sin(frameCount * 0.45) * 2
+          : 0;
+
+      push();
+      translate(cx + boxW * 0.12 + shake, top - boxH * 0.02);
+      stroke(80, 180, 200);
+      strokeWeight(constrain(boxW * 0.045, 5, 9) + (focus === "straw" ? highlightPulse * 2 : 0));
+      strokeCap(ROUND);
+      line(0, 0, 0, -boxH * 0.35);
+      line(0, -boxH * 0.35, boxW * 0.18, -boxH * 0.48);
+      noStroke();
+      fill(255, 100, 120);
+      circle(boxW * 0.18, -boxH * 0.48, constrain(boxW * 0.07, 7, 12));
+      pop();
+    }
+
+    function drawPressureArrows(cx, cy, boxW, boxH) {
+      const innerP = getInnerPressure();
+      const outerP = OUTER_PRESSURE;
+      const baseLen = width * 0.09;
+      const innerLen = baseLen * (0.25 + innerP * 0.75);
+      const outerLen = baseLen * (0.25 + outerP * 0.75);
+      const gap = boxW * 0.55 + displayAir * boxW * 0.08;
+      const arrowY = cy;
+      const focus = getFocus();
+
+      const outerBoost = focus === "outer" ? 1.15 + highlightPulse * 0.1 : 1;
+      const innerBoost = focus === "inner" ? 1.15 + highlightPulse * 0.1 : 1;
+
+      // 左側
+      drawArrow(
+        cx - gap - outerLen * outerBoost, arrowY,
+        cx - gap, arrowY,
+        color(29, 111, 184),
+        outerLen * outerBoost
+      );
+      drawArrow(
+        cx - gap + 8, arrowY - 22,
+        cx - gap + 8 - innerLen * innerBoost, arrowY - 22,
+        color(214, 40, 40),
+        innerLen * innerBoost
+      );
+
+      // 右側
+      drawArrow(
+        cx + gap + outerLen * outerBoost, arrowY,
+        cx + gap, arrowY,
+        color(29, 111, 184),
+        outerLen * outerBoost
+      );
+      drawArrow(
+        cx + gap - 8, arrowY - 22,
+        cx + gap - 8 + innerLen * innerBoost, arrowY - 22,
+        color(214, 40, 40),
+        innerLen * innerBoost
+      );
+
+      noStroke();
+      textAlign(CENTER, CENTER);
+      textSize(constrain(width * 0.022, 11, 16));
+      textStyle(BOLD);
+
+      fill(29, 111, 184, focus === "outer" ? 255 : 220);
+      text("盒外氣壓", cx - gap - outerLen * 0.5, arrowY + 28);
+      text("盒外氣壓", cx + gap + outerLen * 0.5, arrowY + 28);
+
+      fill(214, 40, 40, focus === "inner" ? 255 : 220);
+      text("盒內氣壓", cx - gap - innerLen * 0.3, arrowY - 42);
+      text("盒內氣壓", cx + gap + innerLen * 0.3, arrowY - 42);
+
+      if (displayAir > 0.2 || focus === "dent" || focus === "outer") {
+        fill(30, 58, 76, 200);
+        textSize(constrain(width * 0.024, 12, 18));
+        text("大氣壓把盒子往內壓 →", width * 0.5, height * 0.12);
+      }
+    }
+
+    function drawArrow(x1, y1, x2, y2, col, lenHint) {
+      const angle = atan2(y2 - y1, x2 - x1);
+      const len = dist(x1, y1, x2, y2);
+      if (len < 4) return;
+      const weight = map(lenHint || len, 10, width * 0.12, 3, 7, true);
+      stroke(col);
+      strokeWeight(weight);
+      strokeCap(ROUND);
+      line(x1, y1, x2, y2);
+      push();
+      translate(x2, y2);
+      rotate(angle);
+      noStroke();
+      fill(col);
+      const ah = weight * 2.2;
+      triangle(0, 0, -ah * 1.6, ah * 0.7, -ah * 1.6, -ah * 0.7);
+      pop();
+    }
+
+    function drawLegend() {
+      const x = width * 0.03;
+      const y = height * 0.72;
+      const w = constrain(width * 0.3, 170, 280);
+
+      noStroke();
+      fill(255, 255, 255, 220);
+      rect(x, y, w, 96, 12);
+
+      stroke(214, 40, 40);
+      strokeWeight(4);
+      line(x + 14, y + 22, x + 40, y + 22);
+      noStroke();
+      fill(214, 40, 40);
+      textAlign(LEFT, CENTER);
+      textSize(constrain(width * 0.019, 11, 14));
+      textStyle(BOLD);
+      text("紅色＝盒內氣壓", x + 48, y + 22);
+
+      stroke(29, 111, 184);
+      strokeWeight(4);
+      line(x + 14, y + 48, x + 40, y + 48);
+      noStroke();
+      fill(29, 111, 184);
+      text("藍色＝盒外氣壓", x + 48, y + 48);
+
+      fill(255, 190, 40);
+      circle(x + 27, y + 74, 10);
+      fill(180, 120, 20);
+      text("黃點＝空氣粒子", x + 48, y + 74);
+    }
+
+    /** 畫布上方分步標語 */
+    function drawStepBanner() {
+      if (currentStep < 1 || currentStep > 5) return;
+      const step = CAUSAL_STEPS[currentStep - 1];
+      const labels = {
+        straw: "焦點：吸出空氣",
+        particles: "焦點：粒子變少",
+        inner: "焦點：盒內氣壓下降",
+        outer: "焦點：外面氣壓更大",
+        dent: "焦點：大氣壓壓凹",
+      };
+      const msg = labels[step.focus] || "";
+      const tw = textWidth(msg) + 28;
+      const bx = width - tw - 16;
+      const by = 12;
+
+      noStroke();
+      fill(255, 255, 255, 220);
+      rect(bx, by, tw, 32, 10);
+      fill(179, 90, 18);
+      textAlign(LEFT, CENTER);
+      textSize(constrain(width * 0.02, 11, 15));
+      textStyle(BOLD);
+      text(msg, bx + 14, by + 16);
+    }
+
+    // ---------- 泡泡 ----------
+    function spawnBubbles(n) {
+      if (typeof width !== "number") return;
+      const cx = width * 0.5 + width * 0.026;
+      const cy = height * 0.52 - height * 0.24;
+      for (let i = 0; i < n; i++) {
+        bubbles.push({
+          x: cx + random(-8, 16),
+          y: cy + random(-10, 10),
+          r: random(4, 10),
+          vx: random(0.5, 2.2),
+          vy: random(-3.5, -1.2),
+          life: 1,
+        });
+      }
+    }
+
+    function updateBubbles() {
+      for (let i = bubbles.length - 1; i >= 0; i--) {
+        const b = bubbles[i];
+        b.x += b.vx;
+        b.y += b.vy;
+        b.life -= 0.02;
+        if (b.life <= 0) bubbles.splice(i, 1);
+      }
+    }
+
+    function drawBubbles() {
+      noStroke();
+      for (const b of bubbles) {
+        fill(120, 200, 230, b.life * 200);
+        circle(b.x, b.y, b.r);
+        fill(255, 255, 255, b.life * 160);
+        circle(b.x - b.r * 0.2, b.y - b.r * 0.2, b.r * 0.35);
+      }
+    }
+  </script>
+</body>
+</html>
