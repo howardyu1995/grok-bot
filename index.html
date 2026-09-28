@@ -227,12 +227,23 @@
             color: #94a3b8;
         }
 
+        @keyframes feedback-flash {
+            0% { opacity: 0.35; transform: scale(0.96); }
+            40% { opacity: 1; transform: scale(1.04); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        .feedback-flash {
+            animation: feedback-flash 0.35s ease;
+        }
+
         @media (prefers-reduced-motion: reduce) {
             .digit-card,
             .slot-digit.filled,
             .shake,
             .success-glow,
-            .overlay {
+            .overlay,
+            .feedback-flash {
                 animation: none !important;
                 transition: none !important;
             }
@@ -285,7 +296,7 @@
                 <span class="slot-digit w-8 md:w-10 border-b-4 border-emerald-500/30 flex items-center justify-center h-full" data-slot="3"></span>
                 <span class="slot-digit w-8 md:w-10 border-b-4 border-emerald-500/30 flex items-center justify-center h-full" data-slot="4"></span>
             </div>
-            <div id="feedback-msg" class="text-xs font-sans h-4 mt-1 font-bold relative z-10" role="status"></div>
+            <div id="feedback-msg" class="text-sm font-sans min-h-[1.25rem] mt-2 font-bold relative z-10" role="status"></div>
         </div>
 
         <!-- 數字卡片投放區 -->
@@ -830,7 +841,12 @@
             function showFeedback(msg, isError) {
                 els.feedbackMsg.innerText = msg;
                 els.feedbackMsg.className =
-                    `text-xs font-sans h-4 mt-1 font-bold relative z-10 ${isError ? 'text-red-400' : 'text-emerald-400'}`;
+                    `text-sm font-sans min-h-[1.25rem] mt-2 font-bold relative z-10 ${isError ? 'text-red-400' : 'text-emerald-400'}`;
+                if (msg) {
+                    els.feedbackMsg.classList.remove('feedback-flash');
+                    void els.feedbackMsg.offsetWidth;
+                    els.feedbackMsg.classList.add('feedback-flash');
+                }
             }
 
             // —— 事件綁定 ——
