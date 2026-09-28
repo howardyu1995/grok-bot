@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="直式乘法填空（蟲蝕算）：填入被隱藏的數字，練習乘法與位值概念">
+  <meta name="description" content="直式乘法填空（蟲蝕算）：一位數乘兩位／三位數，填入被隱藏的數字">
   <title>直式乘法填空｜蟲蝕算</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231f9d8a'/%3E%3Ctext x='32' y='44' text-anchor='middle' font-size='36' fill='white' font-family='sans-serif'%3E×%3C/text%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -600,10 +600,9 @@
 
     <main class="panel">
       <div class="toolbar">
-        <div class="difficulty" role="group" aria-label="難度">
-          <button type="button" class="chip active" data-diff="easy">簡單</button>
-          <button type="button" class="chip" data-diff="medium">中等</button>
-          <button type="button" class="chip" data-diff="hard">困難</button>
+        <div class="difficulty" role="group" aria-label="題型">
+          <button type="button" class="chip active" data-diff="easy">一位×兩位</button>
+          <button type="button" class="chip" data-diff="hard">一位×三位</button>
         </div>
         <button type="button" class="sound-toggle" id="soundBtn" aria-pressed="true" title="音效開關">
           🔊 音效
@@ -661,10 +660,10 @@
       const solveBtn = document.getElementById("solveBtn");
 
       /* ---------- State ---------- */
+      /* 僅一位乘數 × 兩／三位數被乘數的直式（不做兩位×兩位） */
       const DIFFICULTY = {
-        easy:   { label: "兩位數 × 一位數", aMin: 12, aMax: 99, bMin: 2, bMax: 9, hideMin: 2, hideMax: 3 },
-        medium: { label: "兩位數 × 兩位數", aMin: 12, aMax: 99, bMin: 12, bMax: 99, hideMin: 3, hideMax: 5 },
-        hard:   { label: "三位數 × 一位數", aMin: 102, aMax: 999, bMin: 3, bMax: 9, hideMin: 4, hideMax: 6 },
+        easy: { label: "一位數 × 兩位數", aMin: 12, aMax: 99,  bMin: 2, bMax: 9, hideMin: 2, hideMax: 3 },
+        hard: { label: "一位數 × 三位數", aMin: 102, aMax: 999, bMin: 3, bMax: 9, hideMin: 3, hideMax: 5 },
       };
 
       const state = {
@@ -1199,61 +1198,29 @@
       function renderCarryExplanation(a, b, p) {
         carryBoardEl.innerHTML = "";
         const aDigs = digitsOf(a);
-        const bStr = String(b);
-        const isSingle = b < 10;
+        const steps = multiplyWithCarry(aDigs, b);
 
-        if (isSingle) {
-          const steps = multiplyWithCarry(aDigs, b);
-          // carry row
-          const carryRow = document.createElement("div");
-          carryRow.className = "carry-row";
-          carryRow.appendChild(spacer());
-          const maxLen = Math.max(aDigs.length, steps.productDigs.length);
-          const carries = padLeft(steps.carries, maxLen, 0);
-          carries.forEach((c) => {
-            const el = document.createElement("div");
-            el.className = "carry-digit carry";
-            el.textContent = c ? String(c) : "";
-            carryRow.appendChild(el);
-          });
-          carryBoardEl.appendChild(carryRow);
+        const carryRow = document.createElement("div");
+        carryRow.className = "carry-row";
+        carryRow.appendChild(spacer());
+        const maxLen = Math.max(aDigs.length, steps.productDigs.length);
+        const carries = padLeft(steps.carries, maxLen, 0);
+        carries.forEach((c) => {
+          const el = document.createElement("div");
+          el.className = "carry-digit carry";
+          el.textContent = c ? String(c) : "";
+          carryRow.appendChild(el);
+        });
+        carryBoardEl.appendChild(carryRow);
 
-          // multiplicand
-          carryBoardEl.appendChild(labeledDigitRow("", padLeft(aDigs, maxLen, null)));
-          // multiplier
-          carryBoardEl.appendChild(labeledDigitRow("×", padLeft([b], maxLen, null)));
-          // product
-          const prodRow = labeledDigitRow("=", padLeft(steps.productDigs, maxLen, null));
-          carryBoardEl.appendChild(prodRow);
+        carryBoardEl.appendChild(labeledDigitRow("", padLeft(aDigs, maxLen, null)));
+        carryBoardEl.appendChild(labeledDigitRow("×", padLeft([b], maxLen, null)));
+        carryBoardEl.appendChild(labeledDigitRow("=", padLeft(steps.productDigs, maxLen, null)));
 
-          const notes = steps.notes.length
-            ? steps.notes.join("；") + "。"
-            : "每一位相乘皆小於 10，沒有進位。";
-          carryNoteEl.textContent = notes + ` 最後得到積 ${p}。`;
-        } else {
-          // Two-digit multiplier: show partial products
-          const bDigs = digitsOf(b);
-          const ones = bDigs[bDigs.length - 1];
-          const tens = bDigs[bDigs.length - 2];
-          const partial1 = a * ones;
-          const partial2 = a * tens;
-
-          const width = digitsOf(p).length;
-          carryBoardEl.appendChild(labeledDigitRow("", padLeft(aDigs, width, null)));
-          carryBoardEl.appendChild(labeledDigitRow("×", padLeft(bDigs, width, null)));
-
-          const p1 = labeledDigitRow("", padLeft(digitsOf(partial1), width, null));
-          carryBoardEl.appendChild(p1);
-          const p2Digs = digitsOf(partial2).concat([null]); // shift one place (tens)
-          const p2 = labeledDigitRow("+", padLeft(p2Digs, width, null));
-          carryBoardEl.appendChild(p2);
-          carryBoardEl.appendChild(labeledDigitRow("=", padLeft(digitsOf(p), width, null)));
-
-          carryNoteEl.textContent =
-            `先算 ${a} × ${ones} = ${partial1}（個位部分積）；` +
-            `再算 ${a} × ${tens} = ${partial2}，向左移一位（十位部分積）；` +
-            `兩部分積相加得 ${p}。`;
-        }
+        const notes = steps.notes.length
+          ? steps.notes.join("；") + "。"
+          : "每一位相乘皆小於 10，沒有進位。";
+        carryNoteEl.textContent = notes + ` 最後得到積 ${p}。`;
       }
 
       function spacer() {
