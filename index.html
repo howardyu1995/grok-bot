@@ -498,6 +498,149 @@
       line-height: 1.55;
     }
 
+    .numpad {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.45rem;
+      margin: 0.85rem 0 0.15rem;
+      max-width: 280px;
+      margin-left: auto;
+      margin-right: auto;
+      width: 100%;
+    }
+
+    .num-key {
+      appearance: none;
+      border: 1.5px solid var(--line);
+      background: white;
+      color: var(--ink);
+      border-radius: 12px;
+      min-height: 46px;
+      font-family: "Fredoka", "Noto Sans TC", sans-serif;
+      font-weight: 600;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: background 0.12s, transform 0.1s, border-color 0.12s, box-shadow 0.12s;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      touch-action: manipulation;
+    }
+
+    .num-key:hover:not(:disabled) {
+      border-color: var(--accent);
+      background: #eefaf7;
+    }
+
+    .num-key:active:not(:disabled) {
+      transform: scale(0.96);
+      background: var(--accent-soft);
+    }
+
+    .num-key:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .num-key:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .num-key.wide {
+      font-size: 0.95rem;
+      font-weight: 700;
+    }
+
+    .num-key.action {
+      background: var(--sky);
+      color: var(--ink-soft);
+      font-size: 0.88rem;
+    }
+
+    .num-key.check-key {
+      background: linear-gradient(160deg, #2bb8a0, var(--accent-hot));
+      color: white;
+      border-color: transparent;
+      font-size: 0.88rem;
+    }
+
+    .teach-tip {
+      margin-top: 0.55rem;
+      padding: 0.65rem 0.75rem;
+      border-radius: 12px;
+      background: var(--sun-soft);
+      border: 1px solid rgba(240, 180, 41, 0.45);
+      color: #7a5a00;
+      font-size: 0.88rem;
+      line-height: 1.5;
+      display: none;
+    }
+
+    .teach-tip.show { display: block; animation: fade-up 0.3s ease both; }
+
+    .solution-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin: 0.55rem 0 0.65rem;
+    }
+
+    .solution-toolbar .btn {
+      padding: 0.45rem 0.7rem;
+      font-size: 0.82rem;
+      border-radius: 10px;
+    }
+
+    .step-list {
+      list-style: none;
+      margin: 0.65rem 0 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .step-item {
+      padding: 0.55rem 0.7rem;
+      border-radius: 10px;
+      background: white;
+      border: 1.5px solid var(--line);
+      font-size: 0.86rem;
+      line-height: 1.45;
+      color: var(--ink-soft);
+      opacity: 0.35;
+      transform: translateY(4px);
+      transition: opacity 0.35s ease, transform 0.35s ease, border-color 0.25s, background 0.25s, color 0.25s;
+    }
+
+    .step-item.visible {
+      opacity: 1;
+      transform: translateY(0);
+      color: var(--ink);
+    }
+
+    .step-item.current {
+      border-color: var(--accent);
+      background: #e7f8f4;
+      color: var(--accent-hot);
+      font-weight: 600;
+      box-shadow: 0 0 0 3px rgba(31, 157, 138, 0.15);
+    }
+
+    .carry-digit.lit {
+      background: var(--sun-soft);
+      color: #a87800;
+      border-radius: 6px;
+      outline: 2px solid rgba(240, 180, 41, 0.55);
+    }
+
+    .carry-digit.prod-lit {
+      background: var(--accent-soft);
+      color: var(--accent-hot);
+      border-radius: 6px;
+      outline: 2px solid rgba(31, 157, 138, 0.4);
+    }
+
     .footer-hint {
       text-align: center;
       font-size: 0.78rem;
@@ -609,11 +752,13 @@
         </button>
       </div>
 
-      <p class="equation-label" id="eqLabel">兩位數 × 一位數</p>
+      <p class="equation-label" id="eqLabel">一位數 × 兩位數</p>
 
       <div class="workspace">
         <div class="mul-board" id="board" aria-label="直式乘法題目"></div>
       </div>
+
+      <div class="numpad" id="numpad" role="group" aria-label="數字鍵盤"></div>
 
       <div class="actions">
         <button type="button" class="btn btn-primary" id="checkBtn">檢查答案</button>
@@ -622,17 +767,24 @@
         <button type="button" class="btn btn-ghost" id="solveBtn" style="grid-column: 1 / -1;">顯示解析</button>
       </div>
 
-      <div class="feedback info" id="feedback" role="status" aria-live="polite">填入空格中的數字，再按「檢查答案」</div>
+      <div class="feedback info" id="feedback" role="status" aria-live="polite">用下方鍵盤填入空格，填完會自動檢查</div>
+      <div class="teach-tip" id="teachTip" role="status" aria-live="polite"></div>
 
       <section class="solution" id="solution" aria-live="polite">
         <h3>完整解析</h3>
         <div class="solution-eq" id="solutionEq"></div>
+        <div class="solution-toolbar" id="solutionToolbar">
+          <button type="button" class="btn btn-primary" id="stepNextBtn">下一步</button>
+          <button type="button" class="btn btn-secondary" id="stepPlayBtn">自動播放</button>
+          <button type="button" class="btn btn-ghost" id="stepAllBtn">全部顯示</button>
+        </div>
         <div class="carry-board" id="carryBoard"></div>
+        <ol class="step-list" id="stepList"></ol>
         <p class="carry-note" id="carryNote"></p>
       </section>
     </main>
 
-    <p class="footer-hint">輸入一位數字會自動跳到下一格 · 可用鍵盤左右鍵移動</p>
+    <p class="footer-hint">點數字鍵盤填空 · 填完自動檢查 · 也可用實體鍵盤</p>
   </div>
 
   <div class="confetti-layer" id="confetti" aria-hidden="true"></div>
@@ -644,10 +796,13 @@
       /* ---------- DOM ---------- */
       const boardEl = document.getElementById("board");
       const feedbackEl = document.getElementById("feedback");
+      const teachTipEl = document.getElementById("teachTip");
       const solutionEl = document.getElementById("solution");
       const solutionEqEl = document.getElementById("solutionEq");
       const carryBoardEl = document.getElementById("carryBoard");
       const carryNoteEl = document.getElementById("carryNote");
+      const stepListEl = document.getElementById("stepList");
+      const numpadEl = document.getElementById("numpad");
       const scoreEl = document.getElementById("score");
       const streakEl = document.getElementById("streak");
       const timerEl = document.getElementById("timer");
@@ -658,6 +813,9 @@
       const hintBtn = document.getElementById("hintBtn");
       const nextBtn = document.getElementById("nextBtn");
       const solveBtn = document.getElementById("solveBtn");
+      const stepNextBtn = document.getElementById("stepNextBtn");
+      const stepPlayBtn = document.getElementById("stepPlayBtn");
+      const stepAllBtn = document.getElementById("stepAllBtn");
 
       /* ---------- State ---------- */
       /* 僅一位乘數 × 兩／三位數被乘數的直式（不做兩位×兩位） */
@@ -666,20 +824,29 @@
         hard: { label: "一位數 × 三位數", aMin: 102, aMax: 999, bMin: 3, bMax: 9, hideMin: 3, hideMax: 5 },
       };
 
+      const PLACE_NAMES = ["", "個位", "十位", "百位", "千位", "萬位"];
+
       const state = {
         difficulty: "easy",
         multiplicand: 0,
         multiplier: 0,
         product: 0,
+        width: 0,
         blanks: [],       // { id, value, row, col, input }
+        activeBlank: null,
         score: 0,
         streak: 0,
         bestStreak: Number(localStorage.getItem("mul-worm-best") || 0),
         elapsed: 0,
         timerId: null,
+        autoCheckId: null,
         solved: false,
         soundOn: localStorage.getItem("mul-worm-sound") !== "0",
         audioCtx: null,
+        solutionSteps: [],
+        solutionStepIndex: -1,
+        solutionPlayId: null,
+        solutionMeta: null,
       };
 
       /* ---------- Audio (Web Audio API) ---------- */
@@ -902,46 +1069,153 @@
         return countSolutions(0) === 1;
       }
 
+      /* ---------- Numpad ---------- */
+      function buildNumpad() {
+        numpadEl.innerHTML = "";
+        const keys = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "⌫", "0", "✓"];
+        keys.forEach((key) => {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "num-key";
+          btn.textContent = key;
+          if (key === "⌫") {
+            btn.classList.add("action", "wide");
+            btn.setAttribute("aria-label", "刪除");
+            btn.dataset.action = "backspace";
+          } else if (key === "✓") {
+            btn.classList.add("check-key", "wide");
+            btn.setAttribute("aria-label", "檢查答案");
+            btn.dataset.action = "check";
+          } else {
+            btn.dataset.digit = key;
+            btn.setAttribute("aria-label", `數字 ${key}`);
+          }
+          btn.addEventListener("pointerdown", (e) => {
+            e.preventDefault(); // keep focus on blank / avoid blur race
+            ensureAudio();
+            handleNumpad(btn);
+          });
+          numpadEl.appendChild(btn);
+        });
+      }
+
+      function setNumpadEnabled(on) {
+        numpadEl.querySelectorAll(".num-key").forEach((btn) => {
+          btn.disabled = !on;
+        });
+      }
+
+      function handleNumpad(btn) {
+        if (state.solved) return;
+        const action = btn.dataset.action;
+        if (action === "check") {
+          checkAnswer();
+          return;
+        }
+        if (action === "backspace") {
+          numpadBackspace();
+          return;
+        }
+        if (btn.dataset.digit != null) {
+          enterDigit(btn.dataset.digit);
+        }
+      }
+
+      function ensureActiveBlank() {
+        if (state.activeBlank && !state.activeBlank.disabled && state.blanks.some((b) => b.input === state.activeBlank)) {
+          return state.activeBlank;
+        }
+        const first = state.blanks.find((b) => !b.input.disabled && b.input.value === "");
+        const any = state.blanks.find((b) => !b.input.disabled);
+        const target = (first || any)?.input || null;
+        if (target) {
+          state.activeBlank = target;
+          target.focus({ preventScroll: true });
+        }
+        return target;
+      }
+
+      function enterDigit(digit) {
+        const input = ensureActiveBlank();
+        if (!input || input.disabled) return;
+        input.value = digit;
+        input.classList.remove("wrong", "hinted", "correct");
+        hideTeachTip();
+        playClick();
+        focusNextBlank(input);
+        maybeAutoCheck();
+      }
+
+      function numpadBackspace() {
+        const input = ensureActiveBlank();
+        if (!input || input.disabled) return;
+        cancelAutoCheck();
+        hideTeachTip();
+        if (input.value) {
+          input.value = "";
+          input.classList.remove("wrong", "hinted", "correct");
+          playClick();
+          return;
+        }
+        const blanks = state.blanks.map((b) => b.input);
+        const idx = blanks.indexOf(input);
+        if (idx > 0) {
+          const prev = blanks[idx - 1];
+          if (!prev.disabled) {
+            prev.value = "";
+            prev.classList.remove("wrong", "hinted", "correct");
+            setActiveBlank(prev);
+            playClick();
+          }
+        }
+      }
+
       /* ---------- Render ---------- */
       function renderPuzzle(puzzle) {
+        cancelAutoCheck();
+        stopSolutionPlay();
         state.multiplicand = puzzle.a;
         state.multiplier = puzzle.b;
         state.product = puzzle.p;
+        state.width = puzzle.width;
         state.blanks = [];
+        state.activeBlank = null;
         state.solved = false;
+        state.solutionSteps = [];
+        state.solutionStepIndex = -1;
+        state.solutionMeta = null;
         solutionEl.classList.remove("open");
+        stepListEl.innerHTML = "";
+        carryBoardEl.innerHTML = "";
+        carryNoteEl.textContent = "";
+        hideTeachTip();
         feedbackEl.className = "feedback info";
-        feedbackEl.textContent = "填入空格中的數字，再按「檢查答案」";
+        feedbackEl.textContent = "用下方鍵盤填入空格，填完會自動檢查";
         checkBtn.disabled = false;
         hintBtn.disabled = false;
+        setNumpadEnabled(true);
 
         const { aDigs, bDigs, pDigs, width, cells, hidden } = puzzle;
         const hiddenSet = new Set(hidden);
         const cellMap = new Map(cells.map((c, i) => [`${c.row},${c.col}`, { ...c, i }]));
 
         boardEl.innerHTML = "";
-        const cols = width + 1; // +1 for × column
+        const cols = width + 1;
 
-        // Multiplicand row (no operator)
         boardEl.appendChild(makeRow(0, aDigs, width, cellMap, hiddenSet, false));
-
-        // Multiplier row with ×
         boardEl.appendChild(makeRow(1, bDigs, width, cellMap, hiddenSet, true));
 
-        // Rule aligned to digit columns
         const rule = document.createElement("div");
         rule.className = "rule";
         rule.style.width = `calc(${cols} * var(--cell) + ${cols - 1} * var(--gap))`;
         rule.setAttribute("aria-hidden", "true");
         boardEl.appendChild(rule);
 
-        // Product row
         boardEl.appendChild(makeRow(2, pDigs, width, cellMap, hiddenSet, false));
 
-        // Focus first blank
         requestAnimationFrame(() => {
           const first = boardEl.querySelector(".blank");
-          if (first) first.focus();
+          if (first) setActiveBlank(first);
         });
       }
 
@@ -950,7 +1224,6 @@
         rowEl.className = "mul-row" + (withOp ? " factor" : "");
         rowEl.style.gridTemplateColumns = `repeat(${width + 1}, var(--cell))`;
 
-        // Operator / spacer in first column
         const op = document.createElement("div");
         op.className = "op-cell";
         op.textContent = withOp ? "×" : "";
@@ -972,22 +1245,26 @@
           if (meta && hiddenSet.has(meta.i)) {
             const input = document.createElement("input");
             input.type = "text";
-            input.inputMode = "numeric";
+            input.inputMode = "none";
             input.pattern = "[0-9]*";
             input.maxLength = 1;
             input.className = "blank";
             input.autocomplete = "off";
-            input.enterKeyHint = "next";
             input.setAttribute("aria-label", rowLabel(row, col, width));
             input.dataset.answer = String(d);
             input.dataset.blankId = String(state.blanks.length);
+            input.dataset.row = String(row);
+            input.dataset.col = String(col);
 
             const blank = { id: state.blanks.length, value: d, row, col, input };
             state.blanks.push(blank);
 
             input.addEventListener("input", onBlankInput);
             input.addEventListener("keydown", onBlankKeydown);
-            input.addEventListener("focus", () => input.select());
+            input.addEventListener("focus", () => {
+              state.activeBlank = input;
+              input.select();
+            });
             rowEl.appendChild(input);
           } else {
             const digit = document.createElement("div");
@@ -1002,10 +1279,14 @@
 
       function rowLabel(row, col, width) {
         const names = ["被乘數", "乘數", "積"];
-        const place = width - col; // 1 = 個位
-        const placeNames = ["", "個位", "十位", "百位", "千位", "萬位"];
-        const placeName = placeNames[place] || `右起第 ${place} 位`;
+        const place = width - col;
+        const placeName = PLACE_NAMES[place] || `右起第 ${place} 位`;
         return `${names[row]}的${placeName}`;
+      }
+
+      function placeNameOf(col, width) {
+        const place = width - col;
+        return PLACE_NAMES[place] || `右起第 ${place} 位`;
       }
 
       /* ---------- Input handling ---------- */
@@ -1015,10 +1296,15 @@
         if (v.length > 1) v = v.slice(-1);
         input.value = v;
         input.classList.remove("wrong", "hinted", "correct");
+        hideTeachTip();
+        state.activeBlank = input;
 
         if (v) {
           playClick();
           focusNextBlank(input);
+          maybeAutoCheck();
+        } else {
+          cancelAutoCheck();
         }
       }
 
@@ -1027,20 +1313,24 @@
         const blanks = state.blanks.map((b) => b.input);
         const idx = blanks.indexOf(input);
 
-        if (e.key === "Backspace" && !input.value && idx > 0) {
+        if (/^[0-9]$/.test(e.key)) {
           e.preventDefault();
-          blanks[idx - 1].focus();
-          blanks[idx - 1].select();
+          enterDigit(e.key);
+          return;
+        }
+        if (e.key === "Backspace") {
+          e.preventDefault();
+          numpadBackspace();
           return;
         }
         if (e.key === "ArrowLeft" && idx > 0) {
           e.preventDefault();
-          blanks[idx - 1].focus();
+          setActiveBlank(blanks[idx - 1]);
           return;
         }
         if (e.key === "ArrowRight" && idx < blanks.length - 1) {
           e.preventDefault();
-          blanks[idx + 1].focus();
+          setActiveBlank(blanks[idx + 1]);
           return;
         }
         if (e.key === "Enter") {
@@ -1049,33 +1339,123 @@
         }
       }
 
+      function setActiveBlank(input) {
+        if (!input || input.disabled) return;
+        state.activeBlank = input;
+        input.focus({ preventScroll: true });
+        try { input.select(); } catch (_) { /* ignore */ }
+      }
+
       function focusNextBlank(current) {
         const blanks = state.blanks.map((b) => b.input);
         const idx = blanks.indexOf(current);
         for (let i = idx + 1; i < blanks.length; i++) {
           if (!blanks[i].disabled) {
-            blanks[i].focus();
+            setActiveBlank(blanks[i]);
             return;
           }
         }
+        // stay on last filled
+        setActiveBlank(current);
+      }
+
+      function allBlanksFilled() {
+        return state.blanks.length > 0 && state.blanks.every((b) => b.input.value !== "");
+      }
+
+      function cancelAutoCheck() {
+        if (state.autoCheckId) {
+          clearTimeout(state.autoCheckId);
+          state.autoCheckId = null;
+        }
+      }
+
+      function maybeAutoCheck() {
+        cancelAutoCheck();
+        if (state.solved || !allBlanksFilled()) return;
+        feedbackEl.className = "feedback info";
+        feedbackEl.textContent = "已填完，正在檢查…";
+        state.autoCheckId = setTimeout(() => {
+          state.autoCheckId = null;
+          checkAnswer();
+        }, 280);
+      }
+
+      function hideTeachTip() {
+        teachTipEl.classList.remove("show");
+        teachTipEl.textContent = "";
+      }
+
+      function showTeachTip(text) {
+        teachTipEl.textContent = text;
+        teachTipEl.classList.add("show");
+      }
+
+      /* ---------- Teaching hints for wrong answers ---------- */
+      function buildPlaceHint(blank) {
+        const a = state.multiplicand;
+        const b = state.multiplier;
+        const p = state.product;
+        const width = state.width;
+        const place = placeNameOf(blank.col, width);
+        const aDigs = digitsOf(a);
+        const steps = multiplyWithCarry(aDigs, b);
+
+        if (blank.row === 1) {
+          return `乘數的${place}不對。想想：${a} × ？ = ${p}，乘數應該是幾？`;
+        }
+
+        if (blank.row === 0) {
+          // Hint via reverse thinking with known multiplier
+          const aPlaceIdx = blank.col - (width - aDigs.length);
+          if (aPlaceIdx >= 0 && aPlaceIdx < aDigs.length) {
+            const fromRight = aDigs.length - 1 - aPlaceIdx;
+            const related = steps.notes[fromRight];
+            if (related) {
+              return `被乘數的${place}不對。可從這一步反推：${related}`;
+            }
+          }
+          return `被乘數的${place}不對。已知乘數是 ${b}、積是 ${p}，再推一次被乘數。`;
+        }
+
+        // Product digit
+        const pDigs = steps.productDigs;
+        const pPad = padLeft(pDigs, width, null);
+        // column in padded product grid
+        const prodOffset = width - pDigs.length;
+        const prodIdx = blank.col - prodOffset;
+        if (prodIdx >= 0 && prodIdx < pDigs.length) {
+          const fromRight = pDigs.length - 1 - prodIdx;
+          // notes are ordered from ones upward; last note may be leading carry
+          if (fromRight < aDigs.length && steps.notes[fromRight]) {
+            return `${place}不對。先看這一步：${steps.notes[fromRight]}`;
+          }
+          if (prodIdx === 0 && steps.notes.length > aDigs.length) {
+            return `${place}不對。${steps.notes[steps.notes.length - 1]}`;
+          }
+        }
+        return `${place}的積不對。從個位開始重算 ${a} × ${b}。`;
       }
 
       /* ---------- Check / Hint / Solution ---------- */
       function checkAnswer() {
         if (state.solved) return;
+        cancelAutoCheck();
         ensureAudio();
 
         const empties = state.blanks.filter((b) => b.input.value === "");
         if (empties.length) {
           feedbackEl.className = "feedback bad";
           feedbackEl.textContent = `還有 ${empties.length} 個空格尚未填寫`;
-          empties[0].input.focus();
+          hideTeachTip();
+          setActiveBlank(empties[0].input);
           playError();
           return;
         }
 
         let allCorrect = true;
         let wrongCount = 0;
+        const wrongBlanks = [];
 
         state.blanks.forEach((b) => {
           const ok = b.input.value === String(b.value);
@@ -1083,31 +1463,37 @@
           if (ok) {
             b.input.classList.add("correct");
           } else {
+            b.input.classList.remove("wrong");
+            void b.input.offsetWidth;
             b.input.classList.add("wrong");
             allCorrect = false;
             wrongCount += 1;
-            // re-trigger shake
-            void b.input.offsetWidth;
-            b.input.classList.add("wrong");
+            wrongBlanks.push(b);
           }
         });
 
         if (allCorrect) {
+          hideTeachTip();
           onSuccess();
         } else {
           state.streak = 0;
           streakEl.textContent = "0";
           feedbackEl.className = "feedback bad";
           feedbackEl.textContent = `有 ${wrongCount} 格不正確，再試試看！`;
+          // Prefer teaching the rightmost wrong blank (ones place first)
+          wrongBlanks.sort((x, y) => y.col - x.col || x.row - y.row);
+          const focusBlank = wrongBlanks[0];
+          showTeachTip(buildPlaceHint(focusBlank));
           playError();
-          const firstWrong = state.blanks.find((b) => b.input.classList.contains("wrong"));
-          if (firstWrong) firstWrong.input.focus();
+          if (navigator.vibrate) navigator.vibrate(40);
+          setActiveBlank(focusBlank.input);
         }
       }
 
       function onSuccess() {
         state.solved = true;
         stopTimer();
+        cancelAutoCheck();
         state.streak += 1;
         if (state.streak > state.bestStreak) {
           state.bestStreak = state.streak;
@@ -1128,6 +1514,7 @@
         });
         checkBtn.disabled = true;
         hintBtn.disabled = true;
+        setNumpadEnabled(false);
 
         feedbackEl.className = "feedback ok";
         feedbackEl.textContent = `太棒了！答對了！+${gained} 分`;
@@ -1138,6 +1525,7 @@
       function giveHint() {
         if (state.solved) return;
         ensureAudio();
+        cancelAutoCheck();
 
         const candidates = state.blanks.filter(
           (b) => !b.input.disabled && b.input.value !== String(b.value)
@@ -1148,22 +1536,24 @@
           return;
         }
 
-        // Prefer empty blanks
+        // Prefer empty blanks; among them prefer ones-place (rightmost)
         const empty = candidates.filter((b) => b.input.value === "");
-        const target = (empty.length ? empty : candidates)[randInt(0, (empty.length ? empty : candidates).length - 1)];
+        const pool = (empty.length ? empty : candidates).slice().sort((x, y) => y.col - x.col);
+        const target = pool[0];
 
         target.input.value = String(target.value);
         target.input.classList.remove("wrong");
         target.input.classList.add("hinted");
-        target.input.focus();
+        setActiveBlank(target.input);
 
-        // Small score cost
         state.score = Math.max(0, state.score - 2);
         scoreEl.textContent = String(state.score);
 
         feedbackEl.className = "feedback info";
         feedbackEl.textContent = "已提示一格正確數字（−2 分）";
+        showTeachTip(buildPlaceHint(target).replace("不對。", "提示：").replace("不對：", "提示："));
         playHint();
+        maybeAutoCheck();
       }
 
       function showSolution() {
@@ -1171,8 +1561,9 @@
         const b = state.multiplier;
         const p = state.product;
         solutionEqEl.textContent = `${a} × ${b} = ${p}`;
+        cancelAutoCheck();
+        hideTeachTip();
 
-        // Reveal blanks without awarding score if not solved
         if (!state.solved) {
           state.blanks.forEach((b) => {
             b.input.value = String(b.value);
@@ -1186,41 +1577,211 @@
           streakEl.textContent = "0";
           checkBtn.disabled = true;
           hintBtn.disabled = true;
+          setNumpadEnabled(false);
           feedbackEl.className = "feedback info";
-          feedbackEl.textContent = "已顯示完整答案與解析";
+          feedbackEl.textContent = "已顯示完整答案與解析（逐步觀看下方步驟）";
         }
 
-        renderCarryExplanation(a, b, p);
+        setupStepSolution(a, b, p);
         solutionEl.classList.add("open");
         solutionEl.scrollIntoView({ behavior: "smooth", block: "nearest" });
       }
 
-      function renderCarryExplanation(a, b, p) {
-        carryBoardEl.innerHTML = "";
+      function stopSolutionPlay() {
+        if (state.solutionPlayId) {
+          clearInterval(state.solutionPlayId);
+          state.solutionPlayId = null;
+        }
+        if (stepPlayBtn) stepPlayBtn.textContent = "自動播放";
+      }
+
+      function setupStepSolution(a, b, p) {
+        stopSolutionPlay();
         const aDigs = digitsOf(a);
         const steps = multiplyWithCarry(aDigs, b);
+        const maxLen = Math.max(aDigs.length, steps.productDigs.length);
 
+        state.solutionMeta = { a, b, p, aDigs, steps, maxLen };
+        state.solutionSteps = steps.notes.slice();
+        state.solutionStepIndex = -1;
+
+        // Build board with product/carry hidden initially
+        carryBoardEl.innerHTML = "";
         const carryRow = document.createElement("div");
         carryRow.className = "carry-row";
         carryRow.appendChild(spacer());
-        const maxLen = Math.max(aDigs.length, steps.productDigs.length);
         const carries = padLeft(steps.carries, maxLen, 0);
-        carries.forEach((c) => {
+        carries.forEach((c, i) => {
           const el = document.createElement("div");
           el.className = "carry-digit carry";
-          el.textContent = c ? String(c) : "";
+          el.dataset.carryIdx = String(i);
+          el.dataset.full = c ? String(c) : "";
+          el.textContent = "";
           carryRow.appendChild(el);
         });
         carryBoardEl.appendChild(carryRow);
 
-        carryBoardEl.appendChild(labeledDigitRow("", padLeft(aDigs, maxLen, null)));
-        carryBoardEl.appendChild(labeledDigitRow("×", padLeft([b], maxLen, null)));
-        carryBoardEl.appendChild(labeledDigitRow("=", padLeft(steps.productDigs, maxLen, null)));
+        carryBoardEl.appendChild(labeledDigitRow("", padLeft(aDigs, maxLen, null), "a"));
+        carryBoardEl.appendChild(labeledDigitRow("×", padLeft([b], maxLen, null), "b"));
 
-        const notes = steps.notes.length
-          ? steps.notes.join("；") + "。"
-          : "每一位相乘皆小於 10，沒有進位。";
-        carryNoteEl.textContent = notes + ` 最後得到積 ${p}。`;
+        const prodRow = labeledDigitRow("=", padLeft(steps.productDigs, maxLen, null), "p");
+        // Hide product digits initially for reveal
+        prodRow.querySelectorAll(".carry-digit[data-col]").forEach((el) => {
+          el.dataset.full = el.textContent;
+          el.textContent = "";
+        });
+        carryBoardEl.appendChild(prodRow);
+
+        stepListEl.innerHTML = "";
+        state.solutionSteps.forEach((note, i) => {
+          const li = document.createElement("li");
+          li.className = "step-item";
+          li.textContent = note;
+          li.dataset.step = String(i);
+          stepListEl.appendChild(li);
+        });
+
+        carryNoteEl.textContent = "按「下一步」或「自動播放」，從個位開始看進位過程。";
+        stepNextBtn.disabled = false;
+        stepAllBtn.disabled = false;
+        stepPlayBtn.disabled = false;
+      }
+
+      function applySolutionReveal(upToIndex) {
+        const meta = state.solutionMeta;
+        if (!meta) return;
+        const { aDigs, steps, maxLen } = meta;
+        const items = [...stepListEl.querySelectorAll(".step-item")];
+        const prodCells = [...carryBoardEl.querySelectorAll('.carry-digit[data-row="p"]')];
+        const carryCells = [...carryBoardEl.querySelectorAll(".carry-digit.carry")];
+        const aCells = [...carryBoardEl.querySelectorAll('.carry-digit[data-row="a"]')];
+
+        items.forEach((li, i) => {
+          li.classList.toggle("visible", i <= upToIndex);
+          li.classList.toggle("current", i === upToIndex && upToIndex >= 0);
+        });
+
+        carryBoardEl.querySelectorAll(".carry-digit").forEach((el) => {
+          el.classList.remove("lit", "prod-lit");
+        });
+
+        // Reset hidden fields
+        prodCells.forEach((el) => { el.textContent = ""; });
+        carryCells.forEach((el) => { el.textContent = ""; });
+
+        if (upToIndex < 0) return;
+
+        const placeSteps = Math.min(upToIndex + 1, aDigs.length);
+        const showLeading = upToIndex >= aDigs.length;
+
+        // Reveal product digits from the right
+        const revealCount = showLeading ? steps.productDigs.length : placeSteps;
+        prodCells.forEach((el) => {
+          const col = Number(el.dataset.col);
+          const fromRight = maxLen - 1 - col;
+          if (fromRight < revealCount && el.dataset.full) {
+            el.textContent = el.dataset.full;
+          }
+        });
+
+        // Reveal carries for columns we've reached (carry INTO column)
+        for (let fromRight = 0; fromRight < placeSteps; fromRight++) {
+          const col = maxLen - 1 - fromRight;
+          const cCell = carryCells.find((el) => Number(el.dataset.carryIdx) === col);
+          if (cCell && cCell.dataset.full) cCell.textContent = cCell.dataset.full;
+        }
+        // Also show carry generated into the next-left column after each finished place step
+        if (placeSteps > 0) {
+          const nextCol = maxLen - 1 - placeSteps;
+          if (nextCol >= 0) {
+            const cCell = carryCells.find((el) => Number(el.dataset.carryIdx) === nextCol);
+            if (cCell && cCell.dataset.full) cCell.textContent = cCell.dataset.full;
+          }
+        }
+        if (showLeading) {
+          carryCells.forEach((el) => {
+            if (el.dataset.full) el.textContent = el.dataset.full;
+          });
+          prodCells.forEach((el) => {
+            if (el.dataset.full) el.textContent = el.dataset.full;
+          });
+        }
+
+        // Highlight current step column
+        if (upToIndex < aDigs.length) {
+          const col = maxLen - 1 - upToIndex;
+          const aCell = aCells.find((el) => Number(el.dataset.col) === col);
+          const pCell = prodCells.find((el) => Number(el.dataset.col) === col);
+          const cCell = carryCells.find((el) => Number(el.dataset.carryIdx) === col);
+          if (aCell && aCell.textContent) aCell.classList.add("lit");
+          if (pCell) pCell.classList.add("prod-lit");
+          if (cCell && cCell.textContent) cCell.classList.add("lit");
+        } else {
+          const lead = prodCells.find((el) => el.dataset.full && Number(el.dataset.col) === (maxLen - steps.productDigs.length));
+          if (lead) lead.classList.add("prod-lit");
+        }
+
+        carryNoteEl.textContent = state.solutionSteps[upToIndex] || "";
+        items[upToIndex]?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }
+
+      function solutionNext() {
+        if (!state.solutionSteps.length) return;
+        if (state.solutionStepIndex >= state.solutionSteps.length - 1) {
+          revealAllSolutionSteps();
+          return;
+        }
+        state.solutionStepIndex += 1;
+        applySolutionReveal(state.solutionStepIndex);
+        playClick();
+        if (state.solutionStepIndex >= state.solutionSteps.length - 1) {
+          carryNoteEl.textContent = `完成！最後得到積 ${state.product}。`;
+          stopSolutionPlay();
+        }
+      }
+
+      function revealAllSolutionSteps() {
+        stopSolutionPlay();
+        if (!state.solutionMeta) return;
+        state.solutionStepIndex = state.solutionSteps.length - 1;
+        applySolutionReveal(state.solutionStepIndex);
+        carryBoardEl.querySelectorAll(".carry-digit").forEach((el) => {
+          if (el.dataset.full) el.textContent = el.dataset.full;
+          el.classList.remove("lit", "prod-lit");
+        });
+        stepListEl.querySelectorAll(".step-item").forEach((li) => {
+          li.classList.add("visible");
+          li.classList.remove("current");
+        });
+        const notes = state.solutionMeta.steps.notes.join("；");
+        carryNoteEl.textContent = notes + `。 最後得到積 ${state.product}。`;
+      }
+
+      function toggleSolutionPlay() {
+        if (state.solutionPlayId) {
+          stopSolutionPlay();
+          return;
+        }
+        if (!state.solutionSteps.length) return;
+        stepPlayBtn.textContent = "暫停";
+        if (state.solutionStepIndex >= state.solutionSteps.length - 1) {
+          state.solutionStepIndex = -1;
+          stepListEl.querySelectorAll(".step-item").forEach((li) => {
+            li.classList.remove("visible", "current");
+          });
+          carryBoardEl.querySelectorAll(".carry-digit[data-row='p'], .carry-digit.carry").forEach((el) => {
+            el.textContent = "";
+            el.classList.remove("lit", "prod-lit");
+          });
+        }
+        solutionNext();
+        state.solutionPlayId = setInterval(() => {
+          if (state.solutionStepIndex >= state.solutionSteps.length - 1) {
+            stopSolutionPlay();
+            return;
+          }
+          solutionNext();
+        }, 1400);
       }
 
       function spacer() {
@@ -1230,7 +1791,7 @@
         return el;
       }
 
-      function labeledDigitRow(label, digs) {
+      function labeledDigitRow(label, digs, rowKey) {
         const row = document.createElement("div");
         row.className = "carry-row";
         const lab = document.createElement("div");
@@ -1238,9 +1799,11 @@
         lab.style.width = "20px";
         lab.textContent = label;
         row.appendChild(lab);
-        digs.forEach((d) => {
+        digs.forEach((d, col) => {
           const el = document.createElement("div");
           el.className = "carry-digit";
+          el.dataset.row = rowKey || "";
+          el.dataset.col = String(col);
           el.textContent = d === null ? "" : String(d);
           row.appendChild(el);
         });
@@ -1251,10 +1814,10 @@
         const productDigs = [];
         const notes = [];
         let carry = 0;
-        const tempCarries = []; // carry INTO each digit (from right), left-aligned later
+        const tempCarries = [];
 
         for (let i = aDigs.length - 1; i >= 0; i--) {
-          const place = aDigs.length - 1 - i; // 0=個位
+          const place = aDigs.length - 1 - i;
           const placeName = ["個位", "十位", "百位", "千位"][place] || `第 ${place + 1} 位`;
           const prod = aDigs[i] * b + carry;
           const digit = prod % 10;
@@ -1320,6 +1883,7 @@
         ensureAudio();
         playClick();
         confettiEl.innerHTML = "";
+        stopSolutionPlay();
         eqLabelEl.textContent = DIFFICULTY[state.difficulty].label;
         const puzzle = generatePuzzle(state.difficulty);
         renderPuzzle(puzzle);
@@ -1327,6 +1891,8 @@
       }
 
       /* ---------- Event bindings ---------- */
+      buildNumpad();
+
       checkBtn.addEventListener("click", () => {
         ensureAudio();
         checkAnswer();
@@ -1336,6 +1902,19 @@
       solveBtn.addEventListener("click", () => {
         ensureAudio();
         showSolution();
+      });
+      stepNextBtn.addEventListener("click", () => {
+        ensureAudio();
+        solutionNext();
+      });
+      stepPlayBtn.addEventListener("click", () => {
+        ensureAudio();
+        toggleSolutionPlay();
+      });
+      stepAllBtn.addEventListener("click", () => {
+        ensureAudio();
+        revealAllSolutionSteps();
+        playClick();
       });
 
       document.querySelectorAll(".chip[data-diff]").forEach((chip) => {
@@ -1360,13 +1939,15 @@
         }
       });
 
-      // Unlock audio on first interaction
       ["pointerdown", "keydown"].forEach((evt) => {
         window.addEventListener(evt, () => ensureAudio(), { once: true, passive: true });
       });
 
-      // Cleanup
-      window.addEventListener("beforeunload", stopTimer);
+      window.addEventListener("beforeunload", () => {
+        stopTimer();
+        cancelAutoCheck();
+        stopSolutionPlay();
+      });
 
       /* ---------- Boot ---------- */
       nextPuzzle();
