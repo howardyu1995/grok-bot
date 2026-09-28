@@ -293,8 +293,8 @@
     </div>
 
     <div class="btn-row">
-      <button type="button" id="btn-suck">💨 吸出空氣</button>
-      <button type="button" id="btn-reset">🔄 重置</button>
+      <button type="button" id="btn-suck" onclick="onSuckClick()">💨 吸出空氣</button>
+      <button type="button" id="btn-reset" onclick="onResetClick()">🔄 重置</button>
     </div>
 
     <div class="slider-block">
@@ -344,9 +344,10 @@
     // 動畫與視覺常數
     const LERP_SPEED = 0.08; // 平滑插值速度
 
-    // DOM 控制項
+    // DOM 控制項（在 DOM 就緒時綁定，不依賴 p5 setup）
     let slider, airPercentLabel, guideText, pressureReadout, tipBox;
     let btnSuck, btnReset;
+    let controlsReady = false;
 
     // 畫布基準尺寸（會依視窗縮放）
     let canvasW = 900;
@@ -355,17 +356,12 @@
     // 泡泡粒子（吸氣時的視覺回饋）
     let bubbles = [];
 
-    // ---------- p5 生命週期 ----------
-    function setup() {
-      // 依容器寬度建立響應式畫布
-      const wrap = document.getElementById("canvas-wrap");
-      canvasW = Math.min(960, wrap.clientWidth || window.innerWidth - 24);
-      canvasH = Math.max(360, Math.round(canvasW * 0.52));
-
-      const cnv = createCanvas(canvasW, canvasH);
-      cnv.parent("canvas-wrap");
-
-      // 綁定 HTML 控制項
+    /**
+     * 提早綁定控制項：即使 p5 尚未完成 setup，按鈕／滑桿也能改狀態。
+     * 按鈕已用 HTML onclick；此處主要綁定滑桿與視窗縮放。
+     */
+    function bindControls() {
+      if (controlsReady) return;
       slider = document.getElementById("air-slider");
       airPercentLabel = document.getElementById("air-percent");
       guideText = document.getElementById("guide-text");
@@ -373,13 +369,33 @@
       tipBox = document.getElementById("tip-box");
       btnSuck = document.getElementById("btn-suck");
       btnReset = document.getElementById("btn-reset");
+      if (!slider || !btnSuck || !btnReset) return;
 
       slider.addEventListener("input", onSliderChange);
-      btnSuck.addEventListener("click", onSuckClick);
-      btnReset.addEventListener("click", onResetClick);
-
-      // 視窗尺寸改變時重設畫布
+      slider.addEventListener("change", onSliderChange);
       window.addEventListener("resize", onWindowResize);
+      controlsReady = true;
+      updateUI();
+    }
+
+    // DOM 一就緒就綁定（不必等 p5）
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", bindControls);
+    } else {
+      bindControls();
+    }
+
+    // ---------- p5 生命週期 ----------
+    function setup() {
+      bindControls(); // 保險再綁一次
+
+      // 依容器寬度建立響應式畫布
+      const wrap = document.getElementById("canvas-wrap");
+      canvasW = Math.min(960, wrap.clientWidth || window.innerWidth - 24);
+      canvasH = Math.max(360, Math.round(canvasW * 0.52));
+
+      const cnv = createCanvas(canvasW, canvasH);
+      cnv.parent("canvas-wrap");
 
       updateUI();
       textFont('"Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif');
@@ -403,33 +419,44 @@
     // ---------- 視窗縮放 ----------
     function onWindowResize() {
       const wrap = document.getElementById("canvas-wrap");
+      if (!wrap) return;
       canvasW = Math.min(960, wrap.clientWidth || window.innerWidth - 24);
       canvasH = Math.max(360, Math.round(canvasW * 0.52));
-      resizeCanvas(canvasW, canvasH);
+      // p5 尚未建立畫布時略過
+      if (typeof resizeCanvas === "function" && typeof width === "number" && width > 0) {
+        resizeCanvas(canvasW, canvasH);
+      }
     }
 
     // ---------- 控制邏輯 ----------
     function onSliderChange() {
-      airRemoved = constrain(Number(slider.value) / 100, 0, 1);
+      if (!slider) slider = document.getElementById("air-slider");
+      airRemoved = Math.max(0, Math.min(1, Number(slider.value) / 100));
       slider.setAttribute("aria-valuenow", String(slider.value));
-      if (airRemoved > 0.08) {
+      if (airRemoved > 0.08 && typeof random === "function") {
         spawnBubbles(2);
       }
     }
 
     /** 「吸出空氣」：每次增加約 25%，並產生泡泡 */
     function onSuckClick() {
-      airRemoved = constrain(airRemoved + 0.25, 0, 1);
+      if (!slider) slider = document.getElementById("air-slider");
+      airRemoved = Math.max(0, Math.min(1, airRemoved + 0.25));
       slider.value = String(Math.round(airRemoved * 100));
       slider.setAttribute("aria-valuenow", slider.value);
-      spawnBubbles(10);
+      if (typeof random === "function") {
+        spawnBubbles(10);
+      }
+      updateUI();
     }
 
     function onResetClick() {
+      if (!slider) slider = document.getElementById("air-slider");
       airRemoved = 0;
       slider.value = "0";
       slider.setAttribute("aria-valuenow", "0");
       bubbles = [];
+      updateUI();
     }
 
     /**
