@@ -8,7 +8,7 @@ Google 協作平台（Sites）**不能直接貼上含 JavaScript 的 HTML**（�
 | 檔案 | 用途 |
 |------|------|
 | `Code.gs` | Apps Script 入口（允許 iframe 嵌入） |
-| `Index.html` | 完整互動頁面 |
+| `Index.html` | 完整互動頁面（分步導覽、日夜海風／陸風、溫度差、氣壓示意、練習題） |
 
 ---
 
