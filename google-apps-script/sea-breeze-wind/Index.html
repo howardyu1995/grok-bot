@@ -4,16 +4,18 @@
   <base target="_top">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="風的形成（海風原理）互動教學動畫與小遊戲，適合小學生學習日間海風成因。" />
+  <meta name="description" content="風的形成（海風原理）互動教學：分步導覽、日夜對照、溫度差與課本練習。" />
   <title>風的形成｜海風原理互動教學</title>
   <!-- 完全自含：無外部 CDN，方便 Google Apps Script／Google Sites 嵌入 -->
   <style>
     :root {
-      --sky-top: #7ec8f5;
       --ink: #1a3a4a;
+      --muted: #4a6a7a;
       --panel: #ffffff;
       --ok: #27ae60;
       --hint: #e67e22;
+      --accent: #2a9d8f;
+      --accent-dark: #1f7a6f;
       --shadow: 0 10px 28px rgba(26, 58, 74, 0.14);
       --radius: 20px;
     }
@@ -102,12 +104,12 @@
     .box-sky { background: #f0f9ff; border-color: #bae6fd; }
     .box-quiz {
       background: linear-gradient(145deg, #fffbeb, #fff7ed);
-      border-color: #fde68a;
+      border: 2px solid #fde68a;
       border-radius: 1rem;
-      border-width: 2px;
-      border-style: solid;
       padding: 1rem 1.15rem;
+      margin-bottom: 0.85rem;
     }
+    .box-quiz.extra { background: linear-gradient(145deg, #eef9ff, #f0fdf4); border-color: #a8d4f0; }
 
     .label-row {
       display: flex;
@@ -148,60 +150,51 @@
       cursor: pointer;
       border: 2px solid;
       font-family: inherit;
+      background: #fff;
     }
     .control-btn:hover { transform: translateY(-1px); }
     .control-btn:active { transform: translateY(1px) scale(0.98); }
+    .control-btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
 
-    .btn-day {
-      background: #fef3c7;
-      color: #78350f;
-      border-color: #fcd34d;
-    }
+    .btn-day { background: #fef3c7; color: #78350f; border-color: #fcd34d; }
     .btn-day.active {
       background: linear-gradient(135deg, #f39c12, #e67e22);
-      color: #fff;
-      border-color: transparent;
+      color: #fff; border-color: transparent;
       box-shadow: 0 4px 12px rgba(230, 126, 34, 0.35);
     }
 
-    .btn-night {
-      background: #e0e7ff;
-      color: #312e81;
-      border-color: #c7d2fe;
-    }
+    .btn-night { background: #e0e7ff; color: #312e81; border-color: #c7d2fe; }
     .btn-night.active {
-      background: linear-gradient(135deg, #6366f1, #4f46e5);
-      color: #fff;
-      border-color: transparent;
-      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.35);
+      background: linear-gradient(135deg, #312e81, #1e1b4b);
+      color: #fff; border-color: transparent;
+      box-shadow: 0 4px 12px rgba(30, 27, 75, 0.4);
     }
 
-    .mode-btn {
-      background: #fff;
-      color: #0c4a6e;
-      border-color: #7dd3fc;
-    }
+    .mode-btn { background: #fff; color: #0c4a6e; border-color: #7dd3fc; }
     .mode-btn.active {
       background: linear-gradient(135deg, #3498db, #2980b9);
-      color: #fff;
-      border-color: transparent;
+      color: #fff; border-color: transparent;
       box-shadow: 0 4px 12px rgba(41, 128, 185, 0.35);
+    }
+
+    .toggle-btn { background: #f8fafc; color: #334155; border-color: #cbd5e1; }
+    .toggle-btn.active {
+      background: linear-gradient(135deg, #2a9d8f, #1f7a6f);
+      color: #fff; border-color: transparent;
     }
 
     .btn-check {
       background: linear-gradient(90deg, #10b981, #14b8a6);
-      color: #fff;
-      border: none;
-      font-weight: 900;
-      font-size: 1rem;
+      color: #fff; border: none; font-weight: 900; font-size: 1rem;
       padding: 0.65rem 1.25rem;
       box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
     }
-    .btn-reset {
-      background: #fff;
-      color: #334155;
-      border-color: #cbd5e1;
+    .btn-reset { background: #fff; color: #334155; border-color: #cbd5e1; }
+    .btn-nav {
+      background: #3d8ec9; color: #fff; border-color: transparent;
+      min-width: 6.5rem;
     }
+    .btn-nav.secondary { background: #64748b; }
 
     .legend {
       display: flex;
@@ -230,6 +223,86 @@
       color: #1f618d;
     }
 
+    /* 分步導覽 */
+    .guide-box {
+      background: linear-gradient(90deg, #fff8e7, #e8f8f2);
+      border-radius: 14px;
+      padding: 12px 14px;
+      border-left: 6px solid #f4a261;
+      font-size: clamp(1rem, 2.6vw, 1.15rem);
+      line-height: 1.55;
+      font-weight: 600;
+      min-height: 3.2em;
+      margin-bottom: 0.75rem;
+    }
+    .guide-box .label {
+      display: inline-block;
+      background: #f4a261;
+      color: #fff;
+      font-size: 0.85rem;
+      padding: 2px 10px;
+      border-radius: 999px;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+    .guide-box.night-guide {
+      background: linear-gradient(90deg, #eef2ff, #e0e7ff);
+      border-left-color: #6366f1;
+    }
+    .guide-box.night-guide .label { background: #4f46e5; }
+
+    .step-strip {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px;
+      margin-bottom: 0.65rem;
+    }
+    .step-chip {
+      border: 2px solid #c5e4ef;
+      background: #f4fafc;
+      color: var(--muted);
+      border-radius: 12px;
+      padding: 8px 4px;
+      text-align: center;
+      font-size: clamp(0.68rem, 1.7vw, 0.85rem);
+      font-weight: 700;
+      line-height: 1.25;
+      min-height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.15s ease;
+    }
+    .step-chip.done {
+      background: #e4f6ef;
+      border-color: #7ec8b3;
+      color: var(--accent-dark);
+    }
+    .step-chip.active {
+      background: #fff3e0;
+      border-color: #f4a261;
+      color: #b35a12;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(244, 162, 97, 0.25);
+    }
+
+    .temp-readout {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 18px;
+      justify-content: center;
+      align-items: center;
+      font-size: clamp(0.95rem, 2.4vw, 1.15rem);
+      font-weight: 800;
+      padding: 6px 4px 2px;
+    }
+    .temp-readout .land { color: #c0392b; }
+    .temp-readout .sea { color: #1d6fb8; }
+    .temp-readout .delta { color: #7c3aed; }
+    .temp-readout .vs { color: var(--ink); font-size: 1.2em; }
+
     #sim-canvas {
       display: block;
       width: 100%;
@@ -246,6 +319,14 @@
       font-weight: 600;
       color: #475569;
       margin: 0.6rem 0 0;
+    }
+
+    .click-helpers {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      justify-content: center;
+      margin-top: 0.55rem;
     }
 
     .quiz-sentence {
@@ -265,7 +346,7 @@
       margin: 0.15rem 0.2rem;
     }
 
-    .opt-btn {
+    .opt-btn, .choice-btn {
       min-width: 4.6rem;
       background: #fff8e7;
       border: 2.5px solid #f0c36a;
@@ -277,18 +358,22 @@
       cursor: pointer;
       font-family: inherit;
       transition: transform 0.12s ease, border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+      text-align: left;
     }
-    .opt-btn:hover { transform: translateY(-1px); border-color: #e67e22; }
-    .opt-btn.selected {
+    .choice-btn { width: 100%; min-width: 0; margin-bottom: 0.4rem; }
+    .opt-btn:hover, .choice-btn:hover { transform: translateY(-1px); border-color: #e67e22; }
+    .opt-btn.selected, .choice-btn.selected {
       background: linear-gradient(135deg, #ffe082, #ffcc80);
       border-color: #e67e22;
       box-shadow: 0 3px 10px rgba(230, 126, 34, 0.28);
     }
-    .opt-btn.correct { background: #e8f8ef; border-color: var(--ok); color: #1e8449; }
-    .opt-btn.wrong {
+    .opt-btn.correct, .choice-btn.correct { background: #e8f8ef; border-color: var(--ok); color: #1e8449; }
+    .opt-btn.wrong, .choice-btn.wrong {
       background: #fff0eb; border-color: #e74c3c; color: #c0392b;
       animation: shake 0.4s ease;
     }
+
+    .choice-list { margin: 0.5rem 0 0; padding: 0; list-style: none; }
 
     @keyframes shake {
       0%, 100% { transform: translateX(0); }
@@ -365,6 +450,7 @@
     .text-center { text-align: center; }
     .header { padding-top: 0.35rem; }
     .mb-3 { margin-bottom: 0.75rem; }
+    .q-title { margin: 0 0 0.4rem; font-weight: 800; font-size: 1.05rem; }
   </style>
 </head>
 <body>
@@ -374,10 +460,36 @@
       <p class="subtitle">日間太陽加熱陸地，空氣流動就變成風！</p>
     </header>
 
+    <!-- 分步導覽 -->
+    <section class="panel" aria-label="分步導覽">
+      <div class="row-between">
+        <h2 class="panel-title">分步導覽</h2>
+        <span class="tip-badge">一步一步看懂海風怎麼來</span>
+      </div>
+      <div id="guide-box" class="guide-box" role="status" aria-live="polite">
+        <span class="label">導讀</span>
+        <span id="guide-text">點「開始分步」或下方步驟，跟著動畫學習！</span>
+      </div>
+      <div class="step-strip" id="step-strip" role="tablist" aria-label="海風形成步驟">
+        <button type="button" class="step-chip" data-step="0" role="tab">① 太陽加熱</button>
+        <button type="button" class="step-chip" data-step="1" role="tab">② 陸地變熱</button>
+        <button type="button" class="step-chip" data-step="2" role="tab">③ 熱空氣上升</button>
+        <button type="button" class="step-chip" data-step="3" role="tab">④ 冷空氣補充</button>
+        <button type="button" class="step-chip" data-step="4" role="tab">⑤ 形成海風</button>
+      </div>
+      <div class="btn-row" style="margin-top:0; justify-content:center;">
+        <button type="button" id="btn-steps" class="control-btn btn-nav">開始分步</button>
+        <button type="button" id="btn-prev" class="control-btn btn-nav secondary" disabled>上一步</button>
+        <button type="button" id="btn-next" class="control-btn btn-nav" disabled>下一步</button>
+        <button type="button" id="btn-free" class="control-btn btn-reset">自由探索</button>
+      </div>
+    </section>
+
+    <!-- 控制面板 -->
     <section class="panel" aria-label="控制面板">
       <div class="row-between">
         <h2 class="panel-title">控制面板</h2>
-        <span class="tip-badge">點一下陸地或海洋，看氣溫提示！</span>
+        <span class="tip-badge">可切日間海風／夜間陸風</span>
       </div>
 
       <div class="controls-grid">
@@ -392,42 +504,60 @@
             <span>強（正午）</span>
           </div>
           <div class="btn-row">
-            <button type="button" id="btn-day" class="control-btn btn-day active">日間加熱 ON</button>
-            <button type="button" id="btn-night" class="control-btn btn-night">暫停加熱</button>
+            <button type="button" id="btn-day" class="control-btn btn-day active">日間・海風</button>
+            <button type="button" id="btn-night" class="control-btn btn-night">夜間・陸風</button>
           </div>
         </div>
 
         <div class="box box-sky">
-          <p class="section-label" style="margin-bottom:0.5rem;">🌀 顯示模式</p>
+          <p class="section-label" style="margin-bottom:0.5rem;">🌀 顯示選項</p>
           <div class="btn-row" style="margin-top:0;">
-            <button type="button" id="mode-particles" class="control-btn mode-btn active">氣流粒子模式</button>
-            <button type="button" id="mode-arrows" class="control-btn mode-btn">示意箭頭模式</button>
+            <button type="button" id="mode-particles" class="control-btn mode-btn active">氣流粒子</button>
+            <button type="button" id="mode-arrows" class="control-btn mode-btn">示意箭頭</button>
+            <button type="button" id="btn-pressure" class="control-btn toggle-btn">氣壓示意 OFF</button>
           </div>
           <div class="legend">
-            <span><i class="legend-dot" style="background:#e74c3c;"></i> 熱空氣（上升）</span>
-            <span><i class="legend-dot" style="background:#3498db;"></i> 冷空氣（海風）</span>
+            <span><i class="legend-dot" style="background:#e74c3c;"></i> 較暖空氣</span>
+            <span><i class="legend-dot" style="background:#3498db;"></i> 較冷空氣</span>
+            <span><i class="legend-dot" style="background:#8e44ad;"></i> H 高壓／L 低壓</span>
           </div>
         </div>
       </div>
+
+      <div class="temp-readout" aria-live="polite">
+        <span class="land">陸地 <span id="temp-land">35</span>°C</span>
+        <span class="vs">↔</span>
+        <span class="sea">海洋 <span id="temp-sea">28</span>°C</span>
+        <span class="delta">溫差 <span id="temp-delta">7</span>°C</span>
+      </div>
     </section>
 
+    <!-- Canvas -->
     <section class="panel" aria-label="海風動畫模擬" style="padding:0.85rem;">
-      <canvas id="sim-canvas" width="940" height="520" role="img" aria-label="日間海風形成動畫：左側陸地、右側海洋、中央氣流循環"></canvas>
+      <canvas id="sim-canvas" width="940" height="520" role="img" aria-label="海風與陸風形成動畫"></canvas>
       <p id="canvas-hint">觀察：陸地受熱 → 熱空氣上升 → 海上冷空氣吹向陸地＝海風</p>
+      <div class="click-helpers">
+        <button type="button" id="tap-land" class="control-btn btn-reset">點：陸地氣溫</button>
+        <button type="button" id="tap-sea" class="control-btn btn-reset">點：海洋氣溫</button>
+        <button type="button" id="tap-sun" class="control-btn btn-reset">點：太陽／月亮</button>
+      </div>
     </section>
 
+    <!-- 課本練習 -->
     <section class="panel" aria-label="課本練習題">
-      <h2 class="panel-title mb-3">📝 課本練習：填一填，風怎麼形成？</h2>
+      <h2 class="panel-title mb-3">📝 課本練習</h2>
+
       <div id="quiz-card" class="box-quiz">
+        <p class="q-title">題一｜填一填：日間海風怎麼形成？</p>
         <div class="quiz-sentence" id="quiz-sentence">
           <p>
             日間，在太陽的照射下，陸地上的空氣因受熱
-            <span class="quiz-blank" role="group" aria-label="選項一：膨脹或收縮" data-q="q1">
+            <span class="quiz-blank" role="group" aria-label="選項一" data-q="q1">
               <button type="button" class="opt-btn" data-value="膨脹">膨脹</button>
               <button type="button" class="opt-btn" data-value="收縮">收縮</button>
             </span>
             而
-            <span class="quiz-blank" role="group" aria-label="選項二：上升或下沉" data-q="q2">
+            <span class="quiz-blank" role="group" aria-label="選項二" data-q="q2">
               <button type="button" class="opt-btn" data-value="上升">上升</button>
               <button type="button" class="opt-btn" data-value="下沉">下沉</button>
             </span>
@@ -435,220 +565,67 @@
           </p>
           <p>
             海洋上較冷的空氣會流向陸地，補充了
-            <span class="quiz-blank" role="group" aria-label="選項三：上升或下沉" data-q="q3">
+            <span class="quiz-blank" role="group" aria-label="選項三" data-q="q3">
               <button type="button" class="opt-btn" data-value="上升">上升</button>
               <button type="button" class="opt-btn" data-value="下沉">下沉</button>
             </span>
             的空氣。這樣，空氣流動便形成風。
           </p>
         </div>
-
         <div class="quiz-actions">
-          <button type="button" id="check-answer" class="control-btn btn-check">檢查答案 ✓</button>
-          <button type="button" id="reset-quiz" class="control-btn btn-reset">再試一次</button>
+          <button type="button" id="check-answer" class="control-btn btn-check">檢查題一 ✓</button>
+          <button type="button" id="reset-quiz" class="control-btn btn-reset">重設題一</button>
         </div>
         <p id="quiz-feedback" class="quiz-feedback" role="status" aria-live="polite"></p>
       </div>
+
+      <div class="box-quiz extra" id="quiz-extra">
+        <p class="q-title">題二｜為什麼日間風從海吹向陸？</p>
+        <ul class="choice-list" data-q="q4">
+          <li><button type="button" class="choice-btn" data-value="a">因為海洋比陸地高</button></li>
+          <li><button type="button" class="choice-btn" data-value="b">因為陸地升溫較快，熱空氣上升後，海上較冷空氣來補充</button></li>
+          <li><button type="button" class="choice-btn" data-value="c">因為月亮吸引海水</button></li>
+        </ul>
+
+        <p class="q-title" style="margin-top:1rem;">題三｜夜間常常吹「陸風」，為什麼？</p>
+        <ul class="choice-list" data-q="q5">
+          <li><button type="button" class="choice-btn" data-value="a">陸地降溫較快，近地面空氣從陸流向海</button></li>
+          <li><button type="button" class="choice-btn" data-value="b">夜間太陽更強，海風更猛</button></li>
+          <li><button type="button" class="choice-btn" data-value="c">燈塔把風吹向陸地</button></li>
+        </ul>
+
+        <div class="quiz-actions">
+          <button type="button" id="check-extra" class="control-btn btn-check">檢查題二・三 ✓</button>
+          <button type="button" id="reset-extra" class="control-btn btn-reset">重設題二・三</button>
+        </div>
+        <p id="extra-feedback" class="quiz-feedback" role="status" aria-live="polite"></p>
+      </div>
     </section>
 
-    <footer class="site-footer">自然科小實驗｜日間海風（Sea Breeze）互動教學｜可嵌入 Google 協作平台</footer>
+    <footer class="site-footer">自然科小實驗｜海風／陸風互動教學｜可嵌入 Google 協作平台</footer>
   </div>
 
   <div id="confetti-layer" aria-hidden="true"></div>
 
   <script>
     /**
-     * ========================================
-     * 風的形成（海風原理）互動教學
-     * - WindSimulation：Canvas 粒子／箭頭氣流循環
-     * - QuizGame：課本填空選擇題與慶祝特效
-     * ========================================
+     * 風的形成（海風／陸風）互動教學
+     * - WindSimulation：粒子／箭頭、日夜、溫度差、氣壓疊層、分步高亮
+     * - StepGuide：五步導覽
+     * - QuizGame：填空＋選擇，答錯連動 Canvas
      */
 
-    // ---------- 工具函式 ----------
-    function clamp(v, min, max) {
-      return Math.max(min, Math.min(max, v));
-    }
+    const STEPS = [
+      { title: '太陽加熱', focus: 'sun', guide: '太陽照射大地與海洋，提供熱能。先注意發光的太陽～' },
+      { title: '陸地變熱', focus: 'land', guide: '陸地比熱小、升溫較快；海洋升溫較慢。看溫度差變大了嗎？' },
+      { title: '熱空氣上升', focus: 'hotAir', guide: '陸地上的空氣受熱膨脹變輕，慢慢上升，形成上升氣流。' },
+      { title: '冷空氣補充', focus: 'coldAir', guide: '海上較冷的空氣流向陸地，補充上升後留下的空間。' },
+      { title: '形成海風', focus: 'cycle', guide: '空氣水平流動就是風！日間從海吹向陸的風，叫做海風。' },
+    ];
 
-    function lerp(a, b, t) {
-      return a + (b - a) * t;
-    }
-
-    function rand(min, max) {
-      return min + Math.random() * (max - min);
-    }
-
-    // ---------- 氣流粒子 ----------
-    class AirParticle {
-      /**
-       * @param {'hot'|'cold'} type 熱空氣 / 冷空氣
-       * @param {object} layout 場景佈局比例
-       */
-      constructor(type, layout) {
-        this.type = type;
-        this.layout = layout;
-        this.reset(true);
-      }
-
-      reset(randomPhase = false) {
-        const L = this.layout;
-        // 粒子在循環軌道上的進度 0~1
-        this.t = randomPhase ? Math.random() : 0;
-        this.baseSize = this.type === 'hot' ? rand(4, 8) : rand(3.5, 6.5);
-        this.size = this.baseSize;
-        this.wobble = rand(0, Math.PI * 2);
-        this.speedJitter = rand(0.85, 1.15);
-        this.alpha = rand(0.55, 0.9);
-        this.expand = this.type === 'hot' ? 1 : 1;
-      }
-
-      /** 依進度算出在對流循環上的位置 */
-      getPosition() {
-        const L = this.layout;
-        const landX = L.landCenterX;
-        const seaX = L.seaCenterX;
-        const groundY = L.groundY;
-        const skyY = L.skyY;
-        const midY = (groundY + skyY) / 2;
-
-        // 熱空氣：陸地上升 → 高空飄向海洋 → 略下沉交接
-        // 冷空氣：海洋下沉 → 貼近海面吹向陸地 → 在陸地交接上升
-        let x, y;
-
-        if (this.type === 'hot') {
-          // 0~0.35 上升；0.35~0.7 高空往海；0.7~1 略降交接後重置
-          if (this.t < 0.35) {
-            const p = this.t / 0.35;
-            x = landX + Math.sin(p * Math.PI) * L.w * 0.02;
-            y = lerp(groundY - 8, skyY, p);
-            this.expand = lerp(1, 1.85, p); // 受熱膨脹
-          } else if (this.t < 0.7) {
-            const p = (this.t - 0.35) / 0.35;
-            x = lerp(landX, seaX, p);
-            y = skyY + Math.sin(p * Math.PI) * 10;
-            this.expand = lerp(1.85, 1.3, p);
-          } else {
-            const p = (this.t - 0.7) / 0.3;
-            x = seaX + Math.sin(p * Math.PI) * L.w * 0.015;
-            y = lerp(skyY, midY, p);
-            this.expand = lerp(1.3, 1.05, p);
-          }
-        } else {
-          // 冷空氣：0~0.3 海上下沉；0.3~0.75 水平吹向陸地；0.75~1 陸上交接
-          if (this.t < 0.3) {
-            const p = this.t / 0.3;
-            x = seaX + Math.sin(p * Math.PI) * L.w * 0.02;
-            y = lerp(midY - 20, groundY - 6, p);
-            this.expand = 1;
-          } else if (this.t < 0.75) {
-            const p = (this.t - 0.3) / 0.45;
-            x = lerp(seaX, landX, p);
-            y = groundY - 6 + Math.sin(p * Math.PI * 2) * 4;
-            this.expand = 1;
-          } else {
-            const p = (this.t - 0.75) / 0.25;
-            x = landX;
-            y = lerp(groundY - 6, groundY - 40, p);
-            this.expand = 1;
-          }
-        }
-
-        // 輕微左右晃動，增加生命感
-        x += Math.sin(this.wobble) * 3;
-        return { x, y };
-      }
-
-      update(dt, heat, boost) {
-        // heat: 0~1；boost: 答對後風速加成（熱力差異刻意拉大，方便觀察）
-        const flow = (0.05 + heat * 0.7) * this.speedJitter * boost;
-        this.t += flow * dt;
-        this.wobble += dt * 2.2;
-        if (this.t >= 1) this.reset(false);
-        this.size = this.baseSize * this.expand * (0.85 + heat * 0.35);
-      }
-
-      draw(ctx) {
-        const { x, y } = this.getPosition();
-        const isHot = this.type === 'hot';
-        const r = this.size;
-
-        ctx.save();
-        ctx.globalAlpha = this.alpha;
-        const grad = ctx.createRadialGradient(x - r * 0.3, y - r * 0.3, 0, x, y, r * 1.4);
-        if (isHot) {
-          grad.addColorStop(0, '#ffe082');
-          grad.addColorStop(0.45, '#ff7043');
-          grad.addColorStop(1, 'rgba(231, 76, 60, 0)');
-        } else {
-          grad.addColorStop(0, '#e3f2fd');
-          grad.addColorStop(0.45, '#42a5f5');
-          grad.addColorStop(1, 'rgba(52, 152, 219, 0)');
-        }
-        ctx.fillStyle = grad;
-        ctx.beginPath();
-        ctx.arc(x, y, r * 1.4, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
-      }
-    }
-
-    // ---------- 提示泡泡 ----------
-    class TipBubble {
-      constructor(x, y, text) {
-        this.x = x;
-        this.y = y;
-        this.text = text;
-        this.life = 0;
-        this.maxLife = 2.4;
-      }
-
-      update(dt) {
-        this.life += dt;
-        this.y -= 18 * dt;
-      }
-
-      get alive() {
-        return this.life < this.maxLife;
-      }
-
-      draw(ctx) {
-        const t = this.life / this.maxLife;
-        const alpha = t < 0.15 ? t / 0.15 : 1 - (t - 0.15) / 0.85;
-        ctx.save();
-        ctx.globalAlpha = clamp(alpha, 0, 1);
-        ctx.font = 'bold 15px "Noto Sans TC", sans-serif';
-        const padX = 12;
-        const padY = 8;
-        const tw = ctx.measureText(this.text).width;
-        const w = tw + padX * 2;
-        const h = 28;
-        const rx = this.x - w / 2;
-        const ry = this.y - h;
-
-        // 泡泡底
-        ctx.fillStyle = '#ffffff';
-        ctx.strokeStyle = '#5dade2';
-        ctx.lineWidth = 2.5;
-        roundRect(ctx, rx, ry, w, h, 12);
-        ctx.fill();
-        ctx.stroke();
-
-        // 小三角
-        ctx.beginPath();
-        ctx.moveTo(this.x - 6, ry + h);
-        ctx.lineTo(this.x, ry + h + 8);
-        ctx.lineTo(this.x + 6, ry + h);
-        ctx.closePath();
-        ctx.fill();
-        ctx.stroke();
-
-        ctx.fillStyle = '#1a5276';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(this.text, this.x, ry + h / 2);
-        ctx.restore();
-      }
-    }
+    function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
+    function lerp(a, b, t) { return a + (b - a) * t; }
+    function rand(min, max) { return min + Math.random() * (max - min); }
 
     function roundRect(ctx, x, y, w, h, r) {
       ctx.beginPath();
@@ -660,568 +637,6 @@
       ctx.closePath();
     }
 
-    // ---------- 主模擬類別 ----------
-    class WindSimulation {
-      constructor(canvas) {
-        this.canvas = canvas;
-        this.ctx = canvas.getContext('2d');
-        this.dpr = Math.max(1, window.devicePixelRatio || 1);
-
-        this.heat = 0.7;          // 0~1 太陽熱度
-        this.heatingOn = true;    // 日間加熱開關
-        this.mode = 'particles';  // 'particles' | 'arrows'
-        this.speedBoost = 1;      // 答對後加速
-        this.boostTimer = 0;
-
-        this.particles = [];
-        this.bubbles = [];
-        this.time = 0;
-        this.lastTs = 0;
-        this.running = false;
-
-        this.cssW = 940;
-        this.cssH = 520;
-        this.layout = this.computeLayout();
-
-        this.resize();
-        this.spawnParticles();
-        this.bindEvents();
-      }
-
-      computeLayout() {
-        const w = this.cssW;
-        const h = this.cssH;
-        return {
-          w, h,
-          horizon: h * 0.62,
-          groundY: h * 0.58,
-          skyY: h * 0.18,
-          landCenterX: w * 0.28,
-          seaCenterX: w * 0.72,
-          shoreX: w * 0.52,
-          sunX: w * 0.18,
-          sunY: h * 0.16,
-        };
-      }
-
-      spawnParticles() {
-        this.particles = [];
-        const count = 28;
-        for (let i = 0; i < count; i++) {
-          this.particles.push(new AirParticle(i % 2 === 0 ? 'hot' : 'cold', this.layout));
-        }
-      }
-
-      bindEvents() {
-        this.canvas.addEventListener('pointerdown', (e) => this.onClick(e));
-        window.addEventListener('resize', () => this.resize());
-      }
-
-      onClick(e) {
-        const rect = this.canvas.getBoundingClientRect();
-        const x = ((e.clientX - rect.left) / rect.width) * this.cssW;
-        const y = ((e.clientY - rect.top) / rect.height) * this.cssH;
-        const L = this.layout;
-
-        // 點太陽
-        if (Math.hypot(x - L.sunX, y - L.sunY) < 60) {
-          this.bubbles.push(new TipBubble(x, y, '太陽：提供熱能！'));
-          return;
-        }
-
-        // 左側偏陸地、右側偏海洋（以海岸線分隔）
-        if (x < L.shoreX) {
-          this.bubbles.push(new TipBubble(x, Math.min(y, L.horizon + 20), '陸地：受熱較快 ☀️'));
-        } else {
-          this.bubbles.push(new TipBubble(x, Math.min(y, L.horizon + 30), '海洋：溫度較低 🌊'));
-        }
-      }
-
-      setHeat(value01) {
-        this.heat = clamp(value01, 0, 1);
-      }
-
-      setHeating(on) {
-        this.heatingOn = on;
-      }
-
-      setMode(mode) {
-        this.mode = mode;
-      }
-
-      /** 答對題目後加速展示風速 */
-      boostWind(seconds = 5) {
-        this.speedBoost = 2.4;
-        this.boostTimer = seconds;
-      }
-
-      resize() {
-        const parent = this.canvas.parentElement;
-        const maxW = Math.min(940, parent ? parent.clientWidth - 8 : 940);
-        const ratio = 520 / 940;
-        this.cssW = Math.max(300, maxW);
-        this.cssH = Math.round(this.cssW * ratio);
-        this.dpr = Math.max(1, window.devicePixelRatio || 1);
-
-        this.canvas.width = Math.round(this.cssW * this.dpr);
-        this.canvas.height = Math.round(this.cssH * this.dpr);
-        this.canvas.style.width = this.cssW + 'px';
-        this.canvas.style.height = this.cssH + 'px';
-
-        this.ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
-        this.layout = this.computeLayout();
-        // 更新粒子佈局參考
-        this.particles.forEach((p) => { p.layout = this.layout; });
-      }
-
-      start() {
-        if (this.running) return;
-        this.running = true;
-        this.lastTs = performance.now();
-        const loop = (ts) => {
-          if (!this.running) return;
-          const dt = clamp((ts - this.lastTs) / 1000, 0, 0.05);
-          this.lastTs = ts;
-          this.update(dt);
-          this.draw();
-          requestAnimationFrame(loop);
-        };
-        requestAnimationFrame(loop);
-      }
-
-      update(dt) {
-        this.time += dt;
-
-        if (this.boostTimer > 0) {
-          this.boostTimer -= dt;
-          if (this.boostTimer <= 0) {
-            this.boostTimer = 0;
-            this.speedBoost = 1;
-          }
-        }
-
-        const effectiveHeat = this.heatingOn ? this.heat : this.heat * 0.08;
-        const boost = this.speedBoost;
-
-        if (this.mode === 'particles') {
-          for (const p of this.particles) {
-            p.update(dt, effectiveHeat, boost);
-          }
-        }
-
-        this.bubbles = this.bubbles.filter((b) => {
-          b.update(dt);
-          return b.alive;
-        });
-      }
-
-      draw() {
-        const ctx = this.ctx;
-        const L = this.layout;
-        const w = L.w;
-        const h = L.h;
-
-        ctx.clearRect(0, 0, w, h);
-
-        this.drawSky(ctx, L);
-        this.drawSun(ctx, L);
-        this.drawLand(ctx, L);
-        this.drawSea(ctx, L);
-        this.drawLighthouse(ctx, L);
-        this.drawTrees(ctx, L);
-
-        // 氣流層
-        if (this.mode === 'particles') {
-          for (const p of this.particles) p.draw(ctx);
-        } else {
-          this.drawArrows(ctx, L);
-        }
-
-        this.drawLabels(ctx, L);
-
-        for (const b of this.bubbles) b.draw(ctx);
-      }
-
-      drawSky(ctx, L) {
-        const heat = this.heatingOn ? this.heat : 0.15;
-        const top = mixColor('#5dade2', '#7ec8f5', heat);
-        const bot = mixColor('#aed6f1', '#d6eaf8', heat);
-        const g = ctx.createLinearGradient(0, 0, 0, L.h);
-        g.addColorStop(0, top);
-        g.addColorStop(0.55, bot);
-        g.addColorStop(1, '#b3e0ff');
-        ctx.fillStyle = g;
-        ctx.fillRect(0, 0, L.w, L.h);
-
-        // 柔和雲朵
-        ctx.save();
-        ctx.globalAlpha = 0.45;
-        this.drawCloud(ctx, L.w * 0.55, L.h * 0.12, 1.1);
-        this.drawCloud(ctx, L.w * 0.82, L.h * 0.2, 0.8);
-        ctx.restore();
-      }
-
-      drawCloud(ctx, x, y, s) {
-        ctx.fillStyle = '#ffffff';
-        ctx.beginPath();
-        ctx.arc(x, y, 18 * s, 0, Math.PI * 2);
-        ctx.arc(x + 22 * s, y - 6 * s, 22 * s, 0, Math.PI * 2);
-        ctx.arc(x + 46 * s, y + 2 * s, 16 * s, 0, Math.PI * 2);
-        ctx.arc(x + 20 * s, y + 8 * s, 14 * s, 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-      drawSun(ctx, L) {
-        const heat = this.heatingOn ? this.heat : 0.2;
-        const pulse = 1 + Math.sin(this.time * (1.5 + heat * 2)) * 0.06 * heat;
-        const r = (28 + heat * 14) * pulse;
-
-        // 光芒
-        ctx.save();
-        ctx.translate(L.sunX, L.sunY);
-        const rays = 12;
-        for (let i = 0; i < rays; i++) {
-          const ang = (i / rays) * Math.PI * 2 + this.time * 0.4;
-          const len = (40 + heat * 35) * pulse;
-          ctx.strokeStyle = `rgba(255, 193, 7, ${0.25 + heat * 0.45})`;
-          ctx.lineWidth = 3;
-          ctx.beginPath();
-          ctx.moveTo(Math.cos(ang) * (r + 4), Math.sin(ang) * (r + 4));
-          ctx.lineTo(Math.cos(ang) * len, Math.sin(ang) * len);
-          ctx.stroke();
-        }
-
-        const glow = ctx.createRadialGradient(0, 0, r * 0.2, 0, 0, r * 2.2);
-        glow.addColorStop(0, `rgba(255, 236, 150, ${0.55 + heat * 0.35})`);
-        glow.addColorStop(1, 'rgba(255, 193, 7, 0)');
-        ctx.fillStyle = glow;
-        ctx.beginPath();
-        ctx.arc(0, 0, r * 2.2, 0, Math.PI * 2);
-        ctx.fill();
-
-        const core = ctx.createRadialGradient(-r * 0.25, -r * 0.25, 0, 0, 0, r);
-        core.addColorStop(0, '#fff59d');
-        core.addColorStop(0.55, '#ffca28');
-        core.addColorStop(1, '#ff9800');
-        ctx.fillStyle = core;
-        ctx.beginPath();
-        ctx.arc(0, 0, r, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
-      }
-
-      drawLand(ctx, L) {
-        const shore = L.shoreX;
-        const horizon = L.horizon;
-
-        // 綠色山丘
-        ctx.fillStyle = '#6fcf6f';
-        ctx.beginPath();
-        ctx.moveTo(0, L.h);
-        ctx.lineTo(0, horizon + 20);
-        ctx.quadraticCurveTo(L.w * 0.12, horizon - 70, L.w * 0.26, horizon - 10);
-        ctx.quadraticCurveTo(L.w * 0.38, horizon + 35, shore, horizon + 8);
-        ctx.lineTo(shore, L.h);
-        ctx.closePath();
-        ctx.fill();
-
-        // 山丘陰影層
-        ctx.fillStyle = '#4caf50';
-        ctx.beginPath();
-        ctx.moveTo(0, L.h);
-        ctx.lineTo(0, horizon + 55);
-        ctx.quadraticCurveTo(L.w * 0.18, horizon + 10, L.w * 0.32, horizon + 40);
-        ctx.quadraticCurveTo(L.w * 0.42, horizon + 60, shore - 10, horizon + 35);
-        ctx.lineTo(shore, L.h);
-        ctx.closePath();
-        ctx.fill();
-
-        // 沙灘交接
-        ctx.fillStyle = '#f6d7a7';
-        ctx.beginPath();
-        ctx.moveTo(shore - 28, horizon + 5);
-        ctx.quadraticCurveTo(shore - 5, horizon + 18, shore + 8, horizon + 12);
-        ctx.lineTo(shore + 8, L.h);
-        ctx.lineTo(shore - 28, L.h);
-        ctx.closePath();
-        ctx.fill();
-      }
-
-      drawSea(ctx, L) {
-        const shore = L.shoreX;
-        const horizon = L.horizon;
-        const t = this.time;
-
-        const seaGrad = ctx.createLinearGradient(0, horizon, 0, L.h);
-        seaGrad.addColorStop(0, '#5dade2');
-        seaGrad.addColorStop(0.45, '#2980b9');
-        seaGrad.addColorStop(1, '#1a5276');
-        ctx.fillStyle = seaGrad;
-        ctx.beginPath();
-        ctx.moveTo(shore - 4, horizon + 10);
-        ctx.lineTo(L.w, horizon + 10);
-        ctx.lineTo(L.w, L.h);
-        ctx.lineTo(shore - 4, L.h);
-        ctx.closePath();
-        ctx.fill();
-
-        // 動態波浪
-        for (let layer = 0; layer < 3; layer++) {
-          const yBase = horizon + 28 + layer * 28;
-          const amp = 6 + layer * 2;
-          const speed = 1.2 + layer * 0.35;
-          ctx.beginPath();
-          ctx.moveTo(shore - 4, L.h);
-          ctx.lineTo(shore - 4, yBase);
-          for (let x = shore - 4; x <= L.w + 4; x += 8) {
-            const y = yBase + Math.sin(x * 0.03 + t * speed + layer) * amp;
-            ctx.lineTo(x, y);
-          }
-          ctx.lineTo(L.w, L.h);
-          ctx.closePath();
-          ctx.fillStyle = layer === 0
-            ? 'rgba(174, 214, 241, 0.35)'
-            : layer === 1
-              ? 'rgba(133, 193, 233, 0.28)'
-              : 'rgba(46, 134, 193, 0.22)';
-          ctx.fill();
-        }
-
-        // 粼粼反光
-        ctx.save();
-        ctx.globalAlpha = 0.35;
-        ctx.strokeStyle = '#d4efdf';
-        ctx.lineWidth = 1.5;
-        for (let i = 0; i < 8; i++) {
-          const x = shore + 40 + i * ((L.w - shore) / 8);
-          const y = horizon + 40 + (i % 3) * 22 + Math.sin(t * 2 + i) * 4;
-          ctx.beginPath();
-          ctx.moveTo(x, y);
-          ctx.lineTo(x + 14, y);
-          ctx.stroke();
-        }
-        ctx.restore();
-      }
-
-      drawLighthouse(ctx, L) {
-        const x = L.w * 0.78;
-        const baseY = L.horizon + 18;
-        const h = 78;
-
-        // 岩礁
-        ctx.fillStyle = '#7f8c8d';
-        ctx.beginPath();
-        ctx.ellipse(x, baseY + 8, 28, 12, 0, 0, Math.PI * 2);
-        ctx.fill();
-
-        // 塔身條紋
-        const bw = 16;
-        ctx.fillStyle = '#ecf0f1';
-        ctx.fillRect(x - bw / 2, baseY - h, bw, h);
-        ctx.fillStyle = '#e74c3c';
-        for (let i = 0; i < 4; i++) {
-          ctx.fillRect(x - bw / 2, baseY - h + 8 + i * 18, bw, 8);
-        }
-
-        // 燈室
-        ctx.fillStyle = '#f5b041';
-        ctx.fillRect(x - 12, baseY - h - 16, 24, 18);
-        ctx.fillStyle = '#f9e79f';
-        ctx.globalAlpha = 0.55 + Math.sin(this.time * 3) * 0.25;
-        ctx.beginPath();
-        ctx.arc(x, baseY - h - 8, 10, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.globalAlpha = 1;
-
-        // 屋頂
-        ctx.fillStyle = '#922b21';
-        ctx.beginPath();
-        ctx.moveTo(x - 14, baseY - h - 16);
-        ctx.lineTo(x, baseY - h - 30);
-        ctx.lineTo(x + 14, baseY - h - 16);
-        ctx.closePath();
-        ctx.fill();
-      }
-
-      drawTrees(ctx, L) {
-        const trees = [
-          { x: L.w * 0.1, y: L.horizon + 8, s: 1 },
-          { x: L.w * 0.2, y: L.horizon - 5, s: 1.15 },
-          { x: L.w * 0.34, y: L.horizon + 12, s: 0.9 },
-          { x: L.w * 0.42, y: L.horizon + 18, s: 0.75 },
-        ];
-        for (const t of trees) this.drawTree(ctx, t.x, t.y, t.s);
-      }
-
-      drawTree(ctx, x, y, s) {
-        ctx.fillStyle = '#6d4c41';
-        ctx.fillRect(x - 3 * s, y - 18 * s, 6 * s, 20 * s);
-        ctx.fillStyle = '#2ecc71';
-        ctx.beginPath();
-        ctx.arc(x, y - 28 * s, 14 * s, 0, Math.PI * 2);
-        ctx.arc(x - 10 * s, y - 20 * s, 11 * s, 0, Math.PI * 2);
-        ctx.arc(x + 10 * s, y - 20 * s, 11 * s, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.fillStyle = '#27ae60';
-        ctx.beginPath();
-        ctx.arc(x, y - 32 * s, 9 * s, 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-      drawArrows(ctx, L) {
-        const heat = this.heatingOn ? this.heat : 0.1;
-        const boost = this.speedBoost;
-        const phase = this.time * (0.9 + heat * 1.8) * boost;
-
-        // 熱空氣上升（紅）
-        this.drawFlowArrow(
-          ctx,
-          [
-            { x: L.landCenterX - 10, y: L.groundY - 5 },
-            { x: L.landCenterX - 5, y: L.skyY + 40 },
-            { x: L.landCenterX + 5, y: L.skyY + 5 },
-          ],
-          '#e74c3c',
-          phase,
-          '熱空氣上升'
-        );
-
-        // 高空往海（淡紅）
-        this.drawFlowArrow(
-          ctx,
-          [
-            { x: L.landCenterX + 20, y: L.skyY },
-            { x: (L.landCenterX + L.seaCenterX) / 2, y: L.skyY - 8 },
-            { x: L.seaCenterX - 10, y: L.skyY + 8 },
-          ],
-          '#e67e22',
-          phase + 0.4,
-          ''
-        );
-
-        // 冷空氣下沉（藍）
-        this.drawFlowArrow(
-          ctx,
-          [
-            { x: L.seaCenterX + 8, y: L.skyY + 30 },
-            { x: L.seaCenterX + 5, y: (L.skyY + L.groundY) / 2 },
-            { x: L.seaCenterX, y: L.groundY - 8 },
-          ],
-          '#2980b9',
-          phase + 0.7,
-          '冷空氣下沉'
-        );
-
-        // 海風吹向陸地（藍）
-        this.drawFlowArrow(
-          ctx,
-          [
-            { x: L.seaCenterX - 20, y: L.groundY - 4 },
-            { x: (L.landCenterX + L.seaCenterX) / 2, y: L.groundY + 2 },
-            { x: L.landCenterX + 25, y: L.groundY - 6 },
-          ],
-          '#3498db',
-          phase + 1.1,
-          '冷空氣流向陸地（海風）'
-        );
-      }
-
-      drawFlowArrow(ctx, points, color, phase, label) {
-        if (points.length < 2) return;
-
-        ctx.save();
-        ctx.strokeStyle = color;
-        ctx.fillStyle = color;
-        ctx.lineWidth = 5;
-        ctx.lineCap = 'round';
-        ctx.lineJoin = 'round';
-        ctx.globalAlpha = 0.85;
-
-        // 曲線路徑
-        ctx.beginPath();
-        ctx.moveTo(points[0].x, points[0].y);
-        for (let i = 1; i < points.length - 1; i++) {
-          const xc = (points[i].x + points[i + 1].x) / 2;
-          const yc = (points[i].y + points[i + 1].y) / 2;
-          ctx.quadraticCurveTo(points[i].x, points[i].y, xc, yc);
-        }
-        const last = points[points.length - 1];
-        const prev = points[points.length - 2];
-        ctx.quadraticCurveTo(prev.x, prev.y, last.x, last.y);
-        ctx.stroke();
-
-        // 動態虛線光點沿箭頭移動
-        const dashCount = 4;
-        for (let i = 0; i < dashCount; i++) {
-          const t = ((phase * 0.25 + i / dashCount) % 1);
-          const pos = samplePolyline(points, t);
-          ctx.beginPath();
-          ctx.arc(pos.x, pos.y, 4.5, 0, Math.PI * 2);
-          ctx.fill();
-        }
-
-        // 箭頭頭部
-        const tip = points[points.length - 1];
-        const before = points[points.length - 2];
-        const ang = Math.atan2(tip.y - before.y, tip.x - before.x);
-        ctx.beginPath();
-        ctx.moveTo(tip.x, tip.y);
-        ctx.lineTo(tip.x - 16 * Math.cos(ang - 0.4), tip.y - 16 * Math.sin(ang - 0.4));
-        ctx.lineTo(tip.x - 16 * Math.cos(ang + 0.4), tip.y - 16 * Math.sin(ang + 0.4));
-        ctx.closePath();
-        ctx.fill();
-
-        if (label) {
-          ctx.globalAlpha = 1;
-          ctx.font = 'bold 13px "Noto Sans TC", sans-serif';
-          ctx.textAlign = 'center';
-          const mid = samplePolyline(points, 0.45);
-          const pad = 6;
-          const tw = ctx.measureText(label).width;
-          ctx.fillStyle = 'rgba(255,255,255,0.9)';
-          roundRect(ctx, mid.x - tw / 2 - pad, mid.y - 22, tw + pad * 2, 22, 8);
-          ctx.fill();
-          ctx.fillStyle = color;
-          ctx.fillText(label, mid.x, mid.y - 8);
-        }
-        ctx.restore();
-      }
-
-      drawLabels(ctx, L) {
-        ctx.save();
-        ctx.font = 'bold 16px "Noto Sans TC", sans-serif';
-        ctx.textAlign = 'center';
-
-        // 陸地標籤
-        ctx.fillStyle = 'rgba(255,255,255,0.85)';
-        roundRect(ctx, L.landCenterX - 36, L.horizon + 48, 72, 26, 10);
-        ctx.fill();
-        ctx.fillStyle = '#1e8449';
-        ctx.fillText('陸地', L.landCenterX, L.horizon + 66);
-
-        // 海洋標籤
-        ctx.fillStyle = 'rgba(255,255,255,0.85)';
-        roundRect(ctx, L.seaCenterX - 36, L.horizon + 55, 72, 26, 10);
-        ctx.fill();
-        ctx.fillStyle = '#1a5276';
-        ctx.fillText('海洋', L.seaCenterX, L.horizon + 73);
-
-        // 中央說明（僅粒子模式時顯示簡短提示）
-        if (this.mode === 'particles' && this.heatingOn && this.heat > 0.2) {
-          ctx.font = 'bold 14px "Noto Sans TC", sans-serif';
-          ctx.fillStyle = 'rgba(255,255,255,0.92)';
-          const msg = this.speedBoost > 1.2 ? '風速加快中！💨' : '對流循環進行中…';
-          const tw = ctx.measureText(msg).width;
-          roundRect(ctx, L.w / 2 - tw / 2 - 10, 12, tw + 20, 28, 12);
-          ctx.fill();
-          ctx.fillStyle = '#c0392b';
-          ctx.fillText(msg, L.w / 2, 31);
-        }
-        ctx.restore();
-      }
-    }
-
-    /** 沿折線取樣位置 */
     function samplePolyline(points, t) {
       t = clamp(t, 0, 1);
       let total = 0;
@@ -1246,61 +661,939 @@
     }
 
     function mixColor(a, b, t) {
-      const pa = hexToRgb(a);
-      const pb = hexToRgb(b);
-      const r = Math.round(lerp(pa.r, pb.r, t));
-      const g = Math.round(lerp(pa.g, pb.g, t));
-      const bl = Math.round(lerp(pa.b, pb.b, t));
-      return `rgb(${r},${g},${bl})`;
+      const pa = hexToRgb(a), pb = hexToRgb(b);
+      return `rgb(${Math.round(lerp(pa.r, pb.r, t))},${Math.round(lerp(pa.g, pb.g, t))},${Math.round(lerp(pa.b, pb.b, t))})`;
     }
 
     function hexToRgb(hex) {
       const h = hex.replace('#', '');
-      return {
-        r: parseInt(h.slice(0, 2), 16),
-        g: parseInt(h.slice(2, 4), 16),
-        b: parseInt(h.slice(4, 6), 16),
-      };
+      return { r: parseInt(h.slice(0, 2), 16), g: parseInt(h.slice(2, 4), 16), b: parseInt(h.slice(4, 6), 16) };
     }
 
-    // ---------- 問答遊戲 ----------
+    // ---------- 氣流粒子（支援日／夜路徑） ----------
+    class AirParticle {
+      constructor(type, layout, isNight) {
+        this.type = type; // 'warm' | 'cool'
+        this.layout = layout;
+        this.isNight = !!isNight;
+        this.reset(true);
+      }
+
+      reset(randomPhase = false) {
+        this.t = randomPhase ? Math.random() : 0;
+        this.baseSize = this.type === 'warm' ? rand(4, 8) : rand(3.5, 6.5);
+        this.size = this.baseSize;
+        this.wobble = rand(0, Math.PI * 2);
+        this.speedJitter = rand(0.85, 1.15);
+        this.alpha = rand(0.55, 0.9);
+        this.expand = 1;
+      }
+
+      getPosition() {
+        const L = this.layout;
+        const landX = L.landCenterX, seaX = L.seaCenterX;
+        const groundY = L.groundY, skyY = L.skyY;
+        const midY = (groundY + skyY) / 2;
+        let x, y;
+
+        if (!this.isNight) {
+          // 日間海風：暖空氣在陸上升 → 高空往海；冷空氣貼海面吹向陸
+          if (this.type === 'warm') {
+            if (this.t < 0.35) {
+              const p = this.t / 0.35;
+              x = landX + Math.sin(p * Math.PI) * L.w * 0.02;
+              y = lerp(groundY - 8, skyY, p);
+              this.expand = lerp(1, 1.85, p);
+            } else if (this.t < 0.7) {
+              const p = (this.t - 0.35) / 0.35;
+              x = lerp(landX, seaX, p);
+              y = skyY + Math.sin(p * Math.PI) * 10;
+              this.expand = lerp(1.85, 1.3, p);
+            } else {
+              const p = (this.t - 0.7) / 0.3;
+              x = seaX + Math.sin(p * Math.PI) * L.w * 0.015;
+              y = lerp(skyY, midY, p);
+              this.expand = lerp(1.3, 1.05, p);
+            }
+          } else {
+            if (this.t < 0.3) {
+              const p = this.t / 0.3;
+              x = seaX + Math.sin(p * Math.PI) * L.w * 0.02;
+              y = lerp(midY - 20, groundY - 6, p);
+              this.expand = 1;
+            } else if (this.t < 0.75) {
+              const p = (this.t - 0.3) / 0.45;
+              x = lerp(seaX, landX, p);
+              y = groundY - 6 + Math.sin(p * Math.PI * 2) * 4;
+            } else {
+              const p = (this.t - 0.75) / 0.25;
+              x = landX;
+              y = lerp(groundY - 6, groundY - 40, p);
+            }
+          }
+        } else {
+          // 夜間陸風：暖空氣在海上上升；冷空氣從陸貼地吹向海
+          if (this.type === 'warm') {
+            if (this.t < 0.35) {
+              const p = this.t / 0.35;
+              x = seaX + Math.sin(p * Math.PI) * L.w * 0.02;
+              y = lerp(groundY - 8, skyY, p);
+              this.expand = lerp(1, 1.7, p);
+            } else if (this.t < 0.7) {
+              const p = (this.t - 0.35) / 0.35;
+              x = lerp(seaX, landX, p);
+              y = skyY + Math.sin(p * Math.PI) * 10;
+              this.expand = lerp(1.7, 1.25, p);
+            } else {
+              const p = (this.t - 0.7) / 0.3;
+              x = landX;
+              y = lerp(skyY, midY, p);
+              this.expand = lerp(1.25, 1.05, p);
+            }
+          } else {
+            if (this.t < 0.3) {
+              const p = this.t / 0.3;
+              x = landX;
+              y = lerp(midY - 10, groundY - 6, p);
+            } else if (this.t < 0.75) {
+              const p = (this.t - 0.3) / 0.45;
+              x = lerp(landX, seaX, p);
+              y = groundY - 6 + Math.sin(p * Math.PI * 2) * 4;
+            } else {
+              const p = (this.t - 0.75) / 0.25;
+              x = seaX;
+              y = lerp(groundY - 6, groundY - 40, p);
+            }
+          }
+        }
+
+        x += Math.sin(this.wobble) * 3;
+        return { x, y };
+      }
+
+      update(dt, heat, boost) {
+        const flow = (0.05 + heat * 0.7) * this.speedJitter * boost;
+        this.t += flow * dt;
+        this.wobble += dt * 2.2;
+        if (this.t >= 1) this.reset(false);
+        this.size = this.baseSize * this.expand * (0.85 + heat * 0.35);
+      }
+
+      draw(ctx, dimmed) {
+        const { x, y } = this.getPosition();
+        const r = this.size;
+        ctx.save();
+        ctx.globalAlpha = this.alpha * (dimmed ? 0.18 : 1);
+        const grad = ctx.createRadialGradient(x - r * 0.3, y - r * 0.3, 0, x, y, r * 1.4);
+        if (this.type === 'warm') {
+          grad.addColorStop(0, '#ffe082');
+          grad.addColorStop(0.45, '#ff7043');
+          grad.addColorStop(1, 'rgba(231, 76, 60, 0)');
+        } else {
+          grad.addColorStop(0, '#e3f2fd');
+          grad.addColorStop(0.45, '#42a5f5');
+          grad.addColorStop(1, 'rgba(52, 152, 219, 0)');
+        }
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(x, y, r * 1.4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    class TipBubble {
+      constructor(x, y, text) {
+        this.x = x; this.y = y; this.text = text;
+        this.life = 0; this.maxLife = 2.4;
+      }
+      update(dt) { this.life += dt; this.y -= 18 * dt; }
+      get alive() { return this.life < this.maxLife; }
+      draw(ctx) {
+        const t = this.life / this.maxLife;
+        const alpha = t < 0.15 ? t / 0.15 : 1 - (t - 0.15) / 0.85;
+        ctx.save();
+        ctx.globalAlpha = clamp(alpha, 0, 1);
+        ctx.font = 'bold 15px "Noto Sans TC", sans-serif';
+        const padX = 12, h = 28;
+        const tw = ctx.measureText(this.text).width;
+        const w = tw + padX * 2;
+        const rx = this.x - w / 2, ry = this.y - h;
+        ctx.fillStyle = '#ffffff';
+        ctx.strokeStyle = '#5dade2';
+        ctx.lineWidth = 2.5;
+        roundRect(ctx, rx, ry, w, h, 12);
+        ctx.fill(); ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(this.x - 6, ry + h);
+        ctx.lineTo(this.x, ry + h + 8);
+        ctx.lineTo(this.x + 6, ry + h);
+        ctx.closePath();
+        ctx.fill(); ctx.stroke();
+        ctx.fillStyle = '#1a5276';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(this.text, this.x, ry + h / 2);
+        ctx.restore();
+      }
+    }
+
+    // ---------- 主模擬 ----------
+    class WindSimulation {
+      constructor(canvas) {
+        this.canvas = canvas;
+        this.ctx = canvas.getContext('2d');
+        this.dpr = Math.max(1, window.devicePixelRatio || 1);
+
+        this.heat = 0.7;
+        this.isNight = false;
+        this.mode = 'particles';
+        this.showPressure = false;
+        this.speedBoost = 1;
+        this.boostTimer = 0;
+
+        // 分步／答錯高亮：null | sun | land | sea | hotAir | coldAir | cycle
+        this.focus = null;
+        this.flashFocus = null;
+        this.flashTimer = 0;
+        this.pauseFlow = false;
+        this.pauseTimer = 0;
+
+        this.particles = [];
+        this.bubbles = [];
+        this.time = 0;
+        this.lastTs = 0;
+        this.running = false;
+
+        this.cssW = 940;
+        this.cssH = 520;
+        this.layout = this.computeLayout();
+        this.resize();
+        this.spawnParticles();
+        this.bindEvents();
+      }
+
+      computeLayout() {
+        const w = this.cssW, h = this.cssH;
+        return {
+          w, h,
+          horizon: h * 0.62,
+          groundY: h * 0.58,
+          skyY: h * 0.18,
+          landCenterX: w * 0.28,
+          seaCenterX: w * 0.72,
+          shoreX: w * 0.52,
+          sunX: w * 0.18,
+          sunY: h * 0.16,
+        };
+      }
+
+      spawnParticles() {
+        this.particles = [];
+        for (let i = 0; i < 28; i++) {
+          this.particles.push(new AirParticle(i % 2 === 0 ? 'warm' : 'cool', this.layout, this.isNight));
+        }
+      }
+
+      bindEvents() {
+        this.canvas.addEventListener('pointerdown', (e) => this.onClick(e));
+        window.addEventListener('resize', () => this.resize());
+      }
+
+      onClick(e) {
+        const rect = this.canvas.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width) * this.cssW;
+        const y = ((e.clientY - rect.top) / rect.height) * this.cssH;
+        this.tipAt(x, y);
+      }
+
+      tipAt(x, y) {
+        const L = this.layout;
+        if (Math.hypot(x - L.sunX, y - L.sunY) < 60) {
+          this.bubbles.push(new TipBubble(x, y, this.isNight ? '月亮：夜晚降臨 🌙' : '太陽：提供熱能！'));
+          return;
+        }
+        if (x < L.shoreX) {
+          const t = this.getTemps();
+          this.bubbles.push(new TipBubble(x, Math.min(y, L.horizon + 20), `陸地：約 ${t.land}°C（受熱／冷卻較快）`));
+        } else {
+          const t = this.getTemps();
+          this.bubbles.push(new TipBubble(x, Math.min(y, L.horizon + 30), `海洋：約 ${t.sea}°C（溫度變化較慢）`));
+        }
+      }
+
+      tipRegion(region) {
+        const L = this.layout;
+        if (region === 'land') this.tipAt(L.landCenterX, L.horizon + 10);
+        else if (region === 'sea') this.tipAt(L.seaCenterX, L.horizon + 20);
+        else this.tipAt(L.sunX, L.sunY);
+      }
+
+      /** 依熱力與日夜計算溫度 */
+      getTemps() {
+        if (!this.isNight) {
+          const land = Math.round(24 + this.heat * 16); // 24~40
+          const sea = Math.round(22 + this.heat * 6);   // 22~28
+          return { land, sea, delta: land - sea };
+        }
+        // 夜間：陸地降溫較快，海洋仍偏暖
+        const land = Math.round(18 + this.heat * 4);  // 18~22
+        const sea = Math.round(24 + this.heat * 3);   // 24~27
+        return { land, sea, delta: sea - land };
+      }
+
+      setHeat(v) { this.heat = clamp(v, 0, 1); }
+
+      setNight(on) {
+        this.isNight = !!on;
+        this.spawnParticles();
+      }
+
+      setMode(mode) { this.mode = mode; }
+      setFocus(focus) { this.focus = focus; }
+      setPressure(on) { this.showPressure = !!on; }
+
+      boostWind(seconds = 5) {
+        this.speedBoost = 2.4;
+        this.boostTimer = seconds;
+      }
+
+      /** 答錯：暫停氣流並閃爍對應區域 */
+      flashAndPause(focus, seconds = 2.2) {
+        this.flashFocus = focus;
+        this.flashTimer = seconds;
+        this.pauseFlow = true;
+        this.pauseTimer = seconds;
+      }
+
+      resize() {
+        const parent = this.canvas.parentElement;
+        const maxW = Math.min(940, parent ? parent.clientWidth - 8 : 940);
+        this.cssW = Math.max(300, maxW);
+        this.cssH = Math.round(this.cssW * (520 / 940));
+        this.dpr = Math.max(1, window.devicePixelRatio || 1);
+        this.canvas.width = Math.round(this.cssW * this.dpr);
+        this.canvas.height = Math.round(this.cssH * this.dpr);
+        this.canvas.style.width = this.cssW + 'px';
+        this.canvas.style.height = this.cssH + 'px';
+        this.ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
+        this.layout = this.computeLayout();
+        this.particles.forEach((p) => { p.layout = this.layout; p.isNight = this.isNight; });
+      }
+
+      start() {
+        if (this.running) return;
+        this.running = true;
+        this.lastTs = performance.now();
+        const loop = (ts) => {
+          if (!this.running) return;
+          const dt = clamp((ts - this.lastTs) / 1000, 0, 0.05);
+          this.lastTs = ts;
+          this.update(dt);
+          this.draw();
+          requestAnimationFrame(loop);
+        };
+        requestAnimationFrame(loop);
+      }
+
+      update(dt) {
+        this.time += dt;
+        if (this.boostTimer > 0) {
+          this.boostTimer -= dt;
+          if (this.boostTimer <= 0) { this.boostTimer = 0; this.speedBoost = 1; }
+        }
+        if (this.flashTimer > 0) {
+          this.flashTimer -= dt;
+          if (this.flashTimer <= 0) { this.flashTimer = 0; this.flashFocus = null; }
+        }
+        if (this.pauseTimer > 0) {
+          this.pauseTimer -= dt;
+          if (this.pauseTimer <= 0) { this.pauseTimer = 0; this.pauseFlow = false; }
+        }
+
+        const heat = this.isNight ? Math.max(0.25, this.heat * 0.55) : this.heat;
+        const boost = this.speedBoost;
+        if (this.mode === 'particles' && !this.pauseFlow) {
+          for (const p of this.particles) p.update(dt, heat, boost);
+        }
+        this.bubbles = this.bubbles.filter((b) => { b.update(dt); return b.alive; });
+      }
+
+      activeFocus() {
+        return this.flashFocus || this.focus;
+      }
+
+      isDimmed(kind) {
+        const f = this.activeFocus();
+        if (!f || f === 'cycle') return false;
+        if (f === 'sun') return kind !== 'sun';
+        if (f === 'land') return kind !== 'land' && kind !== 'temp';
+        if (f === 'sea') return kind !== 'sea' && kind !== 'temp';
+        if (f === 'hotAir') return kind !== 'warm' && kind !== 'hotAir';
+        if (f === 'coldAir') return kind !== 'cool' && kind !== 'coldAir';
+        return false;
+      }
+
+      draw() {
+        const ctx = this.ctx, L = this.layout;
+        ctx.clearRect(0, 0, L.w, L.h);
+        this.drawSky(ctx, L);
+        this.drawSunOrMoon(ctx, L);
+        this.drawLand(ctx, L);
+        this.drawSea(ctx, L);
+        this.drawLighthouse(ctx, L);
+        this.drawTrees(ctx, L);
+
+        if (this.mode === 'particles') {
+          const f = this.activeFocus();
+          for (const p of this.particles) {
+            let dim = false;
+            if (f === 'hotAir') dim = p.type !== 'warm';
+            else if (f === 'coldAir') dim = p.type !== 'cool';
+            else if (f === 'sun' || f === 'land') dim = true;
+            p.draw(ctx, dim);
+          }
+        } else {
+          this.drawArrows(ctx, L);
+        }
+
+        this.drawThermometers(ctx, L);
+        if (this.showPressure) this.drawPressure(ctx, L);
+        this.drawFocusRing(ctx, L);
+        this.drawLabels(ctx, L);
+        for (const b of this.bubbles) b.draw(ctx);
+      }
+
+      drawSky(ctx, L) {
+        let top, bot;
+        if (this.isNight) {
+          top = '#0b1d36';
+          bot = '#1a3358';
+        } else {
+          const heat = this.heat;
+          top = mixColor('#5dade2', '#7ec8f5', heat);
+          bot = mixColor('#aed6f1', '#d6eaf8', heat);
+        }
+        const g = ctx.createLinearGradient(0, 0, 0, L.h);
+        g.addColorStop(0, top);
+        g.addColorStop(0.55, bot);
+        g.addColorStop(1, this.isNight ? '#243b55' : '#b3e0ff');
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, L.w, L.h);
+
+        if (this.isNight) {
+          ctx.fillStyle = 'rgba(255,255,255,0.85)';
+          for (let i = 0; i < 18; i++) {
+            const sx = (i * 97 + 40) % L.w;
+            const sy = 20 + (i * 37) % (L.h * 0.35);
+            ctx.beginPath();
+            ctx.arc(sx, sy, 1.2 + (i % 3) * 0.4, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        } else {
+          ctx.save();
+          ctx.globalAlpha = 0.45;
+          this.drawCloud(ctx, L.w * 0.55, L.h * 0.12, 1.1);
+          this.drawCloud(ctx, L.w * 0.82, L.h * 0.2, 0.8);
+          ctx.restore();
+        }
+      }
+
+      drawCloud(ctx, x, y, s) {
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(x, y, 18 * s, 0, Math.PI * 2);
+        ctx.arc(x + 22 * s, y - 6 * s, 22 * s, 0, Math.PI * 2);
+        ctx.arc(x + 46 * s, y + 2 * s, 16 * s, 0, Math.PI * 2);
+        ctx.arc(x + 20 * s, y + 8 * s, 14 * s, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      drawSunOrMoon(ctx, L) {
+        const dim = this.isDimmed('sun');
+        ctx.save();
+        ctx.globalAlpha = dim ? 0.25 : 1;
+        ctx.translate(L.sunX, L.sunY);
+
+        if (this.isNight) {
+          ctx.fillStyle = '#f5f3ce';
+          ctx.beginPath();
+          ctx.arc(0, 0, 26, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.globalCompositeOperation = 'destination-out';
+          ctx.beginPath();
+          ctx.arc(10, -4, 22, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.globalCompositeOperation = 'source-over';
+          ctx.fillStyle = 'rgba(245,243,206,0.25)';
+          ctx.beginPath();
+          ctx.arc(0, 0, 40, 0, Math.PI * 2);
+          ctx.fill();
+        } else {
+          const heat = this.heat;
+          const pulse = 1 + Math.sin(this.time * (1.5 + heat * 2)) * 0.06 * heat;
+          const r = (28 + heat * 14) * pulse;
+          for (let i = 0; i < 12; i++) {
+            const ang = (i / 12) * Math.PI * 2 + this.time * 0.4;
+            const len = (40 + heat * 35) * pulse;
+            ctx.strokeStyle = `rgba(255, 193, 7, ${0.25 + heat * 0.45})`;
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(Math.cos(ang) * (r + 4), Math.sin(ang) * (r + 4));
+            ctx.lineTo(Math.cos(ang) * len, Math.sin(ang) * len);
+            ctx.stroke();
+          }
+          const glow = ctx.createRadialGradient(0, 0, r * 0.2, 0, 0, r * 2.2);
+          glow.addColorStop(0, `rgba(255, 236, 150, ${0.55 + heat * 0.35})`);
+          glow.addColorStop(1, 'rgba(255, 193, 7, 0)');
+          ctx.fillStyle = glow;
+          ctx.beginPath();
+          ctx.arc(0, 0, r * 2.2, 0, Math.PI * 2);
+          ctx.fill();
+          const core = ctx.createRadialGradient(-r * 0.25, -r * 0.25, 0, 0, 0, r);
+          core.addColorStop(0, '#fff59d');
+          core.addColorStop(0.55, '#ffca28');
+          core.addColorStop(1, '#ff9800');
+          ctx.fillStyle = core;
+          ctx.beginPath();
+          ctx.arc(0, 0, r, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
+      }
+
+      drawLand(ctx, L) {
+        const dim = this.isDimmed('land');
+        ctx.save();
+        ctx.globalAlpha = dim ? 0.35 : 1;
+        const shore = L.shoreX, horizon = L.horizon;
+        ctx.fillStyle = this.isNight ? '#3d6b3d' : '#6fcf6f';
+        ctx.beginPath();
+        ctx.moveTo(0, L.h);
+        ctx.lineTo(0, horizon + 20);
+        ctx.quadraticCurveTo(L.w * 0.12, horizon - 70, L.w * 0.26, horizon - 10);
+        ctx.quadraticCurveTo(L.w * 0.38, horizon + 35, shore, horizon + 8);
+        ctx.lineTo(shore, L.h);
+        ctx.closePath();
+        ctx.fill();
+        ctx.fillStyle = this.isNight ? '#2f5530' : '#4caf50';
+        ctx.beginPath();
+        ctx.moveTo(0, L.h);
+        ctx.lineTo(0, horizon + 55);
+        ctx.quadraticCurveTo(L.w * 0.18, horizon + 10, L.w * 0.32, horizon + 40);
+        ctx.quadraticCurveTo(L.w * 0.42, horizon + 60, shore - 10, horizon + 35);
+        ctx.lineTo(shore, L.h);
+        ctx.closePath();
+        ctx.fill();
+        ctx.fillStyle = '#f6d7a7';
+        ctx.beginPath();
+        ctx.moveTo(shore - 28, horizon + 5);
+        ctx.quadraticCurveTo(shore - 5, horizon + 18, shore + 8, horizon + 12);
+        ctx.lineTo(shore + 8, L.h);
+        ctx.lineTo(shore - 28, L.h);
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+      }
+
+      drawSea(ctx, L) {
+        const dim = this.isDimmed('sea');
+        ctx.save();
+        ctx.globalAlpha = dim ? 0.35 : 1;
+        const shore = L.shoreX, horizon = L.horizon, t = this.time;
+        const seaGrad = ctx.createLinearGradient(0, horizon, 0, L.h);
+        seaGrad.addColorStop(0, this.isNight ? '#1a3a5c' : '#5dade2');
+        seaGrad.addColorStop(0.45, this.isNight ? '#12253d' : '#2980b9');
+        seaGrad.addColorStop(1, this.isNight ? '#0a1624' : '#1a5276');
+        ctx.fillStyle = seaGrad;
+        ctx.beginPath();
+        ctx.moveTo(shore - 4, horizon + 10);
+        ctx.lineTo(L.w, horizon + 10);
+        ctx.lineTo(L.w, L.h);
+        ctx.lineTo(shore - 4, L.h);
+        ctx.closePath();
+        ctx.fill();
+        for (let layer = 0; layer < 3; layer++) {
+          const yBase = horizon + 28 + layer * 28;
+          const amp = 6 + layer * 2;
+          const speed = 1.2 + layer * 0.35;
+          ctx.beginPath();
+          ctx.moveTo(shore - 4, L.h);
+          ctx.lineTo(shore - 4, yBase);
+          for (let x = shore - 4; x <= L.w + 4; x += 8) {
+            ctx.lineTo(x, yBase + Math.sin(x * 0.03 + t * speed + layer) * amp);
+          }
+          ctx.lineTo(L.w, L.h);
+          ctx.closePath();
+          ctx.fillStyle = layer === 0 ? 'rgba(174,214,241,0.3)' : 'rgba(46,134,193,0.2)';
+          ctx.fill();
+        }
+        ctx.restore();
+      }
+
+      drawLighthouse(ctx, L) {
+        const x = L.w * 0.78, baseY = L.horizon + 18, h = 78;
+        ctx.fillStyle = '#7f8c8d';
+        ctx.beginPath();
+        ctx.ellipse(x, baseY + 8, 28, 12, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#ecf0f1';
+        ctx.fillRect(x - 8, baseY - h, 16, h);
+        ctx.fillStyle = '#e74c3c';
+        for (let i = 0; i < 4; i++) ctx.fillRect(x - 8, baseY - h + 8 + i * 18, 16, 8);
+        ctx.fillStyle = '#f5b041';
+        ctx.fillRect(x - 12, baseY - h - 16, 24, 18);
+        ctx.globalAlpha = 0.55 + Math.sin(this.time * 3) * 0.25;
+        ctx.fillStyle = this.isNight ? '#fff59d' : '#f9e79f';
+        ctx.beginPath();
+        ctx.arc(x, baseY - h - 8, this.isNight ? 14 : 10, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = '#922b21';
+        ctx.beginPath();
+        ctx.moveTo(x - 14, baseY - h - 16);
+        ctx.lineTo(x, baseY - h - 30);
+        ctx.lineTo(x + 14, baseY - h - 16);
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      drawTrees(ctx, L) {
+        const trees = [
+          { x: L.w * 0.1, y: L.horizon + 8, s: 1 },
+          { x: L.w * 0.2, y: L.horizon - 5, s: 1.15 },
+          { x: L.w * 0.34, y: L.horizon + 12, s: 0.9 },
+          { x: L.w * 0.42, y: L.horizon + 18, s: 0.75 },
+        ];
+        for (const t of trees) this.drawTree(ctx, t.x, t.y, t.s);
+      }
+
+      drawTree(ctx, x, y, s) {
+        ctx.fillStyle = '#6d4c41';
+        ctx.fillRect(x - 3 * s, y - 18 * s, 6 * s, 20 * s);
+        ctx.fillStyle = this.isNight ? '#1e8449' : '#2ecc71';
+        ctx.beginPath();
+        ctx.arc(x, y - 28 * s, 14 * s, 0, Math.PI * 2);
+        ctx.arc(x - 10 * s, y - 20 * s, 11 * s, 0, Math.PI * 2);
+        ctx.arc(x + 10 * s, y - 20 * s, 11 * s, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      drawArrows(ctx, L) {
+        const heat = this.isNight ? 0.45 : this.heat;
+        const boost = this.speedBoost;
+        const phase = this.time * (0.9 + heat * 1.8) * boost;
+        const f = this.activeFocus();
+
+        const paths = this.isNight
+          ? [
+              { pts: [{ x: L.seaCenterX, y: L.groundY - 5 }, { x: L.seaCenterX, y: L.skyY + 5 }], color: '#e74c3c', label: '海上暖空氣上升', kind: 'hotAir' },
+              { pts: [{ x: L.seaCenterX - 10, y: L.skyY }, { x: L.landCenterX + 10, y: L.skyY }], color: '#e67e22', label: '', kind: 'hotAir' },
+              { pts: [{ x: L.landCenterX, y: L.skyY + 30 }, { x: L.landCenterX, y: L.groundY - 8 }], color: '#2980b9', label: '陸地冷空氣下沉', kind: 'coldAir' },
+              { pts: [{ x: L.landCenterX + 20, y: L.groundY - 4 }, { x: L.seaCenterX - 20, y: L.groundY - 4 }], color: '#3498db', label: '陸風：吹向海洋', kind: 'coldAir' },
+            ]
+          : [
+              { pts: [{ x: L.landCenterX - 10, y: L.groundY - 5 }, { x: L.landCenterX + 5, y: L.skyY + 5 }], color: '#e74c3c', label: '熱空氣上升', kind: 'hotAir' },
+              { pts: [{ x: L.landCenterX + 20, y: L.skyY }, { x: L.seaCenterX - 10, y: L.skyY + 8 }], color: '#e67e22', label: '', kind: 'hotAir' },
+              { pts: [{ x: L.seaCenterX + 8, y: L.skyY + 30 }, { x: L.seaCenterX, y: L.groundY - 8 }], color: '#2980b9', label: '冷空氣下沉', kind: 'coldAir' },
+              { pts: [{ x: L.seaCenterX - 20, y: L.groundY - 4 }, { x: L.landCenterX + 25, y: L.groundY - 6 }], color: '#3498db', label: '海風：流向陸地', kind: 'coldAir' },
+            ];
+
+        for (const path of paths) {
+          let alpha = 0.85;
+          if (f === 'hotAir' && path.kind !== 'hotAir') alpha = 0.15;
+          if (f === 'coldAir' && path.kind !== 'coldAir') alpha = 0.15;
+          if (f === 'sun' || f === 'land') alpha = 0.2;
+          this.drawFlowArrow(ctx, path.pts, path.color, phase, path.label, alpha);
+        }
+      }
+
+      drawFlowArrow(ctx, points, color, phase, label, alpha = 0.85) {
+        if (points.length < 2) return;
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        ctx.strokeStyle = color;
+        ctx.fillStyle = color;
+        ctx.lineWidth = 5;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.beginPath();
+        ctx.moveTo(points[0].x, points[0].y);
+        for (let i = 1; i < points.length; i++) ctx.lineTo(points[i].x, points[i].y);
+        ctx.stroke();
+        for (let i = 0; i < 4; i++) {
+          const t = ((phase * 0.25 + i / 4) % 1);
+          const pos = samplePolyline(points, t);
+          ctx.beginPath();
+          ctx.arc(pos.x, pos.y, 4.5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        const tip = points[points.length - 1], before = points[points.length - 2];
+        const ang = Math.atan2(tip.y - before.y, tip.x - before.x);
+        ctx.beginPath();
+        ctx.moveTo(tip.x, tip.y);
+        ctx.lineTo(tip.x - 16 * Math.cos(ang - 0.4), tip.y - 16 * Math.sin(ang - 0.4));
+        ctx.lineTo(tip.x - 16 * Math.cos(ang + 0.4), tip.y - 16 * Math.sin(ang + 0.4));
+        ctx.closePath();
+        ctx.fill();
+        if (label && alpha > 0.4) {
+          ctx.globalAlpha = 1;
+          ctx.font = 'bold 13px "Noto Sans TC", sans-serif';
+          ctx.textAlign = 'center';
+          const mid = samplePolyline(points, 0.45);
+          const tw = ctx.measureText(label).width;
+          ctx.fillStyle = 'rgba(255,255,255,0.92)';
+          roundRect(ctx, mid.x - tw / 2 - 6, mid.y - 22, tw + 12, 22, 8);
+          ctx.fill();
+          ctx.fillStyle = color;
+          ctx.fillText(label, mid.x, mid.y - 8);
+        }
+        ctx.restore();
+      }
+
+      drawThermometers(ctx, L) {
+        const temps = this.getTemps();
+        this.drawThermo(ctx, L.landCenterX - 70, L.horizon - 10, temps.land, 18, 40, '#e74c3c', '陸');
+        this.drawThermo(ctx, L.seaCenterX + 55, L.horizon - 10, temps.sea, 18, 40, '#2980b9', '海');
+      }
+
+      drawThermo(ctx, x, y, temp, minT, maxT, color, tag) {
+        const h = 70, ratio = clamp((temp - minT) / (maxT - minT), 0.08, 1);
+        ctx.save();
+        ctx.fillStyle = 'rgba(255,255,255,0.9)';
+        roundRect(ctx, x - 12, y - h - 8, 24, h + 28, 10);
+        ctx.fill();
+        ctx.strokeStyle = '#94a3b8';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        ctx.fillStyle = '#e2e8f0';
+        roundRect(ctx, x - 5, y - h, 10, h, 5);
+        ctx.fill();
+        ctx.fillStyle = color;
+        const fillH = h * ratio;
+        roundRect(ctx, x - 5, y - fillH, 10, fillH, 5);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(x, y + 2, 9, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#1e293b';
+        ctx.font = 'bold 12px "Noto Sans TC", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(tag + temp + '°', x, y - h - 14);
+        ctx.restore();
+      }
+
+      drawPressure(ctx, L) {
+        // 日間：陸 L、海 H；夜間相反
+        const landIsLow = !this.isNight;
+        this.drawHL(ctx, L.landCenterX, L.skyY + 55, landIsLow ? 'L' : 'H', landIsLow);
+        this.drawHL(ctx, L.seaCenterX, L.skyY + 55, landIsLow ? 'H' : 'L', !landIsLow);
+        ctx.save();
+        ctx.font = 'bold 13px "Noto Sans TC", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillStyle = 'rgba(255,255,255,0.92)';
+        const msg = this.isNight
+          ? '夜間：陸地偏高氣壓 → 風吹向海（陸風）'
+          : '日間：陸地偏低氣壓 → 風吹向陸（海風）';
+        const tw = ctx.measureText(msg).width;
+        roundRect(ctx, L.w / 2 - tw / 2 - 10, L.h - 36, tw + 20, 26, 10);
+        ctx.fill();
+        ctx.fillStyle = '#6d28d9';
+        ctx.fillText(msg, L.w / 2, L.h - 18);
+        ctx.restore();
+      }
+
+      drawHL(ctx, x, y, letter, isLow) {
+        ctx.save();
+        ctx.fillStyle = isLow ? 'rgba(231,76,60,0.9)' : 'rgba(41,128,185,0.9)';
+        ctx.beginPath();
+        ctx.arc(x, y, 22, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 22px "Noto Sans TC", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(letter, x, y + 1);
+        ctx.font = 'bold 11px "Noto Sans TC", sans-serif';
+        ctx.fillText(isLow ? '低壓' : '高壓', x, y + 28);
+        ctx.restore();
+      }
+
+      drawFocusRing(ctx, L) {
+        const f = this.activeFocus();
+        if (!f || f === 'cycle') return;
+        const pulse = 0.45 + Math.sin(this.time * 6) * 0.25;
+        ctx.save();
+        ctx.strokeStyle = `rgba(243, 156, 18, ${pulse})`;
+        ctx.lineWidth = 4;
+        ctx.setLineDash([8, 6]);
+        if (f === 'sun') {
+          ctx.beginPath();
+          ctx.arc(L.sunX, L.sunY, 55, 0, Math.PI * 2);
+          ctx.stroke();
+        } else if (f === 'land') {
+          roundRect(ctx, 8, L.horizon - 80, L.shoreX - 20, L.h - L.horizon + 70, 16);
+          ctx.stroke();
+        } else if (f === 'hotAir') {
+          roundRect(ctx, L.landCenterX - 50, L.skyY - 10, 100, L.groundY - L.skyY, 16);
+          ctx.stroke();
+        } else if (f === 'coldAir') {
+          const x0 = this.isNight ? L.landCenterX - 40 : L.landCenterX + 10;
+          const x1 = this.isNight ? L.seaCenterX + 40 : L.seaCenterX + 40;
+          roundRect(ctx, Math.min(x0, x1), L.groundY - 50, Math.abs(x1 - x0), 70, 16);
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+
+      drawLabels(ctx, L) {
+        ctx.save();
+        ctx.font = 'bold 16px "Noto Sans TC", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillStyle = 'rgba(255,255,255,0.9)';
+        roundRect(ctx, L.landCenterX - 36, L.horizon + 48, 72, 26, 10);
+        ctx.fill();
+        ctx.fillStyle = '#1e8449';
+        ctx.fillText('陸地', L.landCenterX, L.horizon + 66);
+        ctx.fillStyle = 'rgba(255,255,255,0.9)';
+        roundRect(ctx, L.seaCenterX - 36, L.horizon + 55, 72, 26, 10);
+        ctx.fill();
+        ctx.fillStyle = '#1a5276';
+        ctx.fillText('海洋', L.seaCenterX, L.horizon + 73);
+
+        ctx.font = 'bold 14px "Noto Sans TC", sans-serif';
+        const badge = this.isNight
+          ? (this.speedBoost > 1.2 ? '陸風加速中！🌙' : '夜間・陸風')
+          : (this.speedBoost > 1.2 ? '海風加速中！💨' : '日間・海風');
+        const tw = ctx.measureText(badge).width;
+        ctx.fillStyle = 'rgba(255,255,255,0.92)';
+        roundRect(ctx, L.w / 2 - tw / 2 - 10, 10, tw + 20, 28, 12);
+        ctx.fill();
+        ctx.fillStyle = this.isNight ? '#3730a3' : '#c0392b';
+        ctx.fillText(badge, L.w / 2, 29);
+        ctx.restore();
+      }
+    }
+
+    // ---------- 分步導覽 ----------
+    class StepGuide {
+      constructor(sim) {
+        this.sim = sim;
+        this.step = -1; // -1 = 自由探索
+        this.guideBox = document.getElementById('guide-box');
+        this.guideText = document.getElementById('guide-text');
+        this.chips = [...document.querySelectorAll('.step-chip')];
+        this.btnSteps = document.getElementById('btn-steps');
+        this.btnPrev = document.getElementById('btn-prev');
+        this.btnNext = document.getElementById('btn-next');
+        this.btnFree = document.getElementById('btn-free');
+
+        this.chips.forEach((chip) => {
+          chip.addEventListener('click', () => {
+            if (this.sim.isNight) this.exitNightForSteps();
+            this.go(Number(chip.dataset.step));
+          });
+        });
+        this.btnSteps.addEventListener('click', () => {
+          if (this.sim.isNight) this.exitNightForSteps();
+          this.go(0);
+        });
+        this.btnPrev.addEventListener('click', () => { if (this.step > 0) this.go(this.step - 1); });
+        this.btnNext.addEventListener('click', () => {
+          if (this.step < 0) this.go(0);
+          else if (this.step < STEPS.length - 1) this.go(this.step + 1);
+          else this.free();
+        });
+        this.btnFree.addEventListener('click', () => this.free());
+        this.free();
+      }
+
+      exitNightForSteps() {
+        document.getElementById('btn-day').click();
+      }
+
+      go(n) {
+        this.step = clamp(n, 0, STEPS.length - 1);
+        const s = STEPS[this.step];
+        this.sim.setFocus(s.focus);
+        this.guideBox.classList.remove('night-guide');
+        this.guideText.textContent = s.guide;
+        this.chips.forEach((c, i) => {
+          c.classList.toggle('active', i === this.step);
+          c.classList.toggle('done', i < this.step);
+        });
+        this.btnPrev.disabled = this.step <= 0;
+        this.btnNext.disabled = false;
+        this.btnNext.textContent = this.step >= STEPS.length - 1 ? '完成' : '下一步';
+        document.getElementById('canvas-hint').textContent = `步驟 ${this.step + 1}/5：${s.title}`;
+      }
+
+      free() {
+        this.step = -1;
+        this.sim.setFocus(null);
+        this.chips.forEach((c) => c.classList.remove('active', 'done'));
+        this.btnPrev.disabled = true;
+        this.btnNext.disabled = true;
+        this.btnNext.textContent = '下一步';
+        if (this.sim.isNight) {
+          this.guideBox.classList.add('night-guide');
+          this.guideText.textContent = '夜間陸地降溫較快，風向與日間相反，吹「陸風」。想想：為什麼日夜相反？';
+          document.getElementById('canvas-hint').textContent = '夜間：近地面風從陸地吹向海洋＝陸風';
+        } else {
+          this.guideBox.classList.remove('night-guide');
+          this.guideText.textContent = '自由探索：拖動熱力、切換日夜／箭頭，或點陸地與海洋！';
+          document.getElementById('canvas-hint').textContent = '觀察：陸地受熱 → 熱空氣上升 → 海上冷空氣吹向陸地＝海風';
+        }
+      }
+    }
+
+    // ---------- 問答 ----------
     class QuizGame {
       constructor(sim) {
         this.sim = sim;
         this.answers = { q1: '膨脹', q2: '上升', q3: '上升' };
+        this.extraAnswers = { q4: 'b', q5: 'a' };
         this.selected = { q1: '', q2: '', q3: '' };
-        this.solved = false;
+        this.extraSelected = { q4: '', q5: '' };
 
         this.feedback = document.getElementById('quiz-feedback');
-        this.checkBtn = document.getElementById('check-answer');
-        this.resetBtn = document.getElementById('reset-quiz');
+        this.extraFeedback = document.getElementById('extra-feedback');
 
-        // 綁定每個空格的按鈕選擇
         document.querySelectorAll('.quiz-blank').forEach((group) => {
           const key = group.dataset.q;
           group.querySelectorAll('.opt-btn').forEach((btn) => {
             btn.addEventListener('click', () => {
-              group.querySelectorAll('.opt-btn').forEach((b) => {
-                b.classList.remove('selected', 'correct', 'wrong');
-              });
+              group.querySelectorAll('.opt-btn').forEach((b) => b.classList.remove('selected', 'correct', 'wrong'));
               btn.classList.add('selected');
               this.selected[key] = btn.dataset.value;
-              this.feedback.textContent = '';
               this.feedback.className = 'quiz-feedback';
+              this.feedback.textContent = '';
             });
           });
         });
 
-        this.checkBtn.addEventListener('click', () => this.check());
-        this.resetBtn.addEventListener('click', () => this.reset());
+        document.querySelectorAll('.choice-list').forEach((list) => {
+          const key = list.dataset.q;
+          list.querySelectorAll('.choice-btn').forEach((btn) => {
+            btn.addEventListener('click', () => {
+              list.querySelectorAll('.choice-btn').forEach((b) => b.classList.remove('selected', 'correct', 'wrong'));
+              btn.classList.add('selected');
+              this.extraSelected[key] = btn.dataset.value;
+              this.extraFeedback.className = 'quiz-feedback';
+              this.extraFeedback.textContent = '';
+            });
+          });
+        });
+
+        document.getElementById('check-answer').addEventListener('click', () => this.checkFill());
+        document.getElementById('reset-quiz').addEventListener('click', () => this.resetFill());
+        document.getElementById('check-extra').addEventListener('click', () => this.checkExtra());
+        document.getElementById('reset-extra').addEventListener('click', () => this.resetExtra());
       }
 
-      check() {
+      checkFill() {
         const { q1: v1, q2: v2, q3: v3 } = this.selected;
-
-        document.querySelectorAll('.opt-btn').forEach((el) => {
-          el.classList.remove('correct', 'wrong');
-        });
+        document.querySelectorAll('.opt-btn').forEach((el) => el.classList.remove('correct', 'wrong'));
 
         if (!v1 || !v2 || !v3) {
           this.feedback.className = 'quiz-feedback feedback-hint';
@@ -1311,70 +1604,134 @@
         const ok1 = v1 === this.answers.q1;
         const ok2 = v2 === this.answers.q2;
         const ok3 = v3 === this.answers.q3;
-
         this.markGroup('q1', ok1);
         this.markGroup('q2', ok2);
         this.markGroup('q3', ok3);
 
         if (ok1 && ok2 && ok3) {
-          this.solved = true;
           this.feedback.className = 'quiz-feedback feedback-ok';
-          this.feedback.textContent = '太棒了！答對了 🎉 陸地上熱空氣膨脹上升，冷空氣補充上升的空氣，就形成海風！';
+          this.feedback.textContent = '太棒了！答對了 🎉 熱空氣膨脹上升，冷空氣補充，就形成海風！';
+          this.sim.setFocus('cycle');
           this.sim.boostWind(6);
-          launchConfetti();
-          // 短暫切到箭頭模式加強課本示意感
-          const particleBtn = document.getElementById('mode-particles');
-          const arrowBtn = document.getElementById('mode-arrows');
           this.sim.setMode('arrows');
-          arrowBtn.classList.add('active');
-          particleBtn.classList.remove('active');
+          document.getElementById('mode-arrows').classList.add('active');
+          document.getElementById('mode-particles').classList.remove('active');
+          launchConfetti();
           setTimeout(() => {
             this.sim.setMode('particles');
-            particleBtn.classList.add('active');
-            arrowBtn.classList.remove('active');
+            document.getElementById('mode-particles').classList.add('active');
+            document.getElementById('mode-arrows').classList.remove('active');
+            this.sim.setFocus(null);
           }, 3500);
-        } else {
-          this.feedback.className = 'quiz-feedback feedback-hint';
-          let hint = '再想想看～';
-          if (!ok1) hint = '想想看，熱空氣會變輕還是變重呢？受熱後空氣會膨脹喔！';
-          else if (!ok2) hint = '膨脹變輕的熱空氣，會上升還是下沉呢？';
-          else if (!ok3) hint = '海洋冷空氣吹來，是要補充「上升」還是「下沉」的空氣呢？';
-          this.feedback.textContent = hint;
+          return;
+        }
+
+        // 答錯：連動 Canvas 高亮對應區塊
+        let hint = '再想想看～';
+        let focus = 'hotAir';
+        if (!ok1) {
+          hint = '想想看，熱空氣會變輕還是變重？受熱後會膨脹喔！（看陸地上方紅粒子）';
+          focus = 'hotAir';
+        } else if (!ok2) {
+          hint = '膨脹變輕的熱空氣，會上升還是下沉呢？（看上升箭頭／紅粒子）';
+          focus = 'hotAir';
+        } else if (!ok3) {
+          hint = '海上冷空氣來補充的，是「上升」還是「下沉」的空氣？（看藍色海風）';
+          focus = 'coldAir';
+        }
+        this.feedback.className = 'quiz-feedback feedback-hint';
+        this.feedback.textContent = hint;
+        this.sim.flashAndPause(focus, 2.4);
+        if (this.sim.mode !== 'arrows') {
+          this.sim.setMode('arrows');
+          document.getElementById('mode-arrows').classList.add('active');
+          document.getElementById('mode-particles').classList.remove('active');
+          setTimeout(() => {
+            this.sim.setMode('particles');
+            document.getElementById('mode-particles').classList.add('active');
+            document.getElementById('mode-arrows').classList.remove('active');
+          }, 2400);
         }
       }
 
       markGroup(key, ok) {
         const group = document.querySelector(`.quiz-blank[data-q="${key}"]`);
-        const selected = group.querySelector('.opt-btn.selected');
+        const selected = group && group.querySelector('.opt-btn.selected');
         if (selected) selected.classList.add(ok ? 'correct' : 'wrong');
       }
 
-      reset() {
-        this.solved = false;
+      resetFill() {
         this.selected = { q1: '', q2: '', q3: '' };
-        document.querySelectorAll('.opt-btn').forEach((el) => {
-          el.classList.remove('selected', 'correct', 'wrong');
-        });
+        document.querySelectorAll('.opt-btn').forEach((el) => el.classList.remove('selected', 'correct', 'wrong'));
         this.feedback.className = 'quiz-feedback';
         this.feedback.textContent = '';
         this.sim.speedBoost = 1;
         this.sim.boostTimer = 0;
+        this.sim.flashFocus = null;
+        this.sim.pauseFlow = false;
+      }
+
+      checkExtra() {
+        const { q4, q5 } = this.extraSelected;
+        document.querySelectorAll('.choice-btn').forEach((el) => el.classList.remove('correct', 'wrong'));
+
+        if (!q4 || !q5) {
+          this.extraFeedback.className = 'quiz-feedback feedback-hint';
+          this.extraFeedback.textContent = '題二、題三都選好再檢查喔！';
+          return;
+        }
+
+        const ok4 = q4 === this.extraAnswers.q4;
+        const ok5 = q5 === this.extraAnswers.q5;
+        this.markChoice('q4', ok4);
+        this.markChoice('q5', ok5);
+
+        if (ok4 && ok5) {
+          this.extraFeedback.className = 'quiz-feedback feedback-ok';
+          this.extraFeedback.textContent = '滿分！日間海風、夜間陸風，都是因為陸地與海洋升溫／降溫速度不同～';
+          this.sim.boostWind(5);
+          launchConfetti();
+          return;
+        }
+
+        let hint = '再想想日夜溫差～';
+        if (!ok4) {
+          hint = '重點是：誰升溫比較快？熱空氣上升後，誰來補充？看看分步導覽第 2～4 步！';
+          this.sim.flashAndPause('coldAir', 2.2);
+          document.getElementById('btn-day').click();
+        } else if (!ok5) {
+          hint = '夜間陸地降溫較快。點「夜間・陸風」看看風向有沒有反過來！';
+          document.getElementById('btn-night').click();
+          this.sim.flashAndPause('coldAir', 2.5);
+        }
+        this.extraFeedback.className = 'quiz-feedback feedback-hint';
+        this.extraFeedback.textContent = hint;
+      }
+
+      markChoice(key, ok) {
+        const list = document.querySelector(`.choice-list[data-q="${key}"]`);
+        const selected = list && list.querySelector('.choice-btn.selected');
+        if (selected) selected.classList.add(ok ? 'correct' : 'wrong');
+      }
+
+      resetExtra() {
+        this.extraSelected = { q4: '', q5: '' };
+        document.querySelectorAll('.choice-btn').forEach((el) => el.classList.remove('selected', 'correct', 'wrong'));
+        this.extraFeedback.className = 'quiz-feedback';
+        this.extraFeedback.textContent = '';
       }
     }
 
-    // ---------- 彩帶慶祝 ----------
     function launchConfetti() {
       const layer = document.getElementById('confetti-layer');
       const colors = ['#e74c3c', '#f39c12', '#f1c40f', '#2ecc71', '#3498db', '#9b59b6', '#e91e63'];
-      const count = 60;
-      for (let i = 0; i < count; i++) {
+      for (let i = 0; i < 60; i++) {
         const piece = document.createElement('div');
         piece.className = 'confetti-piece';
         piece.style.left = Math.random() * 100 + 'vw';
         piece.style.background = colors[i % colors.length];
         piece.style.animationDuration = rand(1.6, 3.2) + 's';
         piece.style.animationDelay = rand(0, 0.5) + 's';
-        piece.style.transform = `rotate(${rand(0, 360)}deg)`;
         piece.style.width = rand(8, 12) + 'px';
         piece.style.height = rand(10, 16) + 'px';
         layer.appendChild(piece);
@@ -1382,22 +1739,29 @@
       }
     }
 
-    // ---------- 控制面板綁定 ----------
-    function setupControls(sim) {
+    function updateTempUI(sim) {
+      const t = sim.getTemps();
+      document.getElementById('temp-land').textContent = t.land;
+      document.getElementById('temp-sea').textContent = t.sea;
+      document.getElementById('temp-delta').textContent = t.delta;
+    }
+
+    function setupControls(sim, guide) {
       const slider = document.getElementById('heat-slider');
       const heatLabel = document.getElementById('heat-label');
       const btnDay = document.getElementById('btn-day');
       const btnNight = document.getElementById('btn-night');
       const modeParticles = document.getElementById('mode-particles');
       const modeArrows = document.getElementById('mode-arrows');
+      const btnPressure = document.getElementById('btn-pressure');
       const hint = document.getElementById('canvas-hint');
 
       const updateHeatLabel = () => {
-        const v = Number(slider.value);
-        if (!sim.heatingOn) {
-          heatLabel.textContent = '加熱已暫停';
+        if (sim.isNight) {
+          heatLabel.textContent = '夜間（殘餘熱力）';
           return;
         }
+        const v = Number(slider.value);
         if (v < 25) heatLabel.textContent = '清晨微暖';
         else if (v < 55) heatLabel.textContent = '上午暖熱';
         else if (v < 80) heatLabel.textContent = '日間加熱';
@@ -1405,62 +1769,73 @@
       };
 
       slider.addEventListener('input', () => {
-        const v = Number(slider.value) / 100;
-        sim.setHeat(v);
+        sim.setHeat(Number(slider.value) / 100);
         slider.setAttribute('aria-valuenow', String(slider.value));
-        if (!sim.heatingOn) {
-          sim.setHeating(true);
-          btnDay.classList.add('active');
-          btnNight.classList.remove('active');
-        }
         updateHeatLabel();
-        hint.textContent = v > 0.5
-          ? '熱力夠強！看紅粒子膨脹上升，藍粒子從海上吹來～'
-          : '熱力較弱時，空氣流動會變慢。';
+        updateTempUI(sim);
+        hint.textContent = sim.isNight
+          ? '夜間熱力會影響海陸殘餘溫度差，觀察陸風強弱。'
+          : (Number(slider.value) > 50
+            ? '溫差變大！紅粒子上升更快，藍粒子海風更明顯。'
+            : '熱力較弱時，溫差變小、氣流變慢。');
       });
 
       btnDay.addEventListener('click', () => {
-        sim.setHeating(true);
+        sim.setNight(false);
         btnDay.classList.add('active');
         btnNight.classList.remove('active');
         updateHeatLabel();
-        hint.textContent = '日間加熱開啟：陸地升溫，海風開始加強！';
+        updateTempUI(sim);
+        if (guide.step < 0) guide.free();
+        else guide.go(guide.step);
+        hint.textContent = '日間：陸地較熱 → 海風吹向陸地';
       });
 
       btnNight.addEventListener('click', () => {
-        sim.setHeating(false);
+        sim.setNight(true);
         btnNight.classList.add('active');
         btnDay.classList.remove('active');
         updateHeatLabel();
-        hint.textContent = '加熱暫停：對流變慢，觀察看看有什麼不同？';
+        updateTempUI(sim);
+        guide.free();
+        hint.textContent = '夜間：陸地較涼 → 陸風吹向海洋。為什麼日夜相反？';
       });
 
       modeParticles.addEventListener('click', () => {
         sim.setMode('particles');
         modeParticles.classList.add('active');
         modeArrows.classList.remove('active');
-        hint.textContent = '氣流粒子模式：紅＝熱空氣，藍＝冷空氣（海風）。';
       });
 
       modeArrows.addEventListener('click', () => {
         sim.setMode('arrows');
         modeArrows.classList.add('active');
         modeParticles.classList.remove('active');
-        hint.textContent = '示意箭頭模式：像課本圖一樣的紅／藍對流箭頭。';
       });
 
+      btnPressure.addEventListener('click', () => {
+        sim.setPressure(!sim.showPressure);
+        btnPressure.classList.toggle('active', sim.showPressure);
+        btnPressure.textContent = sim.showPressure ? '氣壓示意 ON' : '氣壓示意 OFF';
+      });
+
+      document.getElementById('tap-land').addEventListener('click', () => sim.tipRegion('land'));
+      document.getElementById('tap-sea').addEventListener('click', () => sim.tipRegion('sea'));
+      document.getElementById('tap-sun').addEventListener('click', () => sim.tipRegion('sun'));
+
       updateHeatLabel();
+      updateTempUI(sim);
     }
 
-    // ---------- 啟動 ----------
     function boot() {
       const canvas = document.getElementById('sim-canvas');
       const sim = new WindSimulation(canvas);
-      setupControls(sim);
+      const guide = new StepGuide(sim);
+      setupControls(sim, guide);
       new QuizGame(sim);
       sim.start();
-      // 暴露給除錯／測試使用
       window.__seaBreezeSim = sim;
+      window.__seaBreezeGuide = guide;
     }
 
     if (document.readyState === 'loading') {
@@ -1469,6 +1844,6 @@
       boot();
     }
   </script>
-
 </body>
 </html>
+
