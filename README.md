@@ -7,6 +7,7 @@
 | 網頁 | 檔案 | 說明 |
 |------|------|------|
 | 氣壓原理互動模型 | [`air-pressure-drink-box.html`](./air-pressure-drink-box.html) | 香港小五常識：飲品盒為何會凹陷（p5.js） |
+| 風的形成（海風原理） | [`sea-breeze-wind.html`](./sea-breeze-wind.html) | 日間海風成因：Canvas 對流動畫＋課本填空小遊戲 |
 | 五位數密碼鎖 | [`index.html`](./index.html) | 解密挑戰小遊戲 |
 
 ---
@@ -29,6 +30,12 @@ Google Sites **不能直接執行** 含 JavaScript 的 HTML，請先用 GitHub P
 
 ```text
 https://howardyu1995.github.io/grok-bot/air-pressure-drink-box.html
+```
+
+風的形成（海風原理）：
+
+```text
+https://howardyu1995.github.io/grok-bot/sea-breeze-wind.html
 ```
 
 倉庫首頁（密碼鎖遊戲）：
@@ -60,6 +67,18 @@ https://howardyu1995.github.io/grok-bot/
 </iframe>
 ```
 
+海風原理頁亦可同樣嵌入：
+
+```html
+<iframe
+  src="https://howardyu1995.github.io/grok-bot/sea-breeze-wind.html"
+  style="width:100%;height:1100px;border:0;"
+  loading="lazy"
+  allowfullscreen
+  title="風的形成｜海風原理互動教學">
+</iframe>
+```
+
 ### 四、課堂注意
 
 - 學校網路需能連到 `*.github.io` 與 `cdn.jsdelivr.net`（載入 p5.js）。
@@ -73,4 +92,5 @@ https://howardyu1995.github.io/grok-bot/
 # 在倉庫根目錄
 python3 -m http.server 8765
 # 瀏覽器開啟 http://127.0.0.1:8765/air-pressure-drink-box.html
+# 或 http://127.0.0.1:8765/sea-breeze-wind.html
 ```
