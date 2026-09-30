@@ -39,19 +39,15 @@ python3 -m http.server 8765
 
 ## 放到 Google Sites
 
-這個資料夾不會由本改動自動發佈到 GitHub Pages，請交負責發佈的同事處理。
+合併到 `main` 後，`.github/workflows/deploy-github-pages.yml` 會把 `game-index/index.html` 複製到 GitHub Pages。
 
-現有的 `.github/workflows/deploy-github-pages.yml` 只複製倉庫根目錄的 `*.html`，未包括 `game-index/`。發佈時要一併複製這個資料夾，例如在準備網站檔案那一步加上：
-
-```bash
-cp -a game-index _site/game-index
-```
-
-公開後的網址格式：
+公開網址：
 
 ```text
 https://howardyu1995.github.io/grok-bot/game-index/
 ```
+
+若 Actions 顯示 Pages 未啟用，請有倉庫管理權限的人做一次：**Settings → Pages → Build and deployment → Source** 選 **GitHub Actions**，再到 **Actions** 重新跑 **Deploy GitHub Pages**。
 
 嵌入步驟：
 

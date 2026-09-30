@@ -29,10 +29,11 @@ jobs:
 
       - name: Prepare static site files
         run: |
-          mkdir -p _site
-          # 複製所有 HTML（含氣壓模型、首頁等）
+          mkdir -p _site/game-index
+          # 複製根目錄 HTML（含氣壓模型、首頁等）
           cp -v *.html _site/
-          # 若有額外靜態資源可在此擴充，例如：cp -r assets _site/
+          # 教學遊戲目錄
+          cp -v game-index/index.html _site/game-index/index.html
 
       - name: Setup Pages
         uses: actions/configure-pages@v5

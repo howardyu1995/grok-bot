@@ -8,6 +8,7 @@
 |------|------|------|
 | 氣壓原理互動模型 | [`air-pressure-drink-box.html`](./air-pressure-drink-box.html) | 香港小五常識：飲品盒為何會凹陷（p5.js） |
 | 五位數密碼鎖 | [`index.html`](./index.html) | 解密挑戰小遊戲 |
+| 教學遊戲目錄 | [`game-index/index.html`](./game-index/index.html) | 按年級、課次進入教學遊戲 |
 
 ---
 
@@ -35,6 +36,12 @@ https://howardyu1995.github.io/grok-bot/air-pressure-drink-box.html
 
 ```text
 https://howardyu1995.github.io/grok-bot/
+```
+
+教學遊戲目錄：
+
+```text
+https://howardyu1995.github.io/grok-bot/game-index/
 ```
 
 請先用瀏覽器打開確認可以操作，再去 Google Sites 嵌入。
