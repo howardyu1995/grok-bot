@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-HK">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <meta name="description" content="香港小學教學遊戲目錄。撳一撳卡片，就會在新分頁打開對應遊戲。">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'">
+  <link rel="icon" href="data:,">
+  <title>教學遊戲目錄</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #F4F7FB;
+      --text: #1B3A5F;
+      --green: #2E7D4F;
+      --green-press: #1F5C3A;
+      --orange: #C45C26;
+      --card: #ffffff;
+      --radius: 16px;
+      --shadow: 0 8px 24px rgba(27, 58, 95, 0.1);
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    html {
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "PingFang HK", "PingFang TC", "Heiti TC", "LiHei Pro", "Microsoft JhengHei", "Microsoft JhengHei UI", "Noto Sans CJK HK", "Noto Sans CJK TC", "Noto Sans TC", system-ui, -apple-system, "Segoe UI", sans-serif;
+      font-size: 1.125rem;
+      line-height: 1.5;
+      min-height: 100vh;
+      min-height: 100dvh;
+    }
+
+    .wrap {
+      width: min(960px, 100%);
+      margin: 0 auto;
+      padding: 28px 20px 48px;
+    }
+
+    .page-header {
+      margin-bottom: 32px;
+    }
+
+    .page-mark {
+      margin: 0 0 8px;
+      font-size: 3rem;
+      line-height: 1;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 2.25rem;
+      line-height: 1.25;
+      font-weight: 700;
+    }
+
+    .subtitle {
+      margin: 10px 0 0;
+      font-size: 1.35rem;
+      font-weight: 700;
+      line-height: 1.4;
+    }
+
+    .accent-bar {
+      width: 88px;
+      height: 8px;
+      margin-top: 16px;
+      border-radius: var(--radius);
+      background: linear-gradient(90deg, var(--green) 0 62%, var(--orange) 62% 100%);
+    }
+
+    .grade + .grade {
+      margin-top: 40px;
+    }
+
+    .grade-title {
+      margin: 0 0 20px;
+      padding-bottom: 8px;
+      border-bottom: 4px solid var(--green);
+      font-size: 1.75rem;
+      line-height: 1.3;
+      font-weight: 700;
+    }
+
+    .lesson + .lesson {
+      margin-top: 28px;
+    }
+
+    .lesson-title {
+      margin: 0 0 14px;
+      padding-left: 12px;
+      border-left: 6px solid var(--orange);
+      font-size: 1.375rem;
+      line-height: 1.4;
+      font-weight: 700;
+    }
+
+    .cards {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 20px;
+    }
+
+    .card {
+      min-width: 0;
+    }
+
+    .card-link {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      height: 100%;
+      padding: 20px;
+      border: 3px solid transparent;
+      border-radius: var(--radius);
+      background: var(--card);
+      box-shadow: var(--shadow);
+      color: var(--text);
+      text-decoration: none;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: rgba(46, 125, 79, 0.16);
+      transition: transform 0.12s ease, border-color 0.12s ease, background-color 0.12s ease;
+    }
+
+    .card-link:hover {
+      border-color: var(--green);
+    }
+
+    .card-link:focus {
+      outline: none;
+    }
+
+    .card-link:focus-visible {
+      outline: 3px solid var(--orange);
+      outline-offset: 3px;
+      border-color: var(--green);
+    }
+
+    .card-link:active {
+      transform: translateY(2px);
+      background: #F3F8F5;
+    }
+
+    .card-icon {
+      display: flex;
+      flex: none;
+      align-items: center;
+      justify-content: center;
+      width: 80px;
+      height: 80px;
+      border-radius: var(--radius);
+      background: #E8F6EE;
+      font-size: 2.75rem;
+      line-height: 1;
+    }
+
+    .card-title {
+      margin: 0;
+      font-size: 1.5rem;
+      line-height: 1.35;
+      font-weight: 700;
+    }
+
+    .card-intro {
+      margin: 0;
+      font-size: 1.125rem;
+      line-height: 1.55;
+    }
+
+    .play {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 56px;
+      margin-top: auto;
+      padding: 12px 16px;
+      border-radius: var(--radius);
+      background: var(--green);
+      color: #ffffff;
+      font-size: 1.25rem;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    .card-link:active .play {
+      background: var(--green-press);
+    }
+
+    .page-footer {
+      margin-top: 36px;
+      font-size: 1.125rem;
+    }
+
+    .page-footer p,
+    .empty {
+      margin: 0;
+    }
+
+    .empty {
+      padding: 24px;
+      border-radius: var(--radius);
+      background: var(--card);
+      box-shadow: var(--shadow);
+      font-size: 1.25rem;
+    }
+
+    .visually-hidden {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+
+    @media (min-width: 768px) {
+      .wrap {
+        padding: 36px 28px 56px;
+      }
+
+      h1 {
+        font-size: 2.75rem;
+      }
+
+      .cards {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 24px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .card-link,
+      .card-link:active {
+        transition: none;
+        transform: none;
+      }
+    }
+
+    @media (forced-colors: active) {
+      .card-link {
+        border-color: CanvasText;
+      }
+
+      .card-link:focus-visible {
+        outline-color: Highlight;
+      }
+
+      .play {
+        border: 2px solid ButtonText;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="page-header">
+      <p class="page-mark" aria-hidden="true">📚</p>
+      <h1>教學遊戲目錄</h1>
+      <p class="subtitle">撳一撳卡片，開始玩！</p>
+      <div class="accent-bar" aria-hidden="true"></div>
+    </header>
+    <main id="catalog">
+      <noscript>
+        <p class="empty">請開啟 JavaScript，頁面先可以顯示遊戲目錄。</p>
+      </noscript>
+    </main>
+    <footer class="page-footer">
+      <p>撳卡片或「開始玩」，遊戲會在新分頁打開。</p>
+    </footer>
+  </div>
+  <!-- 加遊戲：改下面 script 最上面的 GAMES。說明見 game-index/README.md -->
+  <script>
+    "use strict";
+
+    /*
+     * GAMES：教學遊戲清單（日後只改這裡）
+     *
+     * 加遊戲就在陣列加一項。頁面會按年級、課次由小到大排列。
+     * 同一課多於一個遊戲時，次序跟下面由上至下。
+     *
+     * title        遊戲名稱
+     * grade        年級數字（5 會顯示成「五年級」）
+     * lessonNo     課次數字（1 會顯示成「第一課」，1–20 會正確轉換）
+     * lessonTitle  課題
+     * intro        一句簡介
+     * url          遊戲網址（請用 http 或 https）
+     * icon         一個 emoji
+     */
+    const GAMES = [
+      {
+        title: "人體呼吸系統",
+        grade: 5,
+        lessonNo: 1,
+        lessonTitle: "呼吸和消化",
+        intro: "認識空氣怎樣進入身體，走過哪些器官。",
+        url: "https://howardyu1995.github.io/respiratory-system-demo/",
+        icon: "🫁"
+      },
+      {
+        title: "氣壓原理互動模型",
+        grade: 5,
+        lessonNo: 3,
+        lessonTitle: "空氣的特性",
+        intro: "動手試一試，看看氣壓怎樣令飲品被吸上來。",
+        url: "https://howardyu1995.github.io/air-pressure-drink-box/",
+        icon: "🥤"
+      },
+      {
+        title: "海陸風形成",
+        grade: 5,
+        lessonNo: 3,
+        lessonTitle: "空氣的特性",
+        intro: "看看白天和晚上，風為什麼會由海吹向陸地，又由陸地吹向海。",
+        url: "https://howardyu1995.github.io/sea-breeze-wind/",
+        icon: "🌬️"
+      },
+      {
+        title: "氣壓在日常生活中的應用",
+        grade: 5,
+        lessonNo: 3,
+        lessonTitle: "空氣的特性",
+        intro: "找找生活中哪些東西用到氣壓。",
+        url: "https://howardyu1995.github.io/air-pressure-daily-applications/",
+        icon: "🧪"
+      }
+    ];
+
+    function toChineseNumber(n) {
+      const digits = ["零", "一", "二", "三", "四", "五", "六", "七", "八", "九"];
+      if (!Number.isInteger(n) || n < 1 || n > 99) {
+        return String(n);
+      }
+      if (n < 10) {
+        return digits[n];
+      }
+      if (n === 10) {
+        return "十";
+      }
+      if (n < 20) {
+        return "十" + digits[n % 10];
+      }
+      const tens = Math.floor(n / 10);
+      const ones = n % 10;
+      return digits[tens] + "十" + (ones === 0 ? "" : digits[ones]);
+    }
+
+    function formatGrade(grade) {
+      return toChineseNumber(grade) + "年級";
+    }
+
+    function formatLesson(lessonNo) {
+      return "第" + toChineseNumber(lessonNo) + "課";
+    }
+
+    function isSafeHttpUrl(url) {
+      try {
+        const parsed = new URL(url);
+        return parsed.protocol === "https:" || parsed.protocol === "http:";
+      } catch (_) {
+        return false;
+      }
+    }
+
+    function isValidGame(game) {
+      return Boolean(game)
+        && typeof game.title === "string"
+        && game.title.trim() !== ""
+        && Number.isInteger(game.grade)
+        && game.grade > 0
+        && Number.isInteger(game.lessonNo)
+        && game.lessonNo > 0
+        && typeof game.lessonTitle === "string"
+        && game.lessonTitle.trim() !== ""
+        && typeof game.intro === "string"
+        && typeof game.url === "string"
+        && isSafeHttpUrl(game.url)
+        && typeof game.icon === "string"
+        && game.icon.trim() !== "";
+    }
+
+    function groupGames(games) {
+      const ordered = games
+        .map((game, index) => ({ game: game, index: index }))
+        .filter((item) => isValidGame(item.game))
+        .sort((a, b) => {
+          if (a.game.grade !== b.game.grade) {
+            return a.game.grade - b.game.grade;
+          }
+          if (a.game.lessonNo !== b.game.lessonNo) {
+            return a.game.lessonNo - b.game.lessonNo;
+          }
+          return a.index - b.index;
+        });
+
+      const grades = [];
+      ordered.forEach((item) => {
+        const game = item.game;
+        let gradeGroup = null;
+        for (let i = 0; i < grades.length; i += 1) {
+          if (grades[i].grade === game.grade) {
+            gradeGroup = grades[i];
+            break;
+          }
+        }
+        if (!gradeGroup) {
+          gradeGroup = { grade: game.grade, lessons: [] };
+          grades.push(gradeGroup);
+        }
+
+        let lessonGroup = null;
+        for (let i = 0; i < gradeGroup.lessons.length; i += 1) {
+          const lesson = gradeGroup.lessons[i];
+          if (lesson.lessonNo === game.lessonNo && lesson.lessonTitle === game.lessonTitle) {
+            lessonGroup = lesson;
+            break;
+          }
+        }
+        if (!lessonGroup) {
+          lessonGroup = {
+            lessonNo: game.lessonNo,
+            lessonTitle: game.lessonTitle,
+            games: []
+          };
+          gradeGroup.lessons.push(lessonGroup);
+        }
+        lessonGroup.games.push(game);
+      });
+      return grades;
+    }
+
+    function renderCard(game) {
+      const item = document.createElement("li");
+      item.className = "card";
+
+      const link = document.createElement("a");
+      link.className = "card-link";
+      link.setAttribute("href", game.url);
+      link.setAttribute("target", "_blank");
+      link.setAttribute("rel", "noopener");
+
+      const icon = document.createElement("span");
+      icon.className = "card-icon";
+      icon.setAttribute("aria-hidden", "true");
+      icon.textContent = game.icon;
+
+      const title = document.createElement("h4");
+      title.className = "card-title";
+      title.textContent = game.title;
+
+      const intro = document.createElement("p");
+      intro.className = "card-intro";
+      intro.textContent = game.intro;
+
+      const play = document.createElement("span");
+      play.className = "play";
+      play.textContent = "開始玩";
+
+      const newTab = document.createElement("span");
+      newTab.className = "visually-hidden";
+      newTab.textContent = "（在新分頁打開）";
+
+      link.append(icon, title, intro, play, newTab);
+      item.append(link);
+      return item;
+    }
+
+    function clearElement(element) {
+      while (element.firstChild) {
+        element.removeChild(element.firstChild);
+      }
+    }
+
+    function renderCatalog(games) {
+      const catalog = document.getElementById("catalog");
+      clearElement(catalog);
+
+      const grades = groupGames(games);
+      if (grades.length === 0) {
+        const empty = document.createElement("p");
+        empty.className = "empty";
+        empty.textContent = "暫時未有遊戲。";
+        catalog.append(empty);
+        return;
+      }
+
+      grades.forEach((gradeGroup) => {
+        const gradeSection = document.createElement("section");
+        gradeSection.className = "grade";
+
+        const gradeTitle = document.createElement("h2");
+        gradeTitle.className = "grade-title";
+        gradeTitle.textContent = formatGrade(gradeGroup.grade);
+        gradeSection.append(gradeTitle);
+
+        gradeGroup.lessons.forEach((lesson) => {
+          const lessonSection = document.createElement("section");
+          lessonSection.className = "lesson";
+
+          const lessonTitle = document.createElement("h3");
+          lessonTitle.className = "lesson-title";
+          lessonTitle.textContent = formatLesson(lesson.lessonNo) + "\u3000" + lesson.lessonTitle;
+
+          const list = document.createElement("ul");
+          list.className = "cards";
+          lesson.games.forEach((game) => {
+            list.append(renderCard(game));
+          });
+
+          lessonSection.append(lessonTitle, list);
+          gradeSection.append(lessonSection);
+        });
+
+        catalog.append(gradeSection);
+      });
+    }
+
+    renderCatalog(GAMES);
+  </script>
+</body>
+</html>
