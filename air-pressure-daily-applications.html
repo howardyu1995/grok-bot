@@ -63,25 +63,58 @@
     /* ===== Hero ===== */
     .hero {
       position: relative;
-      min-height: min(88vh, 720px);
+      min-height: min(92vh, 760px);
       display: grid;
       align-items: end;
       overflow: hidden;
-      padding: 1.25rem 1.25rem 2.5rem;
+      padding: 1.25rem 1.25rem 2.75rem;
     }
 
     .hero-bg {
       position: absolute;
       inset: 0;
       background:
-        linear-gradient(180deg, rgba(14, 90, 84, 0.15) 0%, rgba(14, 90, 84, 0.55) 100%),
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 800'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop stop-color='%231a9b8e'/%3E%3Cstop offset='1' stop-color='%234cc9f0'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill='url(%23g)' width='1200' height='800'/%3E%3Ccircle cx='180' cy='220' r='8' fill='%23fff' opacity='.35'/%3E%3Ccircle cx='260' cy='180' r='5' fill='%23fff' opacity='.28'/%3E%3Ccircle cx='340' cy='260' r='6' fill='%23fff' opacity='.3'/%3E%3Ccircle cx='900' cy='200' r='7' fill='%23fff' opacity='.32'/%3E%3Ccircle cx='980' cy='280' r='5' fill='%23fff' opacity='.25'/%3E%3Ccircle cx='720' cy='160' r='6' fill='%23fff' opacity='.28'/%3E%3Crect x='420' y='280' width='360' height='280' rx='28' fill='%23ffffff' opacity='.18'/%3E%3Crect x='450' y='320' width='300' height='180' rx='18' fill='%23ffffff' opacity='.22'/%3E%3Cpath d='M470 520 Q600 560 730 520' stroke='%23fff' stroke-width='4' fill='none' opacity='.35'/%3E%3C/svg%3E") center/cover no-repeat;
-      animation: heroPulse 8s ease-in-out infinite alternate;
+        linear-gradient(105deg, rgba(8, 58, 54, 0.72) 0%, rgba(14, 90, 84, 0.35) 42%, rgba(20, 110, 130, 0.2) 100%),
+        linear-gradient(165deg, #0f766e 0%, #147a8c 48%, #1a9bb8 100%);
+      animation: heroPulse 10s ease-in-out infinite alternate;
     }
 
+    .hero-bg::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(circle, rgba(255, 255, 255, 0.45) 1.2px, transparent 1.4px);
+      background-size: 42px 42px;
+      background-position: 0 0;
+      opacity: 0.35;
+      animation: particleDrift 18s linear infinite;
+    }
+
+    .hero-visual {
+      position: absolute;
+      right: max(2%, calc(50% - 520px));
+      bottom: 12%;
+      width: min(420px, 48vw);
+      aspect-ratio: 5 / 4;
+      pointer-events: none;
+      animation: bagFloat 5.5s ease-in-out infinite;
+    }
+
+    .hero-visual svg { width: 100%; height: 100%; display: block; filter: drop-shadow(0 18px 28px rgba(0, 0, 0, 0.28)); }
+
     @keyframes heroPulse {
-      from { transform: scale(1); }
-      to { transform: scale(1.04); }
+      from { filter: saturate(1); }
+      to { filter: saturate(1.08); }
+    }
+
+    @keyframes particleDrift {
+      from { background-position: 0 0; }
+      to { background-position: 42px 42px; }
+    }
+
+    @keyframes bagFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
     }
 
     .hero-inner {
@@ -90,30 +123,38 @@
       margin: 0 auto;
       color: #fff;
       text-shadow: 0 2px 16px rgba(8, 40, 38, 0.35);
+      max-width: 34rem;
+    }
+
+    @media (max-width: 760px) {
+      .hero-visual { opacity: 0.35; width: min(280px, 70vw); right: -4%; bottom: 18%; }
+      .hero-inner { max-width: 100%; }
     }
 
     .brand {
       font-family: Outfit, "Noto Sans TC", sans-serif;
       font-weight: 800;
-      font-size: clamp(2.4rem, 7vw, 4.2rem);
+      font-size: clamp(2.8rem, 8vw, 4.6rem);
       letter-spacing: 0.04em;
-      line-height: 1.05;
-      margin: 0 0 0.75rem;
+      line-height: 1.02;
+      margin: 0 0 0.85rem;
       animation: fadeUp 0.8s var(--ease) both;
     }
 
-    .hero h2 {
-      margin: 0 0 0.6rem;
-      font-size: clamp(1.15rem, 3.2vw, 1.65rem);
+    .hero .tagline {
+      margin: 0 0 0.55rem;
+      font-size: clamp(1.05rem, 2.8vw, 1.35rem);
       font-weight: 700;
+      opacity: 0.95;
       animation: fadeUp 0.8s var(--ease) 0.1s both;
     }
 
-    .hero p {
+    .hero .lead {
       margin: 0 0 1.4rem;
-      max-width: 36rem;
-      font-size: clamp(0.95rem, 2.4vw, 1.1rem);
-      opacity: 0.95;
+      max-width: 32rem;
+      font-size: clamp(0.95rem, 2.4vw, 1.08rem);
+      opacity: 0.92;
+      font-weight: 500;
       animation: fadeUp 0.8s var(--ease) 0.18s both;
     }
 
@@ -727,10 +768,51 @@
   <div class="page">
     <header class="hero" id="top">
       <div class="hero-bg" aria-hidden="true"></div>
+      <div class="hero-visual" aria-hidden="true">
+        <svg viewBox="0 0 420 336" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="bagFill" x1="0" y1="0" x2="1" y2="1">
+              <stop stop-color="#ffffff" stop-opacity="0.28"/>
+              <stop offset="1" stop-color="#d7f7f2" stop-opacity="0.18"/>
+            </linearGradient>
+            <linearGradient id="quilt" x1="0" y1="0" x2="1" y2="1">
+              <stop stop-color="#f4a261"/>
+              <stop offset="1" stop-color="#e76f51"/>
+            </linearGradient>
+          </defs>
+          <!-- outer particles -->
+          <g fill="#ef476f" opacity="0.75">
+            <circle cx="48" cy="70" r="4"><animate attributeName="cy" values="70;62;70" dur="2.4s" repeatCount="indefinite"/></circle>
+            <circle cx="78" cy="120" r="3.5"><animate attributeName="cx" values="78;70;78" dur="2.8s" repeatCount="indefinite"/></circle>
+            <circle cx="36" cy="180" r="3"/><circle cx="360" cy="64" r="4"/><circle cx="390" cy="140" r="3.5"/>
+            <circle cx="372" cy="210" r="3"/><circle cx="402" cy="250" r="3.5"/>
+          </g>
+          <!-- pressure arrows -->
+          <g stroke="#ffd6a5" stroke-width="3" fill="#ffd6a5" opacity="0.9">
+            <path d="M20 150 L70 150"/><polygon points="70,150 58,144 58,156"/>
+            <path d="M400 150 L350 150"/><polygon points="350,150 362,144 362,156"/>
+            <path d="M20 200 L70 200"/><polygon points="70,200 58,194 58,206"/>
+            <path d="M400 200 L350 200"/><polygon points="350,200 362,194 362,206"/>
+            <path d="M210 28 L210 70"/><polygon points="210,70 204,58 216,58"/>
+          </g>
+          <!-- vacuum bag -->
+          <rect x="92" y="78" width="236" height="190" rx="28" fill="url(#bagFill)" stroke="#ffffff" stroke-width="4" opacity="0.95"/>
+          <rect x="118" y="88" width="184" height="10" rx="5" fill="#2ec4b6"/>
+          <rect x="118" y="118" width="184" height="118" rx="18" fill="url(#quilt)"/>
+          <path d="M130 150 Q210 165 300 148" stroke="#fff" stroke-opacity="0.45" stroke-width="3" fill="none"/>
+          <path d="M130 180 Q210 195 300 178" stroke="#fff" stroke-opacity="0.35" stroke-width="3" fill="none"/>
+          <!-- inner particles (fewer) -->
+          <g fill="#3a86ff">
+            <circle cx="150" cy="140" r="3.5"><animate attributeName="cx" values="150;158;150" dur="2s" repeatCount="indefinite"/></circle>
+            <circle cx="250" cy="165" r="3"/><circle cx="200" cy="200" r="2.8"/>
+            <circle cx="175" cy="185" r="2.5"/>
+          </g>
+        </svg>
+      </div>
       <div class="hero-inner">
-        <p class="brand">氣壓實驗室</p>
-        <h2>氣壓在日常生活中的應用</h2>
-        <p>透過粒子動畫與動手模擬，看懂真空儲物袋、食物包裝與海綿密實袋背後的氣壓原理。</p>
+        <h1 class="brand">氣壓實驗室</h1>
+        <p class="tagline">氣壓在日常生活中的應用</p>
+        <p class="lead">透過粒子動畫與動手模擬，看懂真空儲物袋、食物包裝與海綿密實袋背後的氣壓原理。</p>
         <div class="hero-ctas">
           <a class="btn btn-primary" href="#module1">開始互動體驗</a>
           <a class="btn btn-ghost" href="#quiz">挑戰知識問答</a>
