@@ -914,9 +914,9 @@
           <!-- vacuum bag -->
           <rect x="92" y="78" width="236" height="190" rx="28" fill="url(#bagFill)" stroke="#ffffff" stroke-width="4" opacity="0.95"/>
           <rect x="118" y="88" width="184" height="10" rx="5" fill="#2ec4b6"/>
-          <rect x="118" y="118" width="184" height="118" rx="18" fill="url(#quilt)"/>
-          <path d="M130 150 Q210 165 300 148" stroke="#fff" stroke-opacity="0.45" stroke-width="3" fill="none"/>
-          <path d="M130 180 Q210 195 300 178" stroke="#fff" stroke-opacity="0.35" stroke-width="3" fill="none"/>
+          <rect x="118" y="118" width="184" height="118" rx="16" fill="#efe6d6"/>
+          <path d="M140 148 H280 M140 178 H280 M164 128 V220 M210 128 V220 M256 128 V220" stroke="#c4a574" stroke-width="1.4" opacity=".7"/>
+          <path d="M130 160 Q210 176 300 158" stroke="#b08958" stroke-opacity=".45" stroke-width="3" fill="none"/>
           <!-- inner particles (fewer) -->
           <g fill="#3a86ff">
             <circle cx="150" cy="140" r="3.5"><animate attributeName="cx" values="150;158;150" dur="2s" repeatCount="indefinite"/></circle>
@@ -1444,24 +1444,236 @@
         updateStorageUI();
       }
 
+      function hexToRgb(hex) {
+        const n = parseInt(hex.slice(1), 16);
+        return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
+      }
+
+      function mixColor(a, b, t) {
+        const pa = hexToRgb(a);
+        const pb = hexToRgb(b);
+        return "rgb(" +
+          Math.round(lerp(pa.r, pb.r, t)) + "," +
+          Math.round(lerp(pa.g, pb.g, t)) + "," +
+          Math.round(lerp(pa.b, pb.b, t)) + ")";
+      }
+
+      function drawSceneBackdrop(ctx, w, h) {
+        const sky = ctx.createLinearGradient(0, 0, 0, h);
+        sky.addColorStop(0, "#eef7f5");
+        sky.addColorStop(0.58, "#d7ebe7");
+        sky.addColorStop(0.58, "#c9b08a");
+        sky.addColorStop(1, "#a88862");
+        ctx.fillStyle = sky;
+        ctx.fillRect(0, 0, w, h);
+        ctx.save();
+        ctx.globalAlpha = 0.22;
+        ctx.strokeStyle = "#7a5a34";
+        ctx.lineWidth = 1;
+        for (let y = h * 0.6; y < h; y += 8) {
+          ctx.beginPath();
+          ctx.moveTo(0, y);
+          ctx.bezierCurveTo(w * 0.25, y + 3, w * 0.7, y - 2, w, y + 1);
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+
+      function drawGroundShadow(ctx, x, y, w, h) {
+        ctx.save();
+        ctx.fillStyle = "rgba(70, 48, 24, 0.22)";
+        ctx.beginPath();
+        ctx.ellipse(x + w / 2, y + h + 8, w * 0.42, 10, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      function drawPlasticFilm(ctx, x, y, w, h, radius, cling) {
+        ctx.save();
+        roundRect(ctx, x, y, w, h, radius);
+        const film = ctx.createLinearGradient(x, y, x + w, y + h);
+        film.addColorStop(0, "rgba(255,255,255,0.42)");
+        film.addColorStop(0.45, "rgba(190,220,230,0.12)");
+        film.addColorStop(1, "rgba(255,255,255,0.28)");
+        ctx.fillStyle = film;
+        ctx.fill();
+        ctx.strokeStyle = "rgba(90,120,130,0.55)";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        ctx.clip();
+        ctx.fillStyle = "rgba(255,255,255,0.38)";
+        ctx.beginPath();
+        ctx.ellipse(x + w * 0.28, y + h * 0.18, Math.max(12, w * 0.14), Math.max(6, h * 0.07), -0.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = "rgba(70,100,110," + (0.12 + cling * 0.28) + ")";
+        ctx.lineWidth = 1.1;
+        const bands = [[0.1, 0.22], [0.78, 0.9]];
+        bands.forEach(([a, b], band) => {
+          const lines = 2 + Math.round(cling * 2);
+          for (let i = 0; i < lines; i++) {
+            const yy = y + h * (a + ((i + 0.5) / lines) * (b - a));
+            const sag = (3 + cling * 8) * (band === 0 ? 1 : -1);
+            ctx.beginPath();
+            ctx.moveTo(x + 8, yy);
+            ctx.quadraticCurveTo(x + w * 0.5, yy + sag, x + w - 8, yy + sag * 0.2);
+            ctx.stroke();
+          }
+        });
+        ctx.restore();
+      }
+
+      function drawZipTrack(ctx, x, y, w, closed) {
+        ctx.save();
+        ctx.fillStyle = "#e6edf0";
+        roundRect(ctx, x, y, w, 11, 3);
+        ctx.fill();
+        ctx.strokeStyle = "#8ea0a8";
+        ctx.lineWidth = 1;
+        for (let i = 6; i < w - 6; i += 5) {
+          ctx.beginPath();
+          ctx.moveTo(x + i, y + 2);
+          ctx.lineTo(x + i, y + 9);
+          ctx.stroke();
+        }
+        const sx = closed ? x + w - 18 : x + 4;
+        ctx.fillStyle = closed ? "#d4573c" : "#314047";
+        roundRect(ctx, sx, y - 2, 16, 15, 3);
+        ctx.fill();
+        ctx.fillStyle = "#f4f7f8";
+        ctx.fillRect(sx + 6, y + 1, 3, 9);
+        ctx.restore();
+      }
+
+      function drawQuilt(ctx, x, y, w, h, squash) {
+        ctx.save();
+        roundRect(ctx, x, y, w, h, 12);
+        ctx.clip();
+        const g = ctx.createLinearGradient(x, y, x, y + h);
+        g.addColorStop(0, "#f7f3ea");
+        g.addColorStop(0.45, "#e4d5bc");
+        g.addColorStop(1, "#c9b18d");
+        ctx.fillStyle = g;
+        ctx.fillRect(x, y, w, h);
+        ctx.strokeStyle = "rgba(130, 98, 58, 0.38)";
+        ctx.lineWidth = 1;
+        for (let c = 1; c < 4; c++) {
+          ctx.beginPath();
+          ctx.moveTo(x + (w * c) / 4, y + 3);
+          ctx.lineTo(x + (w * c) / 4, y + h - 3);
+          ctx.stroke();
+        }
+        for (let r = 1; r < 3; r++) {
+          const yy = y + (h * r) / 3;
+          ctx.beginPath();
+          ctx.moveTo(x + 4, yy);
+          ctx.quadraticCurveTo(x + w / 2, yy + 4 + squash * 8, x + w - 4, yy);
+          ctx.stroke();
+        }
+        ctx.fillStyle = "rgba(110, 78, 40, 0.13)";
+        ctx.beginPath();
+        ctx.ellipse(x + w * 0.38, y + h * 0.58, w * 0.24, h * 0.2, 0.15, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+        ctx.strokeStyle = "rgba(120, 88, 50, 0.45)";
+        ctx.lineWidth = 1.4;
+        roundRect(ctx, x, y, w, h, 12);
+        ctx.stroke();
+      }
+
+      function drawValveAndPump(ctx, bag, active) {
+        const vx = bag.x + bag.w - 8;
+        const vy = bag.y + bag.h * 0.28;
+        ctx.save();
+        ctx.fillStyle = "#dfe7ea";
+        ctx.beginPath();
+        ctx.arc(vx, vy, 7, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = "#5d737c";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        ctx.strokeStyle = "#3d4c54";
+        ctx.lineWidth = 4;
+        ctx.lineCap = "round";
+        ctx.beginPath();
+        ctx.moveTo(vx + 6, vy);
+        ctx.quadraticCurveTo(vx + 36, vy - 18, vx + 48, vy - 46);
+        ctx.stroke();
+        const px = vx + 34;
+        const py = vy - 78;
+        ctx.fillStyle = "#2c3940";
+        roundRect(ctx, px, py, 34, 46, 6);
+        ctx.fill();
+        ctx.fillStyle = active ? "#2ec4b6" : "#7d8f86";
+        roundRect(ctx, px + 6, py + 8, 22, 12, 3);
+        ctx.fill();
+        ctx.fillStyle = "#c5d0d4";
+        roundRect(ctx, px + 12, py - 10, 10, 12, 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      function drawSteak(ctx, x, y, w, h, spoil) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(x + w * 0.1, y + h * 0.38);
+        ctx.bezierCurveTo(x + w * 0.02, y + h * 0.12, x + w * 0.38, y + h * 0.02, x + w * 0.68, y + h * 0.14);
+        ctx.bezierCurveTo(x + w * 1.02, y + h * 0.24, x + w * 0.96, y + h * 0.72, x + w * 0.72, y + h * 0.9);
+        ctx.bezierCurveTo(x + w * 0.42, y + h * 1.04, x + w * 0.08, y + h * 0.86, x + w * 0.05, y + h * 0.55);
+        ctx.closePath();
+        ctx.clip();
+        const g = ctx.createRadialGradient(x + w * 0.42, y + h * 0.4, 10, x + w * 0.5, y + h * 0.5, w * 0.62);
+        g.addColorStop(0, mixColor("#f6b2aa", "#6d4c34", spoil * 0.5));
+        g.addColorStop(0.5, mixColor("#c44545", "#5a3b28", spoil * 0.65));
+        g.addColorStop(1, mixColor("#8d2432", "#3a2a1c", spoil * 0.75));
+        ctx.fillStyle = g;
+        ctx.fillRect(x - 4, y - 4, w + 8, h + 8);
+        ctx.strokeStyle = "rgba(255, 236, 220, " + (0.75 - spoil * 0.4) + ")";
+        ctx.lineWidth = 2.4;
+        ctx.beginPath();
+        ctx.moveTo(x + w * 0.22, y + h * 0.42);
+        ctx.bezierCurveTo(x + w * 0.4, y + h * 0.3, x + w * 0.58, y + h * 0.58, x + w * 0.8, y + h * 0.46);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(x + w * 0.28, y + h * 0.64);
+        ctx.quadraticCurveTo(x + w * 0.5, y + h * 0.74, x + w * 0.7, y + h * 0.6);
+        ctx.stroke();
+        ctx.strokeStyle = "rgba(90, 24, 24, 0.2)";
+        ctx.lineWidth = 1;
+        for (let i = 0; i < 5; i++) {
+          const yy = y + h * (0.28 + i * 0.1);
+          ctx.beginPath();
+          ctx.moveTo(x + w * 0.18, yy);
+          ctx.quadraticCurveTo(x + w * 0.5, yy + 5, x + w * 0.82, yy - 2);
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+
       function drawStorage() {
         const ctx = storage.ctx;
         if (!ctx) return;
         const { w, h } = storage;
         ctx.clearRect(0, 0, w, h);
-
-        // soft lab bg dots
-        ctx.fillStyle = "rgba(255,255,255,0.35)";
-        for (let i = 0; i < 18; i++) {
-          ctx.beginPath();
-          ctx.arc((i * 97) % w, (i * 53) % h, 1.5, 0, Math.PI * 2);
-          ctx.fill();
-        }
+        drawSceneBackdrop(ctx, w, h);
 
         const bag = getStorageBag();
         const t = bag.t;
+        drawGroundShadow(ctx, bag.x, bag.y, bag.w, bag.h);
 
-        // outside particles
+        const clothInset = 16 + t * 6;
+        drawQuilt(
+          ctx,
+          bag.x + clothInset,
+          bag.y + 26,
+          bag.w - clothInset * 2,
+          bag.h - 40,
+          t
+        );
+        drawPlasticFilm(ctx, bag.x, bag.y, bag.w, bag.h, 18, t);
+        drawZipTrack(ctx, bag.x + bag.w * 0.12, bag.y + 6, bag.w * 0.62, t > 0.2);
+        drawValveAndPump(ctx, bag, storage.pumping || t > 0.05);
+        drawPressureArrows(ctx, bag, t);
+
         const outBounds = { l: 0, t: 0, r: w, b: h };
         storage.particlesOut.forEach((p) => {
           if (!p.alive) return;
@@ -1469,65 +1681,21 @@
             p.x += p.vx;
             p.y += p.vy;
           } else {
-            // keep outside bag
             p.update(outBounds, true);
             if (p.x > bag.x && p.x < bag.x + bag.w && p.y > bag.y && p.y < bag.y + bag.h) {
-              p.x = bag.x - 8;
+              p.x = bag.x - 10;
             }
           }
           p.draw(ctx);
         });
 
-        // pressure arrows
-        drawPressureArrows(ctx, bag, t);
-
-        // bag
-        ctx.save();
-        roundRect(ctx, bag.x, bag.y, bag.w, bag.h, 16);
-        ctx.fillStyle = "rgba(255,255,255,0.55)";
-        ctx.fill();
-        ctx.strokeStyle = "rgba(26,155,142,0.65)";
-        ctx.lineWidth = 3;
-        ctx.stroke();
-
-        // zipper
-        ctx.fillStyle = "#2a9d8f";
-        roundRect(ctx, bag.x + bag.w * 0.1, bag.y + 4, bag.w * 0.8, 8, 4);
-        ctx.fill();
-
-        // blanket / clothes
-        const clothInset = 14 + t * 8;
-        roundRect(ctx, bag.x + clothInset, bag.y + 22, bag.w - clothInset * 2, bag.h - 36, 10);
-        const clothGrad = ctx.createLinearGradient(bag.x, bag.y, bag.x + bag.w, bag.y + bag.h);
-        clothGrad.addColorStop(0, "#f4a261");
-        clothGrad.addColorStop(1, "#e9c46a");
-        ctx.fillStyle = clothGrad;
-        ctx.fill();
-        ctx.strokeStyle = "rgba(180,100,40,0.35)";
-        ctx.stroke();
-        // folds
-        ctx.strokeStyle = "rgba(255,255,255,0.45)";
-        ctx.lineWidth = 2;
-        for (let i = 0; i < 3; i++) {
-          const yy = bag.y + 40 + i * (bag.h * 0.18);
-          ctx.beginPath();
-          ctx.moveTo(bag.x + clothInset + 8, yy);
-          ctx.quadraticCurveTo(bag.x + bag.w / 2, yy + 6 - t * 4, bag.x + bag.w - clothInset - 8, yy);
-          ctx.stroke();
-        }
-        ctx.restore();
-
-        // inside particles
         const inBounds = {
-          l: bag.x + 6,
-          t: bag.y + 16,
-          r: bag.x + bag.w - 6,
-          b: bag.y + bag.h - 6,
+          l: bag.x + 8,
+          t: bag.y + 20,
+          r: bag.x + bag.w - 8,
+          b: bag.y + bag.h - 8,
         };
         storage.particlesIn.forEach((p) => {
-          p.vx *= 0.998;
-          p.vy *= 0.998;
-          // slow down as vacuum increases
           const damp = 1 - t * 0.4;
           p.x += p.vx * damp;
           p.y += p.vy * damp;
@@ -1538,28 +1706,9 @@
           p.draw(ctx);
         });
 
-        // pump icon
-        ctx.save();
-        ctx.fillStyle = "#16323f";
-        ctx.font = "bold 13px 'Noto Sans TC', sans-serif";
-        ctx.fillText(t > 0.05 ? "抽氣中…" : "待機幫浦", w - 100, 28);
-        ctx.beginPath();
-        ctx.strokeStyle = "#1a9b8e";
-        ctx.lineWidth = 3;
-        ctx.arc(w - 28, 48, 14, 0, Math.PI * 2);
-        ctx.stroke();
-        if (storage.pumping || t > 0) {
-          ctx.beginPath();
-          ctx.strokeStyle = "#2ec4b6";
-          ctx.arc(w - 28, 48, 8, 0, Math.PI * 1.5 * Math.max(t, 0.2));
-          ctx.stroke();
-        }
-        ctx.restore();
-
-        // label
-        ctx.fillStyle = "rgba(22,50,63,0.75)";
+        ctx.fillStyle = "rgba(22,50,63,0.82)";
         ctx.font = "bold 14px 'Noto Sans TC', sans-serif";
-        ctx.fillText("真空儲物袋（內含被子）", 16, h - 14);
+        ctx.fillText(t > 0.15 ? "抽氣中：塑膠袋貼緊被子" : "真空儲物袋（內含被子）", 16, h - 16);
       }
 
       /* ========== Module 2: Food packaging ========== */
@@ -1765,15 +1914,23 @@
         if (!ctx) return;
         const { w, h } = food;
         ctx.clearRect(0, 0, w, h);
+        drawSceneBackdrop(ctx, w, h);
 
         const bag = getFoodBag();
         const t = bag.t;
+        const spoil = bacteriaLevel(food.day, false) * (food.mode === "vacuum" ? 0.35 : 1);
+        drawGroundShadow(ctx, bag.x, bag.y, bag.w, bag.h);
 
-        // outside particles (atmosphere)
-        ctx.globalAlpha = 0.55;
-        for (let i = 0; i < 20; i++) {
+        const pad = 22 + t * 8;
+        drawSteak(ctx, bag.x + pad * 0.7, bag.y + pad * 0.55, bag.w - pad * 1.4, bag.h - pad * 1.15, spoil);
+        drawPlasticFilm(ctx, bag.x, bag.y, bag.w, bag.h, 16, 0.25 + t * 0.75);
+        drawZipTrack(ctx, bag.x + bag.w * 0.16, bag.y + 5, bag.w * 0.68, t > 0.45);
+        drawPressureArrows(ctx, bag, t);
+
+        ctx.globalAlpha = 0.45;
+        for (let i = 0; i < 16; i++) {
           const px = (i * 73 + performance.now() * 0.02) % w;
-          const py = (i * 41) % h;
+          const py = (i * 41) % (h * 0.55);
           if (px > bag.x && px < bag.x + bag.w && py > bag.y && py < bag.y + bag.h) continue;
           ctx.beginPath();
           ctx.fillStyle = "#ef476f";
@@ -1782,40 +1939,10 @@
         }
         ctx.globalAlpha = 1;
 
-        drawPressureArrows(ctx, bag, t);
-
-        // package
-        ctx.save();
-        roundRect(ctx, bag.x, bag.y, bag.w, bag.h, 14);
-        ctx.fillStyle = t > 0.5 ? "rgba(220,245,240,0.65)" : "rgba(255,255,255,0.5)";
-        ctx.fill();
-        ctx.strokeStyle = t > 0.3 ? "#1a9b8e" : "#7a9eab";
-        ctx.lineWidth = 3;
-        ctx.stroke();
-
-        // meat / food
-        const foodPad = 18 + t * 10;
-        roundRect(ctx, bag.x + foodPad, bag.y + foodPad * 0.8, bag.w - foodPad * 2, bag.h - foodPad * 1.6, 12);
-        const mg = ctx.createLinearGradient(bag.x, bag.y, bag.x + bag.w, bag.y + bag.h);
-        mg.addColorStop(0, "#c1121f");
-        mg.addColorStop(0.5, "#e63946");
-        mg.addColorStop(1, "#9d0208");
-        ctx.fillStyle = mg;
-        ctx.fill();
-        // fat marbling
-        ctx.strokeStyle = "rgba(255,230,200,0.55)";
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.moveTo(bag.x + foodPad + 10, bag.y + bag.h * 0.4);
-        ctx.quadraticCurveTo(bag.x + bag.w * 0.5, bag.y + bag.h * 0.35, bag.x + bag.w - foodPad - 10, bag.y + bag.h * 0.55);
-        ctx.stroke();
-        ctx.restore();
-
-        // air particles inside
         const bounds = {
-          l: bag.x + 8,
-          t: bag.y + 8,
-          r: bag.x + bag.w - 8,
+          l: bag.x + 10,
+          t: bag.y + 16,
+          r: bag.x + bag.w - 10,
           b: bag.y + bag.h - 8,
         };
         food.particles.forEach((p) => {
@@ -1823,27 +1950,24 @@
           p.draw(ctx);
         });
 
-        // bacteria
         const bLvl = bacteriaLevel(food.day, food.mode === "vacuum");
         const showCount = Math.round(bLvl * 12);
         food.bacteria.forEach((b, i) => {
           if (i >= showCount) return;
-          const pulse = 1 + Math.sin(performance.now() * 0.004 + b.phase) * 0.15;
+          const pulse = 1 + Math.sin(performance.now() * 0.004 + b.phase) * 0.12;
           ctx.beginPath();
-          ctx.fillStyle = "rgba(123,44,191,0.75)";
-          ctx.arc(b.x, b.y, b.r * pulse * (0.7 + bLvl), 0, Math.PI * 2);
+          ctx.fillStyle = "rgba(92, 48, 28, 0.55)";
+          ctx.ellipse(b.x, b.y, b.r * pulse * 1.3, b.r * pulse * 0.7, b.phase, 0, Math.PI * 2);
           ctx.fill();
-          // keep bacteria near food
-          b.x += Math.sin(performance.now() * 0.001 + b.phase) * 0.15;
-          b.y += Math.cos(performance.now() * 0.0012 + b.phase) * 0.12;
-          b.x = clamp(b.x, bag.x + 20, bag.x + bag.w - 20);
-          b.y = clamp(b.y, bag.y + 20, bag.y + bag.h - 20);
+          b.x += Math.sin(performance.now() * 0.001 + b.phase) * 0.12;
+          b.y += Math.cos(performance.now() * 0.0012 + b.phase) * 0.1;
+          b.x = clamp(b.x, bag.x + pad, bag.x + bag.w - pad);
+          b.y = clamp(b.y, bag.y + pad, bag.y + bag.h - pad);
         });
 
-        ctx.fillStyle = "rgba(22,50,63,0.8)";
+        ctx.fillStyle = "rgba(22,50,63,0.82)";
         ctx.font = "bold 14px 'Noto Sans TC', sans-serif";
-        ctx.fillText(food.mode === "vacuum" ? "真空包裝：袋緊貼食物" : "普通包裝：袋內仍有空氣", 16, h - 14);
-
+        ctx.fillText(food.mode === "vacuum" ? "真空包裝：薄膜緊貼肉排" : "普通包裝：袋內仍留有空氣", 16, h - 16);
         drawBacteriaChart();
       }
 
@@ -1987,147 +2111,106 @@
         if (!ctx) return;
         const { w, h } = sponge;
         ctx.clearRect(0, 0, w, h);
-
-        // table
-        ctx.fillStyle = "rgba(255,255,255,0.4)";
-        roundRect(ctx, 40, h - 48, w - 80, 28, 8);
-        ctx.fill();
+        drawSceneBackdrop(ctx, w, h);
 
         if (!sponge.bagIn) {
-          // sponge alone
-          const sx = w / 2 - 70;
-          const sy = h / 2 - 40;
-          drawSpongeBody(ctx, sx, sy, 140, 90, 0);
-          ctx.fillStyle = "rgba(22,50,63,0.75)";
+          const sx = w / 2 - 78;
+          const sy = h * 0.42;
+          drawGroundShadow(ctx, sx, sy, 156, 78);
+          drawSpongeBody(ctx, sx, sy, 156, 78, 0);
+          ctx.fillStyle = "rgba(22,50,63,0.82)";
           ctx.font = "bold 14px 'Noto Sans TC', sans-serif";
-          ctx.fillText("準備中的海綿（尚未入袋）", 16, h - 14);
+          ctx.fillText("廚房海綿（尚未入袋）", 16, h - 16);
           return;
         }
 
         const bag = getSpongeBag();
-        drawPressureArrows(ctx, bag, bag.p);
-
-        // bag
-        ctx.save();
-        roundRect(ctx, bag.x, bag.y, bag.w, bag.h, 14);
-        ctx.fillStyle = "rgba(255,255,255,0.42)";
-        ctx.fill();
-        ctx.strokeStyle = sponge.sealed ? "#1a9b8e" : "#5b8a9a";
-        ctx.lineWidth = 3;
-        ctx.stroke();
-
-        // seal line
-        if (sponge.sealed) {
-          ctx.strokeStyle = "#e76f51";
-          ctx.lineWidth = 4;
-          ctx.beginPath();
-          ctx.moveTo(bag.x + 16, bag.y + 12);
-          ctx.lineTo(bag.x + bag.w - 16, bag.y + 12);
-          ctx.stroke();
-          ctx.fillStyle = "#e76f51";
-          ctx.font = "bold 12px 'Noto Sans TC', sans-serif";
-          ctx.fillText("已密封", bag.x + bag.w - 58, bag.y + 28);
-        } else {
-          ctx.fillStyle = "#2a9d8f";
-          roundRect(ctx, bag.x + bag.w * 0.15, bag.y + 5, bag.w * 0.7, 7, 3);
-          ctx.fill();
-        }
-
-        // sponge inside
-        const pad = 22 + bag.p * 6;
-        const sh = (bag.h - pad * 1.5) * (1 - bag.p * 0.35);
+        drawGroundShadow(ctx, bag.x, bag.y, bag.w, bag.h);
+        const pad = 18 + bag.p * 4;
+        const sh = Math.max(26, (bag.h - 36) * (1 - bag.p * 0.42));
         drawSpongeBody(
           ctx,
           bag.x + pad,
-          bag.y + pad * 0.9 + (bag.h - pad * 1.5 - sh) * 0.5,
+          bag.y + (bag.h - sh) * 0.62,
           bag.w - pad * 2,
-          Math.max(28, sh),
+          sh,
           bag.p
         );
-        ctx.restore();
+        drawPlasticFilm(ctx, bag.x, bag.y, bag.w, bag.h, 16, bag.p);
+        drawZipTrack(ctx, bag.x + bag.w * 0.14, bag.y + 5, bag.w * 0.72, sponge.sealed);
+        drawPressureArrows(ctx, bag, bag.p);
 
-        // particles
         const bounds = {
-          l: bag.x + 6,
+          l: bag.x + 8,
           t: bag.y + 18,
-          r: bag.x + bag.w - 6,
-          b: bag.y + bag.h - 6,
+          r: bag.x + bag.w - 8,
+          b: bag.y + bag.h - 8,
         };
-        const target = sponge.sealed
-          ? Math.round(50 * (1 - bag.p * 0.9))
-          : Math.round(50 * (1 - bag.p * 0.85));
-        while (sponge.particles.length > target) {
-          const gone = sponge.particles.pop();
-          // escape visual briefly omitted for simplicity
-          void gone;
-        }
+        const target = Math.round(50 * (1 - bag.p * (sponge.sealed ? 0.9 : 0.85)));
+        while (sponge.particles.length > target) sponge.particles.pop();
         sponge.particles.forEach((p) => {
           p.update(bounds, true);
           p.draw(ctx);
         });
 
-        // escaping particles when pressing
         if (sponge.pressHeld && !sponge.sealed) {
-          for (let i = 0; i < 2; i++) {
+          ctx.fillStyle = "rgba(58,134,255,0.45)";
+          for (let i = 0; i < 3; i++) {
             ctx.beginPath();
-            ctx.fillStyle = "rgba(58,134,255,0.55)";
-            const ex = bag.x + bag.w * 0.5 + (Math.random() - 0.5) * 40;
-            const ey = bag.y - 10 - Math.random() * 30;
-            ctx.arc(ex, ey, 2 + Math.random() * 2, 0, Math.PI * 2);
+            ctx.arc(bag.x + bag.w * 0.5 + (i - 1) * 14, bag.y - 8 - i * 8, 2.4, 0, Math.PI * 2);
             ctx.fill();
           }
         }
 
-        // press hint on canvas
-        if (sponge.step === 2 && !sponge.sealed) {
-          ctx.save();
-          ctx.fillStyle = sponge.pressHeld ? "rgba(231,111,81,0.9)" : "rgba(26,155,142,0.85)";
-          roundRect(ctx, bag.x + bag.w * 0.18, bag.y + bag.h * 0.42, bag.w * 0.64, 28, 10);
-          ctx.fill();
-          ctx.fillStyle = "#fff";
-          ctx.font = "bold 13px 'Noto Sans TC', sans-serif";
-          ctx.textAlign = "center";
-          ctx.fillText(
-            sponge.pressHeld ? "排氣中…繼續按住" : "按住這裡排氣",
-            bag.x + bag.w / 2,
-            bag.y + bag.h * 0.42 + 19
-          );
-          ctx.textAlign = "left";
-          ctx.restore();
-        }
-
-        ctx.fillStyle = "rgba(22,50,63,0.8)";
+        ctx.fillStyle = "rgba(22,50,63,0.82)";
         ctx.font = "bold 14px 'Noto Sans TC', sans-serif";
         let label = "密實袋中的海綿";
-        if (sponge.sealed) label = "密封後：外壓 > 內壓，保持凹陷";
-        else if (bag.p > 0.2) label = "按壓排氣中…粒子減少";
-        ctx.fillText(label, 16, h - 14);
-
+        if (sponge.sealed) label = "密封後：外壓大於內壓，袋子保持凹陷";
+        else if (sponge.step === 2) label = sponge.pressHeld ? "按住海綿排氣中" : "按住袋中的海綿即可排氣";
+        else if (bag.p > 0.2) label = "空氣被擠出，海綿變扁";
+        ctx.fillText(label, 16, h - 16);
         updateSpongePressureUI();
       }
 
       function drawSpongeBody(ctx, x, y, w, h, squash) {
-        roundRect(ctx, x, y, w, h, 12);
-        const g = ctx.createLinearGradient(x, y, x + w, y + h);
-        g.addColorStop(0, "#f4a261");
-        g.addColorStop(1, "#e76f51");
-        ctx.fillStyle = g;
-        ctx.fill();
-        ctx.strokeStyle = "rgba(180,80,40,0.35)";
-        ctx.stroke();
-        // pores
-        ctx.fillStyle = "rgba(255,255,255,0.35)";
-        const cols = 5;
-        const rows = 3;
-        for (let r = 0; r < rows; r++) {
-          for (let c = 0; c < cols; c++) {
-            const px = x + ((c + 0.5) / cols) * w;
-            const py = y + ((r + 0.5) / rows) * h;
-            ctx.beginPath();
-            ctx.arc(px, py, 3 + (1 - squash) * 2, 0, Math.PI * 2);
-            ctx.fill();
-          }
+        ctx.save();
+        roundRect(ctx, x, y, w, h, 8);
+        ctx.clip();
+        const body = ctx.createLinearGradient(x, y, x, y + h);
+        body.addColorStop(0, "#ffe08a");
+        body.addColorStop(0.55, "#f0b429");
+        body.addColorStop(1, "#d0892b");
+        ctx.fillStyle = body;
+        ctx.fillRect(x, y, w, h);
+        const padH = Math.max(8, h * 0.22);
+        const scour = ctx.createLinearGradient(x, y, x, y + padH);
+        scour.addColorStop(0, "#2f6b45");
+        scour.addColorStop(1, "#1e4d32");
+        ctx.fillStyle = scour;
+        ctx.fillRect(x, y, w, padH);
+        ctx.strokeStyle = "rgba(20, 60, 36, 0.35)";
+        ctx.lineWidth = 1;
+        for (let i = 0; i < 7; i++) {
+          ctx.beginPath();
+          ctx.moveTo(x + (w * i) / 7, y);
+          ctx.lineTo(x + (w * i) / 7, y + padH);
+          ctx.stroke();
         }
+        const pores = 18;
+        for (let i = 0; i < pores; i++) {
+          const px = x + ((i * 47) % Math.max(8, w - 10)) + 6;
+          const py = y + padH + ((i * 29) % Math.max(8, h - padH - 8)) + 4;
+          const pr = (2.2 + (i % 3)) * (1 - squash * 0.35);
+          ctx.beginPath();
+          ctx.fillStyle = i % 2 === 0 ? "rgba(255,248,220,0.55)" : "rgba(160,90,20,0.28)";
+          ctx.ellipse(px, py, pr, pr * (0.7 + squash * 0.4), 0.2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
+        ctx.strokeStyle = "rgba(120, 78, 20, 0.4)";
+        ctx.lineWidth = 1.3;
+        roundRect(ctx, x, y, w, h, 8);
+        ctx.stroke();
       }
 
       /* ========== Quiz + fireworks ========== */
@@ -2460,8 +2543,9 @@
               "排氣足夠了！可以點擊步驟 3：密封袋口並放手。";
           }
         } else if (sponge.step === 2 && !sponge.sealed && !sponge.pressHeld) {
-          // slight rebound if not sealed
-          sponge.press = clamp(sponge.press - dt * 0.25, 0, 1);
+          // slight rebound if not sealed, but keep unlock threshold once reached
+          const floor = sponge.press >= 0.55 ? 0.55 : 0;
+          sponge.press = clamp(sponge.press - dt * 0.25, floor, 1);
         }
 
         drawStorage();
