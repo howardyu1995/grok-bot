@@ -1,0 +1,1374 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="人體呼吸系統互動教學：吸氣與呼氣機制、即時儀表板與節奏挑戰賽" />
+  <title>人體呼吸系統｜吸氣與呼氣機制互動教室</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            bio: {
+              deep: '#071422',
+              panel: '#0d2137',
+              glass: 'rgba(14, 42, 67, 0.72)',
+              teal: '#14b8a6',
+              cyan: '#22d3ee',
+              mint: '#5eead4',
+              o2: '#38bdf8',
+              co2: '#f87171',
+              warn: '#fbbf24',
+            }
+          },
+          fontFamily: {
+            ui: ['system-ui', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', '"Helvetica Neue"', 'Arial', 'sans-serif']
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    :root {
+      --bio-deep: #071422;
+      --bio-panel: #0d2137;
+      --bio-line: rgba(94, 234, 212, 0.22);
+      --bio-teal: #14b8a6;
+      --bio-cyan: #22d3ee;
+      --o2: #38bdf8;
+      --co2: #f87171;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      color: #e2e8f0;
+      background:
+        radial-gradient(ellipse 90% 55% at 15% -10%, rgba(20, 184, 166, 0.18), transparent 55%),
+        radial-gradient(ellipse 70% 45% at 90% 10%, rgba(34, 211, 238, 0.12), transparent 50%),
+        radial-gradient(circle at 70% 90%, rgba(56, 189, 248, 0.08), transparent 40%),
+        linear-gradient(165deg, #050e1a 0%, var(--bio-deep) 45%, #0a1c30 100%);
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(148, 163, 184, 0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(148, 163, 184, 0.035) 1px, transparent 1px);
+      background-size: 36px 36px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .app-shell { position: relative; z-index: 1; }
+
+    .glass-panel {
+      background: linear-gradient(155deg, rgba(16, 48, 74, 0.78), rgba(10, 28, 48, 0.86));
+      border: 1px solid rgba(94, 234, 212, 0.18);
+      box-shadow:
+        0 20px 50px -20px rgba(0, 0, 0, 0.65),
+        inset 0 1px 0 rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+
+    .tab-btn {
+      transition: color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .tab-btn.active {
+      background: linear-gradient(135deg, rgba(20, 184, 166, 0.28), rgba(34, 211, 238, 0.16));
+      color: #99f6e4;
+      box-shadow: inset 0 0 0 1px rgba(45, 212, 191, 0.35);
+    }
+
+    .gauge-card {
+      background: rgba(7, 24, 40, 0.55);
+      border: 1px solid rgba(94, 234, 212, 0.12);
+    }
+
+    .range-bio {
+      -webkit-appearance: none;
+      appearance: none;
+      height: 8px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #f87171 0%, #94a3b8 50%, #38bdf8 100%);
+      outline: none;
+    }
+
+    .range-bio::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #ecfeff, #14b8a6 55%, #0f766e);
+      border: 2px solid #99f6e4;
+      box-shadow: 0 0 12px rgba(20, 184, 166, 0.55);
+      cursor: grab;
+    }
+
+    .range-bio::-moz-range-thumb {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #14b8a6;
+      border: 2px solid #99f6e4;
+      cursor: grab;
+    }
+
+    .breath-btn {
+      user-select: none;
+      touch-action: none;
+      transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+    }
+
+    .breath-btn:active,
+    .breath-btn.pressed {
+      transform: scale(0.97);
+      box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.35), 0 12px 28px rgba(14, 165, 233, 0.35);
+    }
+
+    .mode-chip {
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      background: rgba(15, 23, 42, 0.45);
+      transition: border-color 0.2s, background 0.2s, color 0.2s;
+    }
+
+    .mode-chip.active {
+      border-color: rgba(45, 212, 191, 0.55);
+      background: rgba(20, 184, 166, 0.18);
+      color: #99f6e4;
+    }
+
+    #anatomyCanvas {
+      display: block;
+      width: 100%;
+      height: auto;
+      touch-action: none;
+      cursor: grab;
+      border-radius: 1rem;
+      background:
+        radial-gradient(ellipse at 50% 20%, rgba(20, 184, 166, 0.08), transparent 55%),
+        linear-gradient(180deg, #06101c 0%, #0a1828 100%);
+    }
+
+    #anatomyCanvas.dragging { cursor: grabbing; }
+
+    #waveCanvas {
+      display: block;
+      width: 100%;
+      height: 120px;
+      border-radius: 0.75rem;
+      background: rgba(4, 14, 26, 0.85);
+      border: 1px solid rgba(94, 234, 212, 0.15);
+    }
+
+    .star {
+      color: #334155;
+      transition: color 0.25s ease, transform 0.25s ease;
+    }
+
+    .star.lit {
+      color: #fbbf24;
+      transform: scale(1.08);
+      text-shadow: 0 0 10px rgba(251, 191, 36, 0.45);
+    }
+
+    .knowledge-row:nth-child(even) {
+      background: rgba(15, 35, 55, 0.35);
+    }
+
+    .scroll-soft::-webkit-scrollbar { width: 8px; }
+    .scroll-soft::-webkit-scrollbar-thumb {
+      background: rgba(45, 212, 191, 0.35);
+      border-radius: 999px;
+    }
+
+    @media (max-width: 1023px) {
+      #waveCanvas { height: 100px; }
+    }
+  </style>
+</head>
+<body class="app-shell">
+  <div class="min-h-screen px-3 py-4 sm:px-5 lg:px-8 lg:py-6 max-w-[1440px] mx-auto">
+    <!-- 標題區 -->
+    <header class="mb-4 lg:mb-5">
+      <div class="glass-panel rounded-2xl px-4 py-4 sm:px-6 sm:py-5 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
+        <div>
+          <p class="text-teal-300/80 text-xs sm:text-sm tracking-[0.2em] mb-1">生物 · 生理學 · 互動教室</p>
+          <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-cyan-50 leading-tight">
+            人體呼吸系統
+          </h1>
+          <p class="mt-1.5 text-slate-300 text-sm sm:text-base max-w-2xl">
+            探索吸氣與呼氣如何透過橫膈膜、肋骨與氣壓差驅動氣體交換。
+          </p>
+        </div>
+        <div class="flex flex-wrap gap-2 text-xs sm:text-sm">
+          <span class="px-3 py-1.5 rounded-full bg-sky-500/15 text-sky-300 border border-sky-400/25">氧氣粒子 · 藍</span>
+          <span class="px-3 py-1.5 rounded-full bg-rose-500/15 text-rose-300 border border-rose-400/25">二氧化碳 · 紅</span>
+        </div>
+      </div>
+    </header>
+
+    <main class="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-5">
+      <!-- 左側：解剖視覺化 -->
+      <section class="lg:col-span-7 xl:col-span-7">
+        <div class="glass-panel rounded-2xl p-3 sm:p-4 h-full flex flex-col">
+          <div class="flex items-center justify-between gap-2 mb-3 px-1">
+            <h2 class="text-lg font-semibold text-teal-100">動態解剖剖面</h2>
+            <p id="phaseHint" class="text-xs sm:text-sm text-slate-300">靜止平衡</p>
+          </div>
+          <div class="relative flex-1 min-h-[320px] sm:min-h-[420px]">
+            <canvas id="anatomyCanvas" width="720" height="640" aria-label="人體呼吸系統動態剖面圖"></canvas>
+            <p class="absolute bottom-3 left-3 right-3 text-[11px] sm:text-xs text-slate-400/90 pointer-events-none bg-black/35 rounded-lg px-2.5 py-1.5 backdrop-blur-sm">
+              提示：拖曳下方拱形橫膈膜上下移動，或使用右側控制面板調節呼吸。
+            </p>
+          </div>
+          <div class="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-2 text-center text-xs sm:text-sm">
+            <div class="gauge-card rounded-xl px-2 py-2">
+              <div class="text-slate-400 mb-0.5">相位</div>
+              <div id="hudPhase" class="font-semibold text-teal-200">平衡</div>
+            </div>
+            <div class="gauge-card rounded-xl px-2 py-2">
+              <div class="text-slate-400 mb-0.5">體積</div>
+              <div id="hudVolume" class="font-semibold text-cyan-200">2350 mL</div>
+            </div>
+            <div class="gauge-card rounded-xl px-2 py-2">
+              <div class="text-slate-400 mb-0.5">氣壓差</div>
+              <div id="hudPressure" class="font-semibold text-amber-200">0.0 mmHg</div>
+            </div>
+            <div class="gauge-card rounded-xl px-2 py-2">
+              <div class="text-slate-400 mb-0.5">氣流</div>
+              <div id="hudFlow" class="font-semibold text-sky-200">無</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 右側：控制面板 -->
+      <section class="lg:col-span-5 xl:col-span-5">
+        <div class="glass-panel rounded-2xl p-3 sm:p-4 flex flex-col min-h-[520px] lg:min-h-full">
+          <!-- 頁籤 -->
+          <div class="flex gap-1 p-1 rounded-xl bg-slate-950/40 border border-teal-500/10 mb-4" role="tablist">
+            <button type="button" class="tab-btn active flex-1 rounded-lg px-2 py-2.5 text-xs sm:text-sm font-medium text-slate-300" data-tab="explore" role="tab" aria-selected="true">探索模式</button>
+            <button type="button" class="tab-btn flex-1 rounded-lg px-2 py-2.5 text-xs sm:text-sm font-medium text-slate-300" data-tab="challenge" role="tab" aria-selected="false">節奏挑戰</button>
+            <button type="button" class="tab-btn flex-1 rounded-lg px-2 py-2.5 text-xs sm:text-sm font-medium text-slate-300" data-tab="knowledge" role="tab" aria-selected="false">知識庫</button>
+          </div>
+
+          <!-- 頁籤一：探索 -->
+          <div id="panel-explore" class="tab-panel flex-1 flex flex-col gap-4 scroll-soft overflow-y-auto max-h-[70vh] lg:max-h-none pr-1">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <label for="breathSlider" class="text-sm font-medium text-teal-100">手動呼吸控制</label>
+                <span id="sliderLabel" class="text-xs text-slate-400">平衡</span>
+              </div>
+              <div class="flex justify-between text-[11px] text-slate-400 mb-1 px-0.5">
+                <span>完全呼氣</span>
+                <span>平衡</span>
+                <span>完全吸氣</span>
+              </div>
+              <input id="breathSlider" class="range-bio w-full" type="range" min="-100" max="100" value="0" aria-label="吸氣呼氣程度滑桿" />
+            </div>
+
+            <div>
+              <p class="text-sm font-medium text-teal-100 mb-2">自動呼吸模式</p>
+              <div class="grid grid-cols-3 gap-2" id="autoModeGroup">
+                <button type="button" class="mode-chip active rounded-xl px-2 py-2.5 text-xs sm:text-sm" data-mode="idle">靜止狀態</button>
+                <button type="button" class="mode-chip rounded-xl px-2 py-2.5 text-xs sm:text-sm" data-mode="calm">平靜呼吸</button>
+                <button type="button" class="mode-chip rounded-xl px-2 py-2.5 text-xs sm:text-sm" data-mode="exercise">劇烈運動</button>
+              </div>
+              <p id="autoModeDesc" class="mt-2 text-xs text-slate-400 leading-relaxed">
+                目前為靜止狀態：可用滑桿或拖曳橫膈膜手動探索氣壓與體積變化。
+              </p>
+            </div>
+
+            <div>
+              <p class="text-sm font-medium text-teal-100 mb-2">即時數據儀表板</p>
+              <div class="space-y-2">
+                <div class="gauge-card rounded-xl px-3 py-2.5 flex justify-between items-center gap-2">
+                  <span class="text-slate-300 text-sm">橫膈膜狀態</span>
+                  <span id="gaugeDiaphragm" class="text-sm font-semibold text-teal-200">中立位置</span>
+                </div>
+                <div class="gauge-card rounded-xl px-3 py-2.5">
+                  <div class="flex justify-between text-sm mb-1.5">
+                    <span class="text-slate-300">胸腔相對體積</span>
+                    <span id="gaugeVolume" class="font-semibold text-cyan-200">2350 mL</span>
+                  </div>
+                  <div class="h-2 rounded-full bg-slate-800 overflow-hidden">
+                    <div id="volumeBar" class="h-full rounded-full bg-gradient-to-r from-teal-600 to-cyan-400" style="width:50%"></div>
+                  </div>
+                  <div class="flex justify-between text-[10px] text-slate-500 mt-1">
+                    <span>2100 mL</span>
+                    <span>2600 mL</span>
+                  </div>
+                </div>
+                <div class="gauge-card rounded-xl px-3 py-2.5">
+                  <div class="flex justify-between text-sm mb-1.5">
+                    <span class="text-slate-300">肺內氣壓差</span>
+                    <span id="gaugePressure" class="font-semibold text-amber-200">0.0 mmHg</span>
+                  </div>
+                  <div class="relative h-2 rounded-full bg-slate-800">
+                    <div class="absolute left-1/2 top-0 bottom-0 w-px bg-slate-500"></div>
+                    <div id="pressureMarker" class="absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-amber-300 border-2 border-amber-100 shadow" style="left:calc(50% - 6px)"></div>
+                  </div>
+                  <div class="flex justify-between text-[10px] text-slate-500 mt-1">
+                    <span>−3 mmHg（負壓）</span>
+                    <span>+3 mmHg（正壓）</span>
+                  </div>
+                </div>
+                <div class="gauge-card rounded-xl px-3 py-2.5 flex justify-between items-center gap-2">
+                  <span class="text-slate-300 text-sm">氣流流速與方向</span>
+                  <span id="gaugeFlow" class="text-sm font-semibold text-sky-200">0 mL/s · 無</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="gauge-card rounded-xl px-3 py-3 text-xs sm:text-sm text-slate-300 leading-relaxed">
+              <p class="font-medium text-teal-200 mb-1">機制速記</p>
+              <p>吸氣：橫膈膜收縮下沉 → 胸腔變大 → 肺內氣壓下降 → 空氣流入。</p>
+              <p class="mt-1">呼氣：橫膈膜放鬆上拱 → 胸腔變小 → 肺內氣壓上升 → 空氣流出。</p>
+            </div>
+          </div>
+
+          <!-- 頁籤二：挑戰 -->
+          <div id="panel-challenge" class="tab-panel hidden flex-1 flex flex-col gap-3 scroll-soft overflow-y-auto max-h-[70vh] lg:max-h-none pr-1">
+            <div class="gauge-card rounded-xl px-3 py-3">
+              <p class="text-xs text-slate-400 mb-1">目前指令</p>
+              <p id="challengeInstruction" class="text-sm sm:text-base font-medium text-cyan-100 leading-snug">
+                按下「開始挑戰」後，請依照指令用呼吸按鈕匹配目標波形。
+              </p>
+            </div>
+
+            <canvas id="waveCanvas" width="560" height="120" aria-label="呼吸波形比對畫布"></canvas>
+
+            <div class="grid grid-cols-2 gap-2 text-center text-xs sm:text-sm">
+              <div class="gauge-card rounded-xl px-2 py-2">
+                <div class="text-slate-400">肺活量利用率</div>
+                <div id="scoreCapacity" class="text-lg font-bold text-teal-200">—</div>
+              </div>
+              <div class="gauge-card rounded-xl px-2 py-2">
+                <div class="text-slate-400">氣體交換效率</div>
+                <div id="scoreExchange" class="text-lg font-bold text-cyan-200">—</div>
+              </div>
+            </div>
+
+            <div class="text-center">
+              <div class="flex justify-center gap-1 text-2xl mb-1" id="starRow" aria-label="星級評等">
+                <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
+              </div>
+              <p id="scoreComment" class="text-sm text-slate-300 min-h-[1.5rem]">準備就緒，挑戰你的呼吸節奏掌控力！</p>
+            </div>
+
+            <button
+              id="breathButton"
+              type="button"
+              class="breath-btn w-full rounded-2xl py-5 text-base sm:text-lg font-bold tracking-wide
+                     bg-gradient-to-b from-cyan-400 to-teal-600 text-slate-950
+                     shadow-lg shadow-teal-900/40 border border-cyan-200/40"
+              aria-label="按住吸氣，放開呼氣"
+            >
+              按住吸氣 · 放開呼氣
+              <span class="block text-xs font-medium opacity-80 mt-1">亦可使用空白鍵</span>
+            </button>
+
+            <div class="flex gap-2">
+              <button id="startChallenge" type="button" class="flex-1 rounded-xl py-2.5 text-sm font-semibold bg-teal-500/20 text-teal-100 border border-teal-400/30 hover:bg-teal-500/30 transition">開始挑戰</button>
+              <button id="stopChallenge" type="button" class="flex-1 rounded-xl py-2.5 text-sm font-semibold bg-slate-700/40 text-slate-200 border border-slate-500/30 hover:bg-slate-700/60 transition">結束回合</button>
+            </div>
+
+            <p class="text-[11px] text-slate-500 leading-relaxed">
+              遊戲規則：按住按鈕（或空白鍵）進入吸氣，放開進入呼氣。盡量貼近畫面中青綠色目標波線；藍色為你的實際呼吸。
+            </p>
+          </div>
+
+          <!-- 頁籤三：知識庫 -->
+          <div id="panel-knowledge" class="tab-panel hidden flex-1 flex flex-col gap-4 scroll-soft overflow-y-auto max-h-[70vh] lg:max-h-none pr-1">
+            <div>
+              <h3 class="text-sm font-semibold text-teal-100 mb-2">吸氣 vs 呼氣對照表</h3>
+              <div class="overflow-hidden rounded-xl border border-teal-500/15">
+                <table class="w-full text-xs sm:text-sm">
+                  <thead class="bg-teal-950/50 text-teal-200">
+                    <tr>
+                      <th class="text-left px-3 py-2 font-medium">結構／參數</th>
+                      <th class="text-left px-3 py-2 font-medium">吸氣</th>
+                      <th class="text-left px-3 py-2 font-medium">呼氣</th>
+                    </tr>
+                  </thead>
+                  <tbody class="text-slate-300">
+                    <tr class="knowledge-row border-t border-slate-700/40">
+                      <td class="px-3 py-2 text-slate-200">橫膈膜</td>
+                      <td class="px-3 py-2">收縮並收平（向下）</td>
+                      <td class="px-3 py-2">放鬆並拱起（向上）</td>
+                    </tr>
+                    <tr class="knowledge-row border-t border-slate-700/40">
+                      <td class="px-3 py-2 text-slate-200">肋間肌與肋骨</td>
+                      <td class="px-3 py-2">收縮，肋骨上抬外展</td>
+                      <td class="px-3 py-2">放鬆，肋骨下沉內收</td>
+                    </tr>
+                    <tr class="knowledge-row border-t border-slate-700/40">
+                      <td class="px-3 py-2 text-slate-200">胸腔體積</td>
+                      <td class="px-3 py-2">增大</td>
+                      <td class="px-3 py-2">減小</td>
+                    </tr>
+                    <tr class="knowledge-row border-t border-slate-700/40">
+                      <td class="px-3 py-2 text-slate-200">肺內氣壓</td>
+                      <td class="px-3 py-2">下降（負壓）</td>
+                      <td class="px-3 py-2">上升（正壓）</td>
+                    </tr>
+                    <tr class="knowledge-row border-t border-slate-700/40">
+                      <td class="px-3 py-2 text-slate-200">氣流方向</td>
+                      <td class="px-3 py-2">富含氧氣氣體流入</td>
+                      <td class="px-3 py-2">富含二氧化碳氣體流出</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div>
+              <h3 class="text-sm font-semibold text-teal-100 mb-2">常見醫學情境小知識</h3>
+              <div class="space-y-2">
+                <article class="gauge-card rounded-xl px-3 py-3">
+                  <h4 class="text-sm font-semibold text-amber-200 mb-1">氣喘</h4>
+                  <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                    氣道因發炎與平滑肌收縮而變窄，呼氣尤其費力。吸入氣體可進入肺部，但排出受阻，常聽到喘鳴聲。平時保持規律呼吸練習，發作時需依醫師指示使用吸入劑。
+                  </p>
+                </article>
+                <article class="gauge-card rounded-xl px-3 py-3">
+                  <h4 class="text-sm font-semibold text-rose-200 mb-1">氣胸</h4>
+                  <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                    空氣異常進入胸膜腔，破壞原本讓肺臟貼附胸壁的負壓環境，導致肺葉塌陷、擴張困難。症狀可能包括突發胸痛與呼吸急促，需立即就醫處理。
+                  </p>
+                </article>
+                <article class="gauge-card rounded-xl px-3 py-3">
+                  <h4 class="text-sm font-semibold text-cyan-200 mb-1">運動時的身體變化</h4>
+                  <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                    劇烈運動時，組織需氧量與二氧化碳產量上升。呼吸中樞提高頻率與潮氣量，橫膈膜與肋間肌收縮更有力，胸腔體積變化幅度加大，以維持血液氣體平衡。
+                  </p>
+                </article>
+                <article class="gauge-card rounded-xl px-3 py-3">
+                  <h4 class="text-sm font-semibold text-teal-200 mb-1">平靜呼吸的關鍵角色</h4>
+                  <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                    安靜時吸氣主要靠橫膈膜主動收縮；呼氣多半是被動回彈——肌肉放鬆後，胸壁與肺彈性將氣體推出，無需額外用力（用力呼氣時腹肌與內肋間肌才會參與）。
+                  </p>
+                </article>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="mt-4 text-center text-[11px] sm:text-xs text-slate-500 pb-2">
+      教學示意模型 · 數值為理想化潮氣量區間（約 2100–2600 mL）· 不作為醫療診斷依據
+    </footer>
+  </div>
+
+  <script>
+    (() => {
+      'use strict';
+
+      // ========== 生理與狀態 ==========
+      const VOL_MIN = 2100;
+      const VOL_MAX = 2600;
+      const VOL_MID = (VOL_MIN + VOL_MAX) / 2;
+      const PRESSURE_MAX = 3; // mmHg
+
+      const state = {
+        // -1 完全呼氣 … 0 平衡 … +1 完全吸氣
+        phase: 0,
+        phaseVel: 0,
+        targetPhase: 0,
+        controlMode: 'manual', // manual | auto | challenge
+        autoMode: 'idle', // idle | calm | exercise
+        dragging: false,
+        sliderActive: false,
+        // 挑戰賽
+        challengeActive: false,
+        challengeTime: 0,
+        challengeIndex: 0,
+        holdingBreath: false,
+        matchSamples: [],
+        lastScore: null,
+      };
+
+      const AUTO_PROFILES = {
+        idle: { freq: 0, amp: 0, desc: '目前為靜止狀態：可用滑桿或拖曳橫膈膜手動探索氣壓與體積變化。' },
+        calm: { freq: 0.22, amp: 0.72, desc: '平靜呼吸：約每分鐘 12–14 次，潮氣量適中，適合觀察基礎機制。' },
+        exercise: { freq: 0.55, amp: 0.95, desc: '劇烈運動呼吸：頻率與幅度升高，橫膈膜與肋骨動作更明顯。' },
+      };
+
+      const CHALLENGES = [
+        {
+          title: '正在冥想放鬆，請長吸長呼',
+          duration: 18,
+          wave: (t) => Math.sin(t * Math.PI * 2 * 0.12) * 0.85,
+        },
+        {
+          title: '現在開始衝刺！請加快呼吸頻率',
+          duration: 14,
+          wave: (t) => Math.sin(t * Math.PI * 2 * 0.48) * 0.9,
+        },
+        {
+          title: '恢復節奏：吸兩拍、呼兩拍',
+          duration: 16,
+          wave: (t) => Math.sin(t * Math.PI * 2 * 0.28) * 0.75,
+        },
+      ];
+
+      // ========== 工具 ==========
+      const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+      const lerp = (a, b, t) => a + (b - a) * t;
+
+      function phaseToVolume(phase) {
+        return lerp(VOL_MID, phase >= 0 ? VOL_MAX : VOL_MIN, Math.abs(phase));
+      }
+
+      // 氣壓差：相位變化率驅動（吸氣過程負壓、呼氣過程正壓）
+      function computePressure(phase, phaseVel) {
+        // 以速度為主，並加一點位置偏置讓極端狀態可讀
+        const dynamic = -phaseVel * 4.2;
+        const positional = -phase * 0.35;
+        return clamp(dynamic + positional, -PRESSURE_MAX, PRESSURE_MAX);
+      }
+
+      function flowFromPressure(pressure) {
+        // 負壓 → 吸入；正壓 → 呼出
+        return -pressure * 180; // 約略 mL/s
+      }
+
+      function phaseLabel(phase, pressure) {
+        if (Math.abs(phase) < 0.08 && Math.abs(pressure) < 0.25) return '平衡';
+        if (pressure < -0.2 || phase > 0.15) return '吸氣中';
+        if (pressure > 0.2 || phase < -0.15) return '呼氣中';
+        return phase > 0 ? '吸氣末' : '呼氣末';
+      }
+
+      function diaphragmLabel(phase) {
+        if (phase > 0.35) return '收縮平坦（向下）';
+        if (phase < -0.35) return '放鬆拱起（向上）';
+        if (phase > 0.08) return '逐漸收縮下沉';
+        if (phase < -0.08) return '逐漸放鬆上拱';
+        return '中立位置';
+      }
+
+      function flowLabel(flow) {
+        if (Math.abs(flow) < 25) return '無';
+        return flow > 0 ? '流入肺部' : '流出肺部';
+      }
+
+      // ========== DOM ==========
+      const canvas = document.getElementById('anatomyCanvas');
+      const ctx = canvas.getContext('2d');
+      const waveCanvas = document.getElementById('waveCanvas');
+      const waveCtx = waveCanvas.getContext('2d');
+
+      const breathSlider = document.getElementById('breathSlider');
+      const sliderLabel = document.getElementById('sliderLabel');
+      const autoModeDesc = document.getElementById('autoModeDesc');
+      const phaseHint = document.getElementById('phaseHint');
+
+      const hudPhase = document.getElementById('hudPhase');
+      const hudVolume = document.getElementById('hudVolume');
+      const hudPressure = document.getElementById('hudPressure');
+      const hudFlow = document.getElementById('hudFlow');
+
+      const gaugeDiaphragm = document.getElementById('gaugeDiaphragm');
+      const gaugeVolume = document.getElementById('gaugeVolume');
+      const gaugePressure = document.getElementById('gaugePressure');
+      const gaugeFlow = document.getElementById('gaugeFlow');
+      const volumeBar = document.getElementById('volumeBar');
+      const pressureMarker = document.getElementById('pressureMarker');
+
+      const breathButton = document.getElementById('breathButton');
+      const challengeInstruction = document.getElementById('challengeInstruction');
+      const scoreCapacity = document.getElementById('scoreCapacity');
+      const scoreExchange = document.getElementById('scoreExchange');
+      const scoreComment = document.getElementById('scoreComment');
+      const starRow = document.getElementById('starRow');
+
+      // ========== 粒子系統 ==========
+      const particles = [];
+      const MAX_PARTICLES = 90;
+
+      function spawnParticle(kind, w, h, layout) {
+        const lungY = layout.lungCenterY;
+        const tracheaX = layout.cx;
+        if (kind === 'o2') {
+          particles.push({
+            kind: 'o2',
+            x: tracheaX + (Math.random() - 0.5) * 16,
+            y: layout.tracheaTop + Math.random() * 20,
+            vx: (Math.random() - 0.5) * 0.4,
+            vy: 0.6 + Math.random() * 1.2,
+            life: 1,
+            r: 2.2 + Math.random() * 1.6,
+            targetLung: Math.random() < 0.5 ? -1 : 1,
+          });
+        } else {
+          const side = Math.random() < 0.5 ? -1 : 1;
+          particles.push({
+            kind: 'co2',
+            x: tracheaX + side * (28 + Math.random() * 50),
+            y: lungY + (Math.random() - 0.5) * 60,
+            vx: -side * (0.2 + Math.random() * 0.4),
+            vy: -0.8 - Math.random() * 1.1,
+            life: 1,
+            r: 2 + Math.random() * 1.5,
+            targetLung: side,
+          });
+        }
+        if (particles.length > MAX_PARTICLES) particles.splice(0, particles.length - MAX_PARTICLES);
+      }
+
+      function updateParticles(dt, pressure, flow, layout) {
+        const inhale = flow > 30;
+        const exhale = flow < -30;
+        const rate = Math.min(4, Math.abs(flow) / 80);
+
+        if (inhale && Math.random() < rate * dt * 8) spawnParticle('o2', canvas.width, canvas.height, layout);
+        if (exhale && Math.random() < rate * dt * 8) spawnParticle('co2', canvas.width, canvas.height, layout);
+
+        for (let i = particles.length - 1; i >= 0; i--) {
+          const p = particles[i];
+          if (p.kind === 'o2') {
+            const targetX = layout.cx + p.targetLung * (40 + (1 - p.life) * 55);
+            p.vx += (targetX - p.x) * 0.015;
+            p.vy += 0.02;
+            p.life -= dt * 0.35;
+          } else {
+            const targetX = layout.cx;
+            p.vx += (targetX - p.x) * 0.02;
+            p.vy -= 0.015;
+            p.life -= dt * 0.4;
+          }
+          p.x += p.vx * 60 * dt;
+          p.y += p.vy * 60 * dt;
+          if (p.life <= 0 || p.y < 20 || p.y > canvas.height - 20) particles.splice(i, 1);
+        }
+      }
+
+      function drawParticles() {
+        for (const p of particles) {
+          ctx.globalAlpha = clamp(p.life, 0, 1) * 0.9;
+          if (p.kind === 'o2') {
+            ctx.fillStyle = '#38bdf8';
+            ctx.shadowColor = '#7dd3fc';
+          } else {
+            ctx.fillStyle = '#f87171';
+            ctx.shadowColor = '#fda4af';
+          }
+          ctx.shadowBlur = 8;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.shadowBlur = 0;
+        ctx.globalAlpha = 1;
+      }
+
+      // ========== 解剖繪製 ==========
+      function getLayout(w, h) {
+        const cx = w * 0.5;
+        const top = h * 0.08;
+        return {
+          cx,
+          top,
+          tracheaTop: top + 8,
+          tracheaBottom: h * 0.28,
+          ribTop: h * 0.22,
+          ribBottom: h * 0.62,
+          lungCenterY: h * 0.42,
+          diaphragmBaseY: h * 0.68,
+          handleHitR: 28,
+        };
+      }
+
+      function drawTorso(layout, phase) {
+        const w = canvas.width;
+        const h = canvas.height;
+        const { cx } = layout;
+
+        // 背景光暈
+        const g = ctx.createRadialGradient(cx, h * 0.4, 20, cx, h * 0.4, w * 0.45);
+        g.addColorStop(0, 'rgba(20, 184, 166, 0.07)');
+        g.addColorStop(1, 'transparent');
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, w, h);
+
+        // 軀幹外廓
+        ctx.save();
+        ctx.strokeStyle = 'rgba(148, 163, 184, 0.35)';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.moveTo(cx - w * 0.28, layout.top);
+        ctx.quadraticCurveTo(cx - w * 0.36, h * 0.45, cx - w * 0.26, h * 0.78);
+        ctx.lineTo(cx + w * 0.26, h * 0.78);
+        ctx.quadraticCurveTo(cx + w * 0.36, h * 0.45, cx + w * 0.28, layout.top);
+        ctx.stroke();
+        ctx.restore();
+
+        // 肋骨：隨吸氣上抬外展
+        const ribExpand = phase * 10;
+        const ribLift = phase * 8;
+        ctx.save();
+        for (let i = 0; i < 7; i++) {
+          const t = i / 6;
+          const y = layout.ribTop + t * (layout.ribBottom - layout.ribTop) - ribLift * (1 - t * 0.4);
+          const spread = w * (0.12 + t * 0.14) + ribExpand * (0.6 + t * 0.5);
+          ctx.strokeStyle = `rgba(125, 211, 252, ${0.22 + t * 0.12})`;
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(cx - 14, y - 6);
+          ctx.quadraticCurveTo(cx - spread * 0.55, y + 4, cx - spread, y + 18 + t * 8);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(cx + 14, y - 6);
+          ctx.quadraticCurveTo(cx + spread * 0.55, y + 4, cx + spread, y + 18 + t * 8);
+          ctx.stroke();
+        }
+        // 胸骨示意
+        ctx.strokeStyle = 'rgba(165, 243, 252, 0.35)';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(cx, layout.ribTop - 10);
+        ctx.lineTo(cx, layout.ribBottom - 20 - ribLift);
+        ctx.stroke();
+        ctx.restore();
+
+        // 氣管
+        ctx.save();
+        ctx.fillStyle = 'rgba(148, 163, 184, 0.35)';
+        ctx.strokeStyle = 'rgba(203, 213, 225, 0.55)';
+        ctx.lineWidth = 1.5;
+        roundRect(ctx, cx - 11, layout.tracheaTop, 22, layout.tracheaBottom - layout.tracheaTop, 6);
+        ctx.fill();
+        ctx.stroke();
+        // 環狀軟骨紋
+        for (let y = layout.tracheaTop + 10; y < layout.tracheaBottom - 8; y += 10) {
+          ctx.strokeStyle = 'rgba(100, 116, 139, 0.55)';
+          ctx.beginPath();
+          ctx.moveTo(cx - 9, y);
+          ctx.lineTo(cx + 9, y);
+          ctx.stroke();
+        }
+        // 支氣管分叉
+        ctx.strokeStyle = 'rgba(203, 213, 225, 0.5)';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(cx, layout.tracheaBottom - 4);
+        ctx.quadraticCurveTo(cx - 8, layout.tracheaBottom + 18, cx - 36, layout.lungCenterY - 40);
+        ctx.moveTo(cx, layout.tracheaBottom - 4);
+        ctx.quadraticCurveTo(cx + 8, layout.tracheaBottom + 18, cx + 36, layout.lungCenterY - 40);
+        ctx.stroke();
+        ctx.restore();
+
+        // 肺臟（彈性縮放）
+        const lungScale = 1 + phase * 0.12;
+        const lungW = w * 0.16 * lungScale;
+        const lungH = h * 0.22 * (1 + phase * 0.1);
+        drawLung(cx - w * 0.15, layout.lungCenterY, lungW, lungH, phase, -1);
+        drawLung(cx + w * 0.15, layout.lungCenterY, lungW, lungH, phase, 1);
+
+        // 橫膈膜
+        const diaY = layout.diaphragmBaseY - phase * 42;
+        const arch = 38 - phase * 36; // 吸氣時變平，呼氣時拱起
+        layout.diaphragmY = diaY;
+        layout.diaphragmArch = arch;
+
+        ctx.save();
+        const diaGrad = ctx.createLinearGradient(0, diaY - arch, 0, diaY + 30);
+        diaGrad.addColorStop(0, 'rgba(244, 114, 182, 0.55)');
+        diaGrad.addColorStop(1, 'rgba(190, 24, 93, 0.35)');
+        ctx.fillStyle = diaGrad;
+        ctx.strokeStyle = 'rgba(251, 207, 232, 0.75)';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(cx - w * 0.27, diaY + 8);
+        ctx.quadraticCurveTo(cx, diaY - arch, cx + w * 0.27, diaY + 8);
+        ctx.quadraticCurveTo(cx, diaY + 28, cx - w * 0.27, diaY + 8);
+        ctx.closePath();
+        ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(cx - w * 0.27, diaY + 8);
+        ctx.quadraticCurveTo(cx, diaY - arch, cx + w * 0.27, diaY + 8);
+        ctx.stroke();
+
+        // 拖曳把手
+        ctx.fillStyle = state.dragging ? 'rgba(94, 234, 212, 0.95)' : 'rgba(45, 212, 191, 0.85)';
+        ctx.strokeStyle = 'rgba(204, 251, 241, 0.9)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(cx, diaY - arch * 0.35, 12, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+        // 把手圖示線
+        ctx.strokeStyle = 'rgba(15, 23, 42, 0.65)';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(cx, diaY - arch * 0.35 - 5);
+        ctx.lineTo(cx, diaY - arch * 0.35 + 5);
+        ctx.moveTo(cx - 3.5, diaY - arch * 0.35 - 3);
+        ctx.lineTo(cx, diaY - arch * 0.35 - 5);
+        ctx.lineTo(cx + 3.5, diaY - arch * 0.35 - 3);
+        ctx.moveTo(cx - 3.5, diaY - arch * 0.35 + 3);
+        ctx.lineTo(cx, diaY - arch * 0.35 + 5);
+        ctx.lineTo(cx + 3.5, diaY - arch * 0.35 + 3);
+        ctx.stroke();
+        ctx.restore();
+
+        layout.handleY = diaY - arch * 0.35;
+
+        // 標籤
+        ctx.save();
+        ctx.fillStyle = 'rgba(186, 230, 253, 0.75)';
+        ctx.font = '12px system-ui, sans-serif';
+        ctx.fillText('氣管', cx + 18, layout.tracheaTop + 24);
+        ctx.fillText('左肺', cx - w * 0.28, layout.lungCenterY - lungH * 0.55);
+        ctx.fillText('右肺', cx + w * 0.18, layout.lungCenterY - lungH * 0.55);
+        ctx.fillStyle = 'rgba(251, 207, 232, 0.85)';
+        ctx.fillText('橫膈膜（可拖曳）', cx - 48, Math.min(h - 48, diaY + 46));
+        ctx.restore();
+      }
+
+      function drawLung(x, y, lungW, lungH, phase, side) {
+        ctx.save();
+        const inflate = 0.92 + phase * 0.1;
+        const grd = ctx.createRadialGradient(x, y - 10, 8, x, y, lungW);
+        grd.addColorStop(0, `rgba(125, 211, 252, ${0.35 + phase * 0.12})`);
+        grd.addColorStop(0.55, `rgba(56, 189, 248, ${0.22 + phase * 0.08})`);
+        grd.addColorStop(1, 'rgba(14, 116, 144, 0.12)');
+        ctx.fillStyle = grd;
+        ctx.strokeStyle = `rgba(125, 211, 252, ${0.45 + phase * 0.2})`;
+        ctx.lineWidth = 2;
+
+        ctx.beginPath();
+        ctx.moveTo(x, y - lungH * 0.85 * inflate);
+        ctx.bezierCurveTo(
+          x + side * lungW * 0.15, y - lungH * inflate,
+          x + side * lungW * 1.05, y - lungH * 0.35,
+          x + side * lungW * 0.95, y + lungH * 0.15
+        );
+        ctx.bezierCurveTo(
+          x + side * lungW * 0.85, y + lungH * 0.75 * inflate,
+          x + side * lungW * 0.1, y + lungH * 0.7 * inflate,
+          x, y + lungH * 0.35
+        );
+        ctx.bezierCurveTo(
+          x - side * lungW * 0.05, y - lungH * 0.1,
+          x - side * lungW * 0.05, y - lungH * 0.55,
+          x, y - lungH * 0.85 * inflate
+        );
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+
+        // 肺葉紋理
+        ctx.strokeStyle = 'rgba(186, 230, 253, 0.18)';
+        ctx.lineWidth = 1;
+        for (let i = 0; i < 3; i++) {
+          const yy = y - lungH * 0.4 + i * lungH * 0.28;
+          ctx.beginPath();
+          ctx.moveTo(x + side * 4, yy);
+          ctx.quadraticCurveTo(x + side * lungW * 0.45, yy + 6, x + side * lungW * 0.75, yy + 2);
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+
+      function roundRect(c, x, y, w, h, r) {
+        c.beginPath();
+        c.moveTo(x + r, y);
+        c.arcTo(x + w, y, x + w, y + h, r);
+        c.arcTo(x + w, y + h, x, y + h, r);
+        c.arcTo(x, y + h, x, y, r);
+        c.arcTo(x, y, x + w, y, r);
+        c.closePath();
+      }
+
+      let lastLayout = null;
+
+      function renderAnatomy(phase, pressure, flow) {
+        const w = canvas.width;
+        const h = canvas.height;
+        ctx.clearRect(0, 0, w, h);
+        const layout = getLayout(w, h);
+        drawTorso(layout, phase);
+        drawParticles();
+
+        // 氣流方向箭頭
+        if (Math.abs(flow) > 30) {
+          ctx.save();
+          ctx.fillStyle = flow > 0 ? 'rgba(56, 189, 248, 0.75)' : 'rgba(248, 113, 113, 0.75)';
+          ctx.font = 'bold 13px system-ui, sans-serif';
+          ctx.textAlign = 'center';
+          const label = flow > 0 ? '↓ 氧氣流入' : '↑ 二氧化碳流出';
+          ctx.fillText(label, layout.cx, layout.tracheaTop - 4);
+          ctx.restore();
+        }
+
+        lastLayout = layout;
+        return layout;
+      }
+
+      // ========== 波形畫布 ==========
+      function drawWave(nowSec) {
+        const w = waveCanvas.width;
+        const h = waveCanvas.height;
+        waveCtx.clearRect(0, 0, w, h);
+
+        // 格線
+        waveCtx.strokeStyle = 'rgba(51, 65, 85, 0.55)';
+        waveCtx.lineWidth = 1;
+        for (let i = 1; i < 4; i++) {
+          const y = (h / 4) * i;
+          waveCtx.beginPath();
+          waveCtx.moveTo(0, y);
+          waveCtx.lineTo(w, y);
+          waveCtx.stroke();
+        }
+        waveCtx.strokeStyle = 'rgba(71, 85, 105, 0.8)';
+        waveCtx.beginPath();
+        waveCtx.moveTo(0, h / 2);
+        waveCtx.lineTo(w, h / 2);
+        waveCtx.stroke();
+
+        const mid = h / 2;
+        const amp = h * 0.36;
+
+        if (state.challengeActive) {
+          const ch = CHALLENGES[state.challengeIndex];
+          // 目標波
+          waveCtx.strokeStyle = 'rgba(45, 212, 191, 0.85)';
+          waveCtx.lineWidth = 2.5;
+          waveCtx.beginPath();
+          for (let x = 0; x < w; x++) {
+            const t = state.challengeTime - (w - x) / w * 4;
+            const y = mid - ch.wave(Math.max(0, t)) * amp;
+            if (x === 0) waveCtx.moveTo(x, y);
+            else waveCtx.lineTo(x, y);
+          }
+          waveCtx.stroke();
+        } else {
+          // 示範正弦
+          waveCtx.strokeStyle = 'rgba(45, 212, 191, 0.35)';
+          waveCtx.lineWidth = 2;
+          waveCtx.setLineDash([6, 6]);
+          waveCtx.beginPath();
+          for (let x = 0; x < w; x++) {
+            const t = nowSec * 0.25 + x / w * 2;
+            const y = mid - Math.sin(t * Math.PI * 2) * amp * 0.5;
+            if (x === 0) waveCtx.moveTo(x, y);
+            else waveCtx.lineTo(x, y);
+          }
+          waveCtx.stroke();
+          waveCtx.setLineDash([]);
+        }
+
+        // 玩家波（即時相位）
+        waveCtx.strokeStyle = 'rgba(56, 189, 248, 0.95)';
+        waveCtx.lineWidth = 2.5;
+        const hist = state.matchSamples;
+        if (hist.length > 1) {
+          waveCtx.beginPath();
+          const visible = hist.slice(-Math.floor(w));
+          for (let i = 0; i < visible.length; i++) {
+            const x = w - visible.length + i;
+            const y = mid - visible[i].phase * amp;
+            if (i === 0) waveCtx.moveTo(x, y);
+            else waveCtx.lineTo(x, y);
+          }
+          waveCtx.stroke();
+        } else {
+          const y = mid - state.phase * amp;
+          waveCtx.beginPath();
+          waveCtx.arc(w - 8, y, 4, 0, Math.PI * 2);
+          waveCtx.fillStyle = '#38bdf8';
+          waveCtx.fill();
+        }
+
+        // 圖例
+        waveCtx.font = '11px system-ui, sans-serif';
+        waveCtx.fillStyle = 'rgba(45, 212, 191, 0.9)';
+        waveCtx.fillText('目標', 10, 16);
+        waveCtx.fillStyle = 'rgba(56, 189, 248, 0.9)';
+        waveCtx.fillText('你的呼吸', 50, 16);
+      }
+
+      // ========== UI 更新 ==========
+      function updateUI(phase, volume, pressure, flow) {
+        const label = phaseLabel(phase, pressure);
+        const fl = flowLabel(flow);
+
+        hudPhase.textContent = label;
+        hudVolume.textContent = `${Math.round(volume)} mL`;
+        hudPressure.textContent = `${pressure >= 0 ? '+' : ''}${pressure.toFixed(1)} mmHg`;
+        hudFlow.textContent = fl;
+
+        phaseHint.textContent = label;
+        gaugeDiaphragm.textContent = diaphragmLabel(phase);
+        gaugeVolume.textContent = `${Math.round(volume)} mL`;
+        gaugePressure.textContent = `${pressure >= 0 ? '+' : ''}${pressure.toFixed(1)} mmHg`;
+        gaugeFlow.textContent = `${Math.round(flow)} mL/s · ${fl}`;
+
+        const volPct = ((volume - VOL_MIN) / (VOL_MAX - VOL_MIN)) * 100;
+        volumeBar.style.width = `${clamp(volPct, 0, 100)}%`;
+
+        const pPct = ((pressure + PRESSURE_MAX) / (2 * PRESSURE_MAX)) * 100;
+        pressureMarker.style.left = `calc(${clamp(pPct, 0, 100)}% - 6px)`;
+
+        if (!state.sliderActive && state.controlMode !== 'challenge') {
+          breathSlider.value = String(Math.round(phase * 100));
+        }
+
+        if (phase > 0.2) sliderLabel.textContent = '吸氣';
+        else if (phase < -0.2) sliderLabel.textContent = '呼氣';
+        else sliderLabel.textContent = '平衡';
+      }
+
+      // ========== 挑戰評分 ==========
+      function scoreChallenge() {
+        const samples = state.matchSamples;
+        if (samples.length < 30) {
+          return { capacity: 0, exchange: 0, stars: 0, comment: '資料不足，請再試一次完整回合。' };
+        }
+
+        let errSum = 0;
+        let ampSum = 0;
+        let count = 0;
+        for (const s of samples) {
+          if (s.target == null) continue;
+          errSum += Math.abs(s.phase - s.target);
+          ampSum += Math.abs(s.phase);
+          count++;
+        }
+        if (count === 0) {
+          return { capacity: 0, exchange: 0, stars: 0, comment: '尚未偵測到有效呼吸操作。' };
+        }
+
+        const avgErr = errSum / count;
+        const avgAmp = ampSum / count;
+        const exchange = clamp(Math.round((1 - avgErr / 1.2) * 100), 0, 100);
+        const capacity = clamp(Math.round(avgAmp * 110), 0, 100);
+        const overall = exchange * 0.65 + capacity * 0.35;
+
+        let stars = 1;
+        if (overall >= 90) stars = 5;
+        else if (overall >= 78) stars = 4;
+        else if (overall >= 62) stars = 3;
+        else if (overall >= 45) stars = 2;
+
+        const comments = {
+          5: '卓越！你的節奏與目標波形幾乎同步，氣體交換效率極佳。',
+          4: '表現優異！頻率掌握穩定，再微調幅度就能更接近完美。',
+          3: '不錯的基礎！試著讓吸氣與呼氣的轉折更貼近青綠色目標線。',
+          2: '有在呼吸，但節奏偏離較多。跟著指令放慢或加快再挑戰一次。',
+          1: '節奏落差明顯。先在探索模式感受橫膈膜動作，再回來練習。',
+        };
+
+        return { capacity, exchange, stars, comment: comments[stars] };
+      }
+
+      function applyScore(result) {
+        state.lastScore = result;
+        scoreCapacity.textContent = `${result.capacity}%`;
+        scoreExchange.textContent = `${result.exchange}%`;
+        scoreComment.textContent = result.comment;
+        const stars = starRow.querySelectorAll('.star');
+        stars.forEach((el, i) => {
+          el.classList.toggle('lit', i < result.stars);
+        });
+      }
+
+      function startChallenge() {
+        // 切換到挑戰控制
+        document.querySelectorAll('.mode-chip').forEach((b) => b.classList.remove('active'));
+        document.querySelector('.mode-chip[data-mode="idle"]')?.classList.add('active');
+        state.autoMode = 'idle';
+        state.controlMode = 'challenge';
+        state.challengeActive = true;
+        state.challengeTime = 0;
+        state.challengeIndex = Math.floor(Math.random() * CHALLENGES.length);
+        state.matchSamples = [];
+        state.holdingBreath = false;
+        state.phaseVel = 0;
+
+        const ch = CHALLENGES[state.challengeIndex];
+        challengeInstruction.textContent = ch.title;
+        scoreCapacity.textContent = '—';
+        scoreExchange.textContent = '—';
+        scoreComment.textContent = '挑戰進行中：匹配波形，保持穩定節奏！';
+        starRow.querySelectorAll('.star').forEach((el) => el.classList.remove('lit'));
+
+        // 同步探索說明
+        autoModeDesc.textContent = '挑戰進行中：請使用呼吸按鈕或空白鍵操作。';
+      }
+
+      function stopChallenge(finalize) {
+        if (state.challengeActive && finalize) {
+          applyScore(scoreChallenge());
+        }
+        state.challengeActive = false;
+        state.controlMode = state.autoMode === 'idle' ? 'manual' : 'auto';
+        state.holdingBreath = false;
+        breathButton.classList.remove('pressed');
+        if (!finalize) {
+          challengeInstruction.textContent = '按下「開始挑戰」後，請依照指令用呼吸按鈕匹配目標波形。';
+        }
+      }
+
+      // ========== 事件：頁籤 ==========
+      document.querySelectorAll('.tab-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const tab = btn.dataset.tab;
+          document.querySelectorAll('.tab-btn').forEach((b) => {
+            b.classList.toggle('active', b === btn);
+            b.setAttribute('aria-selected', b === btn ? 'true' : 'false');
+          });
+          document.querySelectorAll('.tab-panel').forEach((p) => p.classList.add('hidden'));
+          document.getElementById(`panel-${tab}`).classList.remove('hidden');
+        });
+      });
+
+      // ========== 事件：自動模式 ==========
+      document.querySelectorAll('.mode-chip').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          if (state.challengeActive) stopChallenge(false);
+          const mode = btn.dataset.mode;
+          state.autoMode = mode;
+          document.querySelectorAll('.mode-chip').forEach((b) => b.classList.toggle('active', b === btn));
+          autoModeDesc.textContent = AUTO_PROFILES[mode].desc;
+          if (mode === 'idle') {
+            state.controlMode = 'manual';
+            state.targetPhase = state.phase;
+          } else {
+            state.controlMode = 'auto';
+            state.sliderActive = false;
+          }
+        });
+      });
+
+      // ========== 事件：滑桿 ==========
+      breathSlider.addEventListener('pointerdown', () => {
+        if (state.challengeActive) stopChallenge(false);
+        state.sliderActive = true;
+        state.controlMode = 'manual';
+        state.autoMode = 'idle';
+        document.querySelectorAll('.mode-chip').forEach((b) => b.classList.toggle('active', b.dataset.mode === 'idle'));
+        autoModeDesc.textContent = AUTO_PROFILES.idle.desc;
+      });
+      breathSlider.addEventListener('input', () => {
+        const next = Number(breathSlider.value) / 100;
+        state.phaseVel = clamp((next - state.phase) * 10, -1.8, 1.8);
+        state.targetPhase = next;
+        state.phase = next;
+      });
+      const endSlider = () => { state.sliderActive = false; };
+      breathSlider.addEventListener('pointerup', endSlider);
+      breathSlider.addEventListener('pointercancel', endSlider);
+
+      // ========== 事件：橫膈膜拖曳 ==========
+      function clientToCanvas(clientX, clientY) {
+        const rect = canvas.getBoundingClientRect();
+        return {
+          x: (clientX - rect.left) * (canvas.width / rect.width),
+          y: (clientY - rect.top) * (canvas.height / rect.height),
+        };
+      }
+
+      function phaseFromDiaphragmY(y, layout) {
+        // 向下（y 大）→ 吸氣（phase +）；向上 → 呼氣
+        const base = layout.diaphragmBaseY;
+        const delta = base - y; // 向上為正
+        // 對應 phase：y 往下 phase+1，所以用 -delta
+        return clamp(-(delta) / 42, -1, 1);
+      }
+
+      canvas.addEventListener('pointerdown', (e) => {
+        if (!lastLayout) return;
+        const pt = clientToCanvas(e.clientX, e.clientY);
+        const dx = pt.x - lastLayout.cx;
+        const dy = pt.y - lastLayout.handleY;
+        if (dx * dx + dy * dy < lastLayout.handleHitR * lastLayout.handleHitR ||
+            Math.abs(pt.y - lastLayout.handleY) < 36 && Math.abs(pt.x - lastLayout.cx) < canvas.width * 0.28) {
+          if (state.challengeActive) stopChallenge(false);
+          state.dragging = true;
+          state.controlMode = 'manual';
+          state.autoMode = 'idle';
+          state.sliderActive = false;
+          canvas.classList.add('dragging');
+          canvas.setPointerCapture(e.pointerId);
+          document.querySelectorAll('.mode-chip').forEach((b) => b.classList.toggle('active', b.dataset.mode === 'idle'));
+          autoModeDesc.textContent = AUTO_PROFILES.idle.desc;
+          const prev = state.phase;
+          state.phase = phaseFromDiaphragmY(pt.y, lastLayout);
+          state.targetPhase = state.phase;
+          state.phaseVel = state.phase - prev;
+        }
+      });
+
+      canvas.addEventListener('pointermove', (e) => {
+        if (!state.dragging || !lastLayout) return;
+        const pt = clientToCanvas(e.clientX, e.clientY);
+        const prev = state.phase;
+        state.phase = phaseFromDiaphragmY(pt.y, lastLayout);
+        state.targetPhase = state.phase;
+        state.phaseVel = clamp((state.phase - prev) * 12, -1.5, 1.5);
+      });
+
+      const endDrag = (e) => {
+        if (!state.dragging) return;
+        state.dragging = false;
+        canvas.classList.remove('dragging');
+        try { canvas.releasePointerCapture(e.pointerId); } catch (_) { /* ignore */ }
+      };
+      canvas.addEventListener('pointerup', endDrag);
+      canvas.addEventListener('pointercancel', endDrag);
+
+      // ========== 挑戰按鈕 / 空白鍵 ==========
+      function setHolding(on) {
+        state.holdingBreath = on;
+        breathButton.classList.toggle('pressed', on);
+      }
+
+      breathButton.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        if (!state.challengeActive && state.controlMode === 'auto') {
+          state.controlMode = 'manual';
+          state.autoMode = 'idle';
+          document.querySelectorAll('.mode-chip').forEach((b) => b.classList.toggle('active', b.dataset.mode === 'idle'));
+          autoModeDesc.textContent = AUTO_PROFILES.idle.desc;
+        }
+        setHolding(true);
+        breathButton.setPointerCapture(e.pointerId);
+      });
+      breathButton.addEventListener('pointerup', (e) => {
+        setHolding(false);
+        try { breathButton.releasePointerCapture(e.pointerId); } catch (_) { /* ignore */ }
+      });
+      breathButton.addEventListener('pointercancel', () => setHolding(false));
+      breathButton.addEventListener('contextmenu', (e) => e.preventDefault());
+
+      window.addEventListener('keydown', (e) => {
+        if (e.code !== 'Space' || e.repeat) return;
+        // 避免頁面捲動
+        const tag = (e.target && e.target.tagName) || '';
+        if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'BUTTON') {
+          if (e.target !== breathButton) return;
+        }
+        e.preventDefault();
+        setHolding(true);
+      });
+      window.addEventListener('keyup', (e) => {
+        if (e.code !== 'Space') return;
+        e.preventDefault();
+        setHolding(false);
+      });
+
+      document.getElementById('startChallenge').addEventListener('click', () => {
+        // 切到挑戰頁籤已在該面板
+        startChallenge();
+      });
+      document.getElementById('stopChallenge').addEventListener('click', () => {
+        if (state.challengeActive) stopChallenge(true);
+      });
+
+      // ========== 主迴圈 ==========
+      let lastTs = performance.now();
+      let autoClock = 0;
+      let buttonDriving = false;
+
+      function mainLoop(ts) {
+        const dt = clamp((ts - lastTs) / 1000, 0.001, 0.05);
+        lastTs = ts;
+        const prevPhase = state.phase;
+
+        if (state.challengeActive) {
+          state.challengeTime += dt;
+          const ch = CHALLENGES[state.challengeIndex];
+          const target = ch.wave(state.challengeTime);
+          const goal = state.holdingBreath ? 1 : -1;
+          state.phase = lerp(state.phase, goal, 1 - Math.exp(-dt * 2.8));
+          state.phaseVel = (state.phase - prevPhase) / Math.max(dt, 0.0001);
+
+          state.matchSamples.push({ phase: state.phase, target, t: state.challengeTime });
+          if (state.matchSamples.length > 2000) state.matchSamples.shift();
+
+          const recent = state.matchSamples.slice(-40);
+          const avgErr = recent.reduce((s, x) => s + Math.abs(x.phase - x.target), 0) / recent.length;
+          scoreExchange.textContent = `${clamp(Math.round((1 - avgErr / 1.2) * 100), 0, 100)}%`;
+          scoreCapacity.textContent = `${clamp(Math.round(Math.abs(state.phase) * 100), 0, 100)}%`;
+
+          if (state.challengeTime >= ch.duration) {
+            stopChallenge(true);
+            challengeInstruction.textContent = `回合結束！原指令：「${ch.title}」`;
+          }
+        } else if (state.controlMode === 'auto') {
+          const profile = AUTO_PROFILES[state.autoMode];
+          autoClock += dt;
+          const next = Math.sin(autoClock * Math.PI * 2 * profile.freq) * profile.amp;
+          state.phase = lerp(state.phase, next, 1 - Math.exp(-dt * 6));
+          state.phaseVel = (state.phase - prevPhase) / Math.max(dt, 0.0001);
+        } else if ((state.holdingBreath || buttonDriving) && !state.dragging && !state.sliderActive) {
+          // 呼吸按鈕：按住吸氣、放開呼氣（探索模式亦可預覽）
+          if (state.holdingBreath) buttonDriving = true;
+          const goal = state.holdingBreath ? 1 : -1;
+          state.phase = lerp(state.phase, goal, 1 - Math.exp(-dt * 2.5));
+          state.phaseVel = (state.phase - prevPhase) / Math.max(dt, 0.0001);
+          if (!state.holdingBreath && Math.abs(state.phase + 1) < 0.02) buttonDriving = false;
+        } else if (!state.dragging && !state.sliderActive) {
+          state.phaseVel *= Math.exp(-dt * 3.2);
+        } else {
+          state.phaseVel *= Math.exp(-dt * 2);
+        }
+
+        state.phase = clamp(state.phase, -1, 1);
+        const volume = phaseToVolume(state.phase);
+        const pressure = computePressure(state.phase, state.phaseVel);
+        const flow = flowFromPressure(pressure);
+
+        const layout = getLayout(canvas.width, canvas.height);
+        layout.diaphragmY = layout.diaphragmBaseY - state.phase * 42;
+        layout.diaphragmArch = 38 - state.phase * 36;
+        layout.handleY = layout.diaphragmY - layout.diaphragmArch * 0.35;
+
+        updateParticles(dt, pressure, flow, layout);
+        renderAnatomy(state.phase, pressure, flow);
+        updateUI(state.phase, volume, pressure, flow);
+        drawWave(ts / 1000);
+
+        requestAnimationFrame(mainLoop);
+      }
+
+      requestAnimationFrame(mainLoop);
+
+      // 響應式：依顯示尺寸調整內部解析度
+      function resizeCanvases() {
+        const rect = canvas.getBoundingClientRect();
+        const targetW = Math.round(Math.max(320, rect.width));
+        const targetH = Math.round(targetW * (640 / 720));
+        if (canvas.width !== targetW || canvas.height !== targetH) {
+          canvas.width = targetW;
+          canvas.height = targetH;
+        }
+        const wr = waveCanvas.getBoundingClientRect();
+        const ww = Math.round(Math.max(280, wr.width));
+        if (waveCanvas.width !== ww) {
+          waveCanvas.width = ww;
+          waveCanvas.height = 120;
+        }
+      }
+      resizeCanvases();
+      window.addEventListener('resize', resizeCanvases);
+    })();
+  </script>
+</body>
+</html>
