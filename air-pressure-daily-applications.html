@@ -762,6 +762,122 @@
       color: var(--ink-soft);
       margin: 0;
     }
+
+    /* Pressure compare bars */
+    .pressure-compare {
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid rgba(26, 155, 142, 0.18);
+      border-radius: 12px;
+      padding: 0.65rem 0.75rem;
+      display: grid;
+      gap: 0.45rem;
+    }
+
+    .pc-row {
+      display: grid;
+      grid-template-columns: 5.2rem 1fr 2.6rem;
+      gap: 0.45rem;
+      align-items: center;
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: var(--ink-soft);
+    }
+
+    .pc-track {
+      height: 10px;
+      border-radius: 999px;
+      background: #dce8ec;
+      overflow: hidden;
+    }
+
+    .pc-fill {
+      height: 100%;
+      border-radius: inherit;
+      width: 100%;
+      transition: width 0.25s var(--ease);
+    }
+
+    .pc-fill.inner { background: linear-gradient(90deg, #3a86ff, #4cc9f0); }
+    .pc-fill.outer { background: linear-gradient(90deg, #e76f51, #f4a261); }
+
+    .pc-val {
+      text-align: right;
+      font-family: Outfit, "Noto Sans TC", sans-serif;
+      color: var(--ink);
+      font-size: 0.82rem;
+    }
+
+    .pc-tip {
+      margin: 0.1rem 0 0;
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: var(--ink-soft);
+      min-height: 1.2em;
+      transition: color 0.25s, transform 0.25s;
+    }
+
+    .pc-tip.hot {
+      color: #b4452d;
+      animation: tipPulse 0.55s var(--ease);
+    }
+
+    @keyframes tipPulse {
+      0% { transform: scale(0.96); }
+      60% { transform: scale(1.03); }
+      100% { transform: scale(1); }
+    }
+
+    .module.demoing {
+      outline: 3px solid var(--lab-coral);
+      outline-offset: 4px;
+      box-shadow: 0 0 0 8px rgba(231, 111, 81, 0.15), var(--shadow);
+    }
+
+    .demo-banner {
+      display: none;
+      position: sticky;
+      top: 52px;
+      z-index: 25;
+      margin: 0.75rem 0 0;
+      padding: 0.7rem 1rem;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #fff4e8, #ffe8e0);
+      border: 2px solid rgba(231, 111, 81, 0.45);
+      font-weight: 800;
+      color: #8f2f1c;
+      animation: fadeUp 0.35s var(--ease);
+    }
+
+    .demo-banner.show { display: block; }
+
+    #canvas-sponge {
+      cursor: default;
+      touch-action: none;
+    }
+
+    #canvas-sponge.pressable { cursor: pointer; }
+    #canvas-sponge.pressing { cursor: grabbing; }
+
+    .press-progress-wrap {
+      display: none;
+      align-items: center;
+      gap: 0.55rem;
+      font-size: 0.82rem;
+      font-weight: 800;
+      color: var(--lab-teal-dark);
+    }
+
+    .press-progress-wrap.show { display: flex; }
+
+    .press-ring {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background:
+        conic-gradient(var(--lab-coral) calc(var(--p, 0) * 1%), #dce8ec 0);
+      mask: radial-gradient(circle 9px, transparent 98%, #000 100%);
+      -webkit-mask: radial-gradient(circle 9px, transparent 98%, #000 100%);
+    }
   </style>
 </head>
 <body>
@@ -867,6 +983,19 @@
                 <span><i class="dot dot-red"></i>袋外空氣粒子</span>
                 <span class="arrow-legend">大氣壓力方向</span>
               </div>
+              <div class="pressure-compare" id="storage-pressure-compare" aria-live="polite">
+                <div class="pc-row">
+                  <span class="pc-label">袋內氣壓</span>
+                  <div class="pc-track"><div class="pc-fill inner" id="storage-bar-in" style="width:100%"></div></div>
+                  <span class="pc-val" id="storage-bar-in-val">1.00</span>
+                </div>
+                <div class="pc-row">
+                  <span class="pc-label">袋外大氣壓</span>
+                  <div class="pc-track"><div class="pc-fill outer" style="width:100%"></div></div>
+                  <span class="pc-val">1.00</span>
+                </div>
+                <p class="pc-tip" id="storage-pc-tip">尚未產生明顯氣壓差</p>
+              </div>
             </div>
             <div class="info-pane">
               <h3>抽氣幫浦模擬</h3>
@@ -921,6 +1050,19 @@
                 <span><i class="dot" style="background:#7b2cbf"></i>細菌示意</span>
                 <span class="arrow-legend">大氣壓力</span>
               </div>
+              <div class="pressure-compare" id="food-pressure-compare" aria-live="polite">
+                <div class="pc-row">
+                  <span class="pc-label">袋內氣壓</span>
+                  <div class="pc-track"><div class="pc-fill inner" id="food-bar-in" style="width:100%"></div></div>
+                  <span class="pc-val" id="food-bar-in-val">1.00</span>
+                </div>
+                <div class="pc-row">
+                  <span class="pc-label">袋外大氣壓</span>
+                  <div class="pc-track"><div class="pc-fill outer" style="width:100%"></div></div>
+                  <span class="pc-val">1.00</span>
+                </div>
+                <p class="pc-tip" id="food-pc-tip">普通包裝：袋內外氣壓接近</p>
+              </div>
             </div>
             <div class="info-pane">
               <h3>包裝方式對比</h3>
@@ -964,11 +1106,28 @@
         <div class="module">
           <div class="module-grid">
             <div class="viz-pane">
-              <canvas id="canvas-sponge" width="640" height="400" aria-label="海綿密實袋實驗模擬"></canvas>
+              <canvas id="canvas-sponge" width="640" height="400" aria-label="海綿密實袋實驗模擬：步驟二可直接按住袋子排氣"></canvas>
               <div class="legend">
                 <span><i class="dot dot-blue"></i>袋內空氣</span>
                 <span><i class="dot" style="background:#f4a261"></i>海綿</span>
                 <span class="arrow-legend">袋外大氣壓力</span>
+              </div>
+              <div class="pressure-compare" id="sponge-pressure-compare" aria-live="polite">
+                <div class="pc-row">
+                  <span class="pc-label">袋內氣壓</span>
+                  <div class="pc-track"><div class="pc-fill inner" id="sponge-bar-in" style="width:100%"></div></div>
+                  <span class="pc-val" id="sponge-bar-in-val">1.00</span>
+                </div>
+                <div class="pc-row">
+                  <span class="pc-label">袋外大氣壓</span>
+                  <div class="pc-track"><div class="pc-fill outer" style="width:100%"></div></div>
+                  <span class="pc-val">1.00</span>
+                </div>
+                <p class="pc-tip" id="sponge-pc-tip">放入海綿後再按壓，才會出現氣壓差</p>
+              </div>
+              <div class="press-progress-wrap" id="sponge-press-progress" aria-hidden="true">
+                <div class="press-ring" id="sponge-press-ring" style="--p:0"></div>
+                <span id="sponge-press-label">在圖上按住海綿排氣</span>
               </div>
             </div>
             <div class="info-pane">
@@ -988,7 +1147,7 @@
                   <span class="step-num">2</span>
                   <span>
                     <div class="step-title">用力按壓排氣</div>
-                    <div class="step-desc">長按或點擊，排出袋內空氣，海綿被壓扁。</div>
+                    <div class="step-desc">直接在左側圖上按住海綿（或長按按鈕）排氣。</div>
                   </span>
                 </button>
                 <button type="button" class="step-btn" data-step="3" id="step3" disabled>
@@ -1013,7 +1172,7 @@
                 <button type="button" class="btn btn-teal" id="sponge-press" disabled>按壓排氣</button>
                 <button type="button" class="btn btn-coral" id="sponge-reset">重做實驗</button>
               </div>
-              <p class="hint" id="sponge-hint">先完成步驟 1，再進行下一步。</p>
+              <p class="hint" id="sponge-hint">先完成步驟 1，再進行下一步。步驟 2 可直接按住圖上的海綿。</p>
             </div>
           </div>
         </div>
@@ -1036,9 +1195,11 @@
           <div class="options" id="quiz-options"></div>
           <div class="feedback" id="quiz-feedback" aria-live="polite"></div>
           <div class="quiz-actions">
+            <button type="button" class="btn btn-coral" id="quiz-demo" hidden>觀看模組示範後重答</button>
             <button type="button" class="btn btn-teal" id="quiz-next" hidden>下一題</button>
             <button type="button" class="btn btn-coral" id="quiz-restart" hidden>再玩一次</button>
           </div>
+          <div class="demo-banner" id="demo-banner" role="status">正在示範對應模組，請觀察袋內氣壓與袋外大氣壓的差異…</div>
           <div class="score-banner" id="score-banner">
             <div class="big" id="score-text">3 / 3</div>
             <p id="score-msg">太棒了！你已經掌握氣壓差的核心觀念。</p>
@@ -1213,17 +1374,45 @@
         return { x, y, w, h, t };
       }
 
+      function updatePressureCompare(prefix, innerAtm, balancedMsg, hotMsg) {
+        const bar = document.getElementById(prefix + "-bar-in");
+        const val = document.getElementById(prefix + "-bar-in-val");
+        const tip = document.getElementById(prefix + "-pc-tip");
+        if (!bar || !val || !tip) return;
+        const atm = clamp(innerAtm, 0.05, 1);
+        bar.style.width = (atm * 100).toFixed(1) + "%";
+        val.textContent = atm.toFixed(2);
+        const delta = 1 - atm;
+        if (delta >= 0.35) {
+          tip.textContent = hotMsg || "袋內氣壓 < 袋外大氣壓 → 被壓凹／壓縮";
+          tip.classList.add("hot");
+        } else if (delta >= 0.12) {
+          tip.textContent = "氣壓差逐漸變大，外壓開始把袋子向內擠";
+          tip.classList.remove("hot");
+        } else {
+          tip.textContent = balancedMsg || "尚未產生明顯氣壓差";
+          tip.classList.remove("hot");
+        }
+      }
+
       function updateStorageUI() {
         const t = storage.vacuum / 100;
+        const innerAtm = 1 - t * 0.85;
         document.getElementById("storage-density").textContent = Math.round((1 - t * 0.92) * 100) + "%";
         document.getElementById("storage-save").textContent = Math.round(t * 55) + "%";
-        document.getElementById("storage-pressure").textContent = (1 - t * 0.85).toFixed(2) + " atm";
+        document.getElementById("storage-pressure").textContent = innerAtm.toFixed(2) + " atm";
         const moist = document.getElementById("storage-moisture");
         if (t < 0.25) moist.textContent = "一般";
         else if (t < 0.65) moist.textContent = "較佳";
         else moist.textContent = "優良防潮";
         document.getElementById("storage-slider").value = String(Math.round(storage.vacuum));
         document.getElementById("storage-slider-label").textContent = Math.round(storage.vacuum) + "%";
+        updatePressureCompare(
+          "storage",
+          innerAtm,
+          "尚未產生明顯氣壓差",
+          "袋內氣壓 < 袋外大氣壓 → 儲物袋被壓扁"
+        );
       }
 
       function setStorageVacuum(v) {
@@ -1425,7 +1614,6 @@
           mode === "vacuum" ? "真空包裝模式" : "普通包裝模式";
         document.getElementById("food-status").classList.toggle("warn", mode === "normal");
         if (mode === "vacuum") {
-          // animate vacuum
           const start = food.vacuumAnim;
           const target = 1;
           const t0 = performance.now();
@@ -1433,12 +1621,14 @@
             const p = clamp((now - t0) / 900, 0, 1);
             food.vacuumAnim = lerp(start, target, p);
             syncFoodParticleCount();
+            updateFoodLabels();
             if (p < 1) requestAnimationFrame(run);
           };
           requestAnimationFrame(run);
         } else {
           food.vacuumAnim = 0;
           syncFoodParticleCount();
+          updateFoodLabels();
         }
       }
 
@@ -1472,6 +1662,13 @@
         else if (lvl < 0.55) el.textContent = "中";
         else if (lvl < 0.8) el.textContent = "高";
         else el.textContent = "很高";
+        const t = food.mode === "vacuum" ? food.vacuumAnim : 0;
+        updatePressureCompare(
+          "food",
+          1 - t * 0.82,
+          "普通包裝：袋內外氣壓接近",
+          "袋內氣壓 < 袋外大氣壓 → 袋子緊貼食物"
+        );
       }
 
       function drawBacteriaChart() {
@@ -1661,7 +1858,38 @@
         h: 400,
         ctx: null,
         pressHeld: false,
+        lastBag: null,
+        canvasPressing: false,
       };
+
+      function updateSpongePressureUI() {
+        const inner = sponge.bagIn ? (1 - sponge.press * (sponge.sealed ? 0.8 : 0.75)) : 1;
+        document.getElementById("sponge-pressure").textContent = "≈ " + inner.toFixed(2);
+        updatePressureCompare(
+          "sponge",
+          inner,
+          sponge.bagIn ? "袋內外氣壓接近，海綿仍可回彈" : "放入海綿後再按壓，才會出現氣壓差",
+          "袋外大氣壓 > 袋內氣壓 → 袋子保持凹陷"
+        );
+        const ring = document.getElementById("sponge-press-ring");
+        const wrap = document.getElementById("sponge-press-progress");
+        const canvas = document.getElementById("canvas-sponge");
+        if (ring) ring.style.setProperty("--p", String(Math.round(sponge.press * 100)));
+        if (wrap) {
+          const show = sponge.step === 2 && !sponge.sealed;
+          wrap.classList.toggle("show", show);
+          wrap.setAttribute("aria-hidden", show ? "false" : "true");
+          document.getElementById("sponge-press-label").textContent = sponge.pressHeld
+            ? "排氣中… " + Math.round(sponge.press * 100) + "%"
+            : sponge.press >= 0.55
+              ? "排氣足夠，可進行步驟 3"
+              : "在圖上按住海綿排氣";
+        }
+        if (canvas) {
+          canvas.classList.toggle("pressable", sponge.step === 2 && !sponge.sealed);
+          canvas.classList.toggle("pressing", sponge.pressHeld);
+        }
+      }
 
       function initSpongeParticles(count = 50) {
         sponge.particles = [];
@@ -1696,24 +1924,22 @@
           document.getElementById("step2").disabled = false;
           document.getElementById("step3").disabled = true;
           pressBtn.disabled = true;
-          hint.textContent = "海綿已放入密實袋。接著進行步驟 2：按壓排氣。";
-          document.getElementById("sponge-pressure").textContent = "≈ 1.00";
+          hint.textContent = "海綿已放入密實袋。接著進行步驟 2，並直接在圖上按住海綿排氣。";
         } else if (step === 2) {
-          document.getElementById("step3").disabled = true;
+          document.getElementById("step3").disabled = sponge.press < 0.55;
           pressBtn.disabled = false;
-          hint.textContent = "點擊或長按「按壓排氣」，排出袋內空氣。排氣足夠後可進行步驟 3。";
+          hint.textContent = "直接按住左側圖中的海綿（或長按按鈕）排氣。排氣足夠後可進行步驟 3。";
         } else if (step === 3) {
           sponge.sealed = true;
           sponge.pressHeld = false;
           pressBtn.disabled = true;
-          // lock vacuum level
           const locked = Math.max(sponge.press, 0.55);
           sponge.press = locked;
           const target = Math.round(50 * (1 - locked * 0.9));
           while (sponge.particles.length > target) sponge.particles.pop();
-          document.getElementById("sponge-pressure").textContent = "≈ " + (1 - locked * 0.8).toFixed(2);
           hint.textContent = "已密封並放手！袋外氣壓 > 袋內氣壓，海綿無法完全復原，袋子保持凹陷。";
         }
+        updateSpongePressureUI();
       }
 
       function resetSponge() {
@@ -1731,8 +1957,8 @@
         document.getElementById("step1").classList.add("active");
         document.getElementById("sponge-press").disabled = true;
         document.getElementById("sponge-step-label").textContent = "準備開始";
-        document.getElementById("sponge-pressure").textContent = "≈ 1.00";
-        document.getElementById("sponge-hint").textContent = "點擊步驟 1，把海綿放入密實袋。";
+        document.getElementById("sponge-hint").textContent = "點擊步驟 1，把海綿放入密實袋。步驟 2 可直接按住圖上的海綿。";
+        updateSpongePressureUI();
       }
 
       function getSpongeBag() {
@@ -1745,13 +1971,15 @@
           w = baseW * (1 - p * 0.22);
           h = baseH * (1 - p * 0.38);
         }
-        return {
+        const bag = {
           x: (sponge.w - w) / 2,
           y: sponge.h * 0.2 + (baseH - h) * 0.5,
           w,
           h,
           p,
         };
+        sponge.lastBag = bag;
+        return bag;
       }
 
       function drawSponge() {
@@ -1850,6 +2078,24 @@
           }
         }
 
+        // press hint on canvas
+        if (sponge.step === 2 && !sponge.sealed) {
+          ctx.save();
+          ctx.fillStyle = sponge.pressHeld ? "rgba(231,111,81,0.9)" : "rgba(26,155,142,0.85)";
+          roundRect(ctx, bag.x + bag.w * 0.18, bag.y + bag.h * 0.42, bag.w * 0.64, 28, 10);
+          ctx.fill();
+          ctx.fillStyle = "#fff";
+          ctx.font = "bold 13px 'Noto Sans TC', sans-serif";
+          ctx.textAlign = "center";
+          ctx.fillText(
+            sponge.pressHeld ? "排氣中…繼續按住" : "按住這裡排氣",
+            bag.x + bag.w / 2,
+            bag.y + bag.h * 0.42 + 19
+          );
+          ctx.textAlign = "left";
+          ctx.restore();
+        }
+
         ctx.fillStyle = "rgba(22,50,63,0.8)";
         ctx.font = "bold 14px 'Noto Sans TC', sans-serif";
         let label = "密實袋中的海綿";
@@ -1857,10 +2103,7 @@
         else if (bag.p > 0.2) label = "按壓排氣中…粒子減少";
         ctx.fillText(label, 16, h - 14);
 
-        if (!sponge.sealed) {
-          document.getElementById("sponge-pressure").textContent =
-            "≈ " + (1 - bag.p * 0.75).toFixed(2);
-        }
+        updateSpongePressureUI();
       }
 
       function drawSpongeBody(ctx, x, y, w, h, squash) {
@@ -1899,6 +2142,8 @@
           ],
           answer: 1,
           explain: "正確！袋內粒子減少 → 袋內氣壓下降 → 袋外大氣壓力把袋子壓扁。",
+          moduleId: "module1",
+          demoName: "真空儲物袋",
         },
         {
           q: "真空食物包裝比較能保鮮，是因為？",
@@ -1910,6 +2155,8 @@
           ],
           answer: 2,
           explain: "正確！抽走空氣後袋子緊貼食物，細菌較難大量滋生，保鮮期較長。",
+          moduleId: "module2",
+          demoName: "真空食物包裝",
         },
         {
           q: "海綿密實袋實驗中，密封並放手後海綿無法完全復原，因為？",
@@ -1921,6 +2168,8 @@
           ],
           answer: 1,
           explain: "正確！密封後袋內空氣進不來，外壓持續大於內壓，袋子保持凹陷。",
+          moduleId: "module3",
+          demoName: "海綿密實袋實驗",
         },
       ];
 
@@ -1929,7 +2178,68 @@
         score: 0,
         locked: false,
         results: [],
+        demoRunning: false,
       };
+
+      function wait(ms) {
+        return new Promise((resolve) => setTimeout(resolve, ms));
+      }
+
+      function animateValue(from, to, duration, onUpdate) {
+        return new Promise((resolve) => {
+          const t0 = performance.now();
+          const tick = (now) => {
+            const p = clamp((now - t0) / duration, 0, 1);
+            const eased = 1 - Math.pow(1 - p, 2);
+            onUpdate(lerp(from, to, eased));
+            if (p < 1) requestAnimationFrame(tick);
+            else resolve();
+          };
+          requestAnimationFrame(tick);
+        });
+      }
+
+      async function runStorageDemo() {
+        storage.pumping = false;
+        setStorageVacuum(0);
+        initStorageParticles();
+        await animateValue(0, 88, 2200, (v) => setStorageVacuum(v));
+        await wait(700);
+      }
+
+      async function runFoodDemo() {
+        food.playing = false;
+        food.day = 0;
+        setFoodMode("normal");
+        await wait(500);
+        setFoodMode("vacuum");
+        await wait(1100);
+        food.playing = true;
+        await wait(2600);
+        food.playing = false;
+        updateFoodLabels();
+      }
+
+      async function runSpongeDemo() {
+        resetSponge();
+        await wait(350);
+        setSpongeStep(1);
+        await wait(500);
+        setSpongeStep(2);
+        await animateValue(0, 0.72, 1600, (v) => {
+          sponge.press = v;
+          updateSpongePressureUI();
+          if (v >= 0.55) document.getElementById("step3").disabled = false;
+        });
+        setSpongeStep(3);
+        await wait(900);
+      }
+
+      async function runModuleDemo(moduleId) {
+        if (moduleId === "module1") await runStorageDemo();
+        else if (moduleId === "module2") await runFoodDemo();
+        else if (moduleId === "module3") await runSpongeDemo();
+      }
 
       function renderQuiz() {
         const item = quizData[quizState.index];
@@ -1948,8 +2258,10 @@
         document.getElementById("quiz-feedback").textContent = "";
         document.getElementById("quiz-feedback").className = "feedback";
         document.getElementById("quiz-next").hidden = true;
+        document.getElementById("quiz-demo").hidden = true;
         document.getElementById("quiz-restart").hidden = true;
         document.getElementById("score-banner").classList.remove("show");
+        document.getElementById("demo-banner").classList.remove("show");
         updateQuizDots();
         quizState.locked = false;
       }
@@ -1965,7 +2277,7 @@
       }
 
       function answerQuiz(choice) {
-        if (quizState.locked) return;
+        if (quizState.locked || quizState.demoRunning) return;
         quizState.locked = true;
         const item = quizData[quizState.index];
         const options = document.querySelectorAll(".option");
@@ -1976,26 +2288,71 @@
         });
         const fb = document.getElementById("quiz-feedback");
         if (choice === item.answer) {
-          quizState.score += 1;
+          if (quizState.results[quizState.index] !== true) {
+            quizState.score += 1;
+          }
           quizState.results[quizState.index] = true;
           fb.textContent = "✔ " + item.explain;
           fb.className = "feedback ok";
+          document.getElementById("quiz-demo").hidden = true;
           launchFireworks();
+          updateQuizDots();
+          if (quizState.index < quizData.length - 1) {
+            document.getElementById("quiz-next").hidden = false;
+          } else {
+            showScore();
+          }
         } else {
           quizState.results[quizState.index] = false;
-          fb.textContent = "✘ 再想一次：記住「袋內氣壓 < 袋外大氣壓力 → 被壓凹」。" ;
+          fb.textContent = "✘ 先去看「" + item.demoName + "」示範，再回來重答。記住：袋內氣壓 < 袋外大氣壓 → 被壓凹。";
           fb.className = "feedback bad";
+          document.getElementById("quiz-demo").hidden = false;
+          document.getElementById("quiz-next").hidden = true;
+          updateQuizDots();
         }
-        updateQuizDots();
-        if (quizState.index < quizData.length - 1) {
-          document.getElementById("quiz-next").hidden = false;
-        } else {
-          showScore();
+      }
+
+      async function startWrongAnswerDemo() {
+        if (quizState.demoRunning) return;
+        const item = quizData[quizState.index];
+        const moduleEl = document.getElementById(item.moduleId);
+        const banner = document.getElementById("demo-banner");
+        const demoBtn = document.getElementById("quiz-demo");
+        quizState.demoRunning = true;
+        demoBtn.disabled = true;
+        demoBtn.textContent = "示範進行中…";
+        banner.textContent = "正在示範「" + item.demoName + "」：請盯著壓力對比條，看袋內氣壓下降。";
+        banner.classList.add("show");
+        document.querySelectorAll(".module").forEach((m) => m.classList.remove("demoing"));
+        if (moduleEl) {
+          const card = moduleEl.querySelector(".module");
+          if (card) card.classList.add("demoing");
+          moduleEl.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+        await wait(600);
+        try {
+          await runModuleDemo(item.moduleId);
+        } finally {
+          document.querySelectorAll(".module").forEach((m) => m.classList.remove("demoing"));
+          banner.classList.remove("show");
+          demoBtn.disabled = false;
+          demoBtn.textContent = "觀看模組示範後重答";
+          demoBtn.hidden = true;
+          quizState.demoRunning = false;
+          // return to quiz and unlock retry
+          delete quizState.results[quizState.index];
+          document.getElementById("quiz").scrollIntoView({ behavior: "smooth", block: "center" });
+          await wait(350);
+          renderQuiz();
+          const fb = document.getElementById("quiz-feedback");
+          fb.textContent = "示範看完了，請再選一次正確答案。";
+          fb.className = "feedback";
         }
       }
 
       function showScore() {
         document.getElementById("quiz-next").hidden = true;
+        document.getElementById("quiz-demo").hidden = true;
         document.getElementById("quiz-restart").hidden = false;
         const banner = document.getElementById("score-banner");
         banner.classList.add("show");
@@ -2135,6 +2492,23 @@
         if (!food.particles.length) initFoodParticles();
       }
 
+      function canvasLocalPoint(canvas, evt) {
+        const rect = canvas.getBoundingClientRect();
+        const clientX = evt.clientX ?? (evt.touches && evt.touches[0]?.clientX);
+        const clientY = evt.clientY ?? (evt.touches && evt.touches[0]?.clientY);
+        if (clientX == null || clientY == null) return null;
+        return {
+          x: ((clientX - rect.left) / rect.width) * sponge.w,
+          y: ((clientY - rect.top) / rect.height) * sponge.h,
+        };
+      }
+
+      function hitSpongeBag(pt) {
+        if (!pt || !sponge.bagIn) return false;
+        const bag = sponge.lastBag || getSpongeBag();
+        return pt.x >= bag.x && pt.x <= bag.x + bag.w && pt.y >= bag.y && pt.y <= bag.y + bag.h;
+      }
+
       function bindUI() {
         const slider = document.getElementById("storage-slider");
         slider.addEventListener("input", () => {
@@ -2180,7 +2554,6 @@
         pressBtn.addEventListener("touchstart", (e) => { e.preventDefault(); startPress(); }, { passive: false });
         pressBtn.addEventListener("touchend", endPress);
         pressBtn.addEventListener("click", () => {
-          // single click also adds some press
           if (sponge.step === 2 && !sponge.sealed) {
             sponge.press = clamp(sponge.press + 0.2, 0, 1);
             if (sponge.press >= 0.55) {
@@ -2188,10 +2561,35 @@
               document.getElementById("sponge-hint").textContent =
                 "排氣足夠了！可以點擊步驟 3：密封袋口並放手。";
             }
+            updateSpongePressureUI();
           }
         });
         document.getElementById("sponge-reset").addEventListener("click", resetSponge);
 
+        const spongeCanvas = document.getElementById("canvas-sponge");
+        const onCanvasDown = (e) => {
+          if (sponge.step !== 2 || sponge.sealed) return;
+          const pt = canvasLocalPoint(spongeCanvas, e);
+          if (!hitSpongeBag(pt)) return;
+          e.preventDefault();
+          sponge.pressHeld = true;
+          sponge.canvasPressing = true;
+        };
+        const onCanvasUp = () => {
+          if (sponge.canvasPressing) {
+            sponge.pressHeld = false;
+            sponge.canvasPressing = false;
+          }
+        };
+        spongeCanvas.addEventListener("mousedown", onCanvasDown);
+        window.addEventListener("mouseup", onCanvasUp);
+        spongeCanvas.addEventListener("touchstart", onCanvasDown, { passive: false });
+        window.addEventListener("touchend", onCanvasUp);
+        spongeCanvas.addEventListener("touchcancel", onCanvasUp);
+
+        document.getElementById("quiz-demo").addEventListener("click", () => {
+          startWrongAnswerDemo();
+        });
         document.getElementById("quiz-next").addEventListener("click", () => {
           quizState.index += 1;
           renderQuiz();
