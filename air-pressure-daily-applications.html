@@ -1740,8 +1740,8 @@
         ctx.clearRect(0, 0, w, h);
         drawSceneBackdrop(ctx, w, h);
         const { before, after } = layoutStorage();
-        storage.hitsL *= 0.94;
-        storage.hitsR *= 0.94;
+        storage.hitsL *= 0.992;
+        storage.hitsR *= 0.992;
         drawStorageBag(ctx, before, storage.refParticles, "抽氣前", () => { storage.hitsL += 1; });
         drawStorageBag(ctx, after, storage.particlesIn, "抽氣後", () => { storage.hitsR += 1; });
         drawFlashes(ctx, storage.flashes);
@@ -1950,8 +1950,8 @@
         const { left, right } = layoutFood();
         const normalLvl = bacteriaLevel(food.day, false);
         const vacuumLvl = bacteriaLevel(food.day, true);
-        food.hitsL *= 0.94;
-        food.hitsR *= 0.94;
+        food.hitsL *= 0.992;
+        food.hitsR *= 0.992;
         drawFoodSide(
           ctx, left, food.leftParticles, normalLvl, Math.round(normalLvl * 8),
           "普通包裝", food.mode === "normal", () => { food.hitsL += 1; }
@@ -2148,7 +2148,7 @@
         const bounds = innerBounds(bag, 18);
         const target = Math.round(50 * (1 - bag.p * (sponge.sealed ? 0.9 : 0.85)));
         while (sponge.particles.length > target) sponge.particles.pop();
-        sponge.hits *= 0.94;
+        sponge.hits *= 0.992;
         sponge.particles.forEach((p) => {
           stepParticle(p, bounds, 1 - bag.p * 0.5, sponge.flashes, "#9ec5ff", () => { sponge.hits += 1; });
           p.draw(ctx);
@@ -2175,7 +2175,7 @@
       }
 
       function drawPressingHand(ctx, cx, top, pressing) {
-        const drop = pressing ? 22 : 0;
+        const drop = pressing ? 40 : 8;
         ctx.save();
         ctx.translate(cx, top + drop);
         ctx.fillStyle = "#f4c7a8";
