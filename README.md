@@ -7,6 +7,7 @@
 | 網頁 | 檔案 | 說明 |
 |------|------|------|
 | 氣壓原理互動模型 | [`air-pressure-drink-box.html`](./air-pressure-drink-box.html) | 香港小五常識：飲品盒為何會凹陷（p5.js） |
+| 氣壓日常生活應用 | [`air-pressure-daily-applications.html`](./air-pressure-daily-applications.html) | 真空儲物袋、食物包裝、海綿密實袋互動實驗＋問答 |
 | 五位數密碼鎖 | [`index.html`](./index.html) | 解密挑戰小遊戲 |
 
 ---
@@ -25,10 +26,16 @@ Google Sites **不能直接執行** 含 JavaScript 的 HTML，請先用 GitHub P
 
 ### 二、公開網址（合併並部署成功後）
 
-氣壓模型：
+氣壓模型（飲品盒）：
 
 ```text
 https://howardyu1995.github.io/grok-bot/air-pressure-drink-box.html
+```
+
+氣壓日常生活應用（儲物袋／食物包裝／海綿實驗）：
+
+```text
+https://howardyu1995.github.io/grok-bot/air-pressure-daily-applications.html
 ```
 
 倉庫首頁（密碼鎖遊戲）：

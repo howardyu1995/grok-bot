@@ -1,0 +1,2147 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="氣壓在日常生活中的應用：真空儲物袋、真空食物包裝、海綿密實袋互動實驗" />
+  <title>氣壓在日常生活中的應用｜互動科學實驗室</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Outfit:wght@600;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #16323f;
+      --ink-soft: #3d5f6e;
+      --panel: #ffffff;
+      --lab-teal: #1a9b8e;
+      --lab-teal-dark: #0f7a70;
+      --lab-cyan: #2ec4b6;
+      --lab-sky: #4cc9f0;
+      --lab-amber: #f4a261;
+      --lab-coral: #e76f51;
+      --lab-mint: #e8f8f5;
+      --lab-ice: #e6f4fb;
+      --particle-in: #3a86ff;
+      --particle-out: #ef476f;
+      --ok: #2a9d8f;
+      --warn: #e9c46a;
+      --shadow: 0 12px 32px rgba(22, 50, 63, 0.12);
+      --radius: 20px;
+      --ease: cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(ellipse 70% 40% at 10% 0%, rgba(46, 196, 182, 0.22), transparent 55%),
+        radial-gradient(ellipse 60% 35% at 90% 10%, rgba(76, 201, 240, 0.2), transparent 50%),
+        linear-gradient(165deg, #f0fbf8 0%, #e8f4fb 45%, #f7fafc 100%);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(26, 155, 142, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(26, 155, 142, 0.04) 1px, transparent 1px);
+      background-size: 28px 28px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .page { position: relative; z-index: 1; }
+
+    /* ===== Hero ===== */
+    .hero {
+      position: relative;
+      min-height: min(88vh, 720px);
+      display: grid;
+      align-items: end;
+      overflow: hidden;
+      padding: 1.25rem 1.25rem 2.5rem;
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(14, 90, 84, 0.15) 0%, rgba(14, 90, 84, 0.55) 100%),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 800'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop stop-color='%231a9b8e'/%3E%3Cstop offset='1' stop-color='%234cc9f0'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill='url(%23g)' width='1200' height='800'/%3E%3Ccircle cx='180' cy='220' r='8' fill='%23fff' opacity='.35'/%3E%3Ccircle cx='260' cy='180' r='5' fill='%23fff' opacity='.28'/%3E%3Ccircle cx='340' cy='260' r='6' fill='%23fff' opacity='.3'/%3E%3Ccircle cx='900' cy='200' r='7' fill='%23fff' opacity='.32'/%3E%3Ccircle cx='980' cy='280' r='5' fill='%23fff' opacity='.25'/%3E%3Ccircle cx='720' cy='160' r='6' fill='%23fff' opacity='.28'/%3E%3Crect x='420' y='280' width='360' height='280' rx='28' fill='%23ffffff' opacity='.18'/%3E%3Crect x='450' y='320' width='300' height='180' rx='18' fill='%23ffffff' opacity='.22'/%3E%3Cpath d='M470 520 Q600 560 730 520' stroke='%23fff' stroke-width='4' fill='none' opacity='.35'/%3E%3C/svg%3E") center/cover no-repeat;
+      animation: heroPulse 8s ease-in-out infinite alternate;
+    }
+
+    @keyframes heroPulse {
+      from { transform: scale(1); }
+      to { transform: scale(1.04); }
+    }
+
+    .hero-inner {
+      position: relative;
+      width: min(980px, 100%);
+      margin: 0 auto;
+      color: #fff;
+      text-shadow: 0 2px 16px rgba(8, 40, 38, 0.35);
+    }
+
+    .brand {
+      font-family: Outfit, "Noto Sans TC", sans-serif;
+      font-weight: 800;
+      font-size: clamp(2.4rem, 7vw, 4.2rem);
+      letter-spacing: 0.04em;
+      line-height: 1.05;
+      margin: 0 0 0.75rem;
+      animation: fadeUp 0.8s var(--ease) both;
+    }
+
+    .hero h2 {
+      margin: 0 0 0.6rem;
+      font-size: clamp(1.15rem, 3.2vw, 1.65rem);
+      font-weight: 700;
+      animation: fadeUp 0.8s var(--ease) 0.1s both;
+    }
+
+    .hero p {
+      margin: 0 0 1.4rem;
+      max-width: 36rem;
+      font-size: clamp(0.95rem, 2.4vw, 1.1rem);
+      opacity: 0.95;
+      animation: fadeUp 0.8s var(--ease) 0.18s both;
+    }
+
+    .hero-ctas {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      animation: fadeUp 0.8s var(--ease) 0.26s both;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .btn {
+      appearance: none;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: 700;
+      font-size: 0.98rem;
+      border-radius: 999px;
+      padding: 0.78rem 1.35rem;
+      transition: transform 0.2s var(--ease), box-shadow 0.2s, background 0.2s, color 0.2s;
+    }
+
+    .btn:active { transform: scale(0.97); }
+
+    .btn-primary {
+      background: #fff;
+      color: var(--lab-teal-dark);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+    }
+
+    .btn-primary:hover { background: #f0fffc; transform: translateY(-2px); }
+
+    .btn-ghost {
+      background: rgba(255, 255, 255, 0.16);
+      color: #fff;
+      border: 2px solid rgba(255, 255, 255, 0.55);
+      backdrop-filter: blur(6px);
+    }
+
+    .btn-ghost:hover { background: rgba(255, 255, 255, 0.28); }
+
+    .btn-teal {
+      background: linear-gradient(135deg, var(--lab-teal), var(--lab-cyan));
+      color: #fff;
+      box-shadow: 0 8px 18px rgba(26, 155, 142, 0.35);
+    }
+
+    .btn-teal:hover { filter: brightness(1.05); transform: translateY(-2px); }
+
+    .btn-coral {
+      background: linear-gradient(135deg, var(--lab-coral), #f4a261);
+      color: #fff;
+      box-shadow: 0 8px 18px rgba(231, 111, 81, 0.3);
+    }
+
+    .btn-coral:hover { filter: brightness(1.05); transform: translateY(-2px); }
+
+    .btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      transform: none !important;
+      filter: none !important;
+    }
+
+    /* ===== Layout ===== */
+    main {
+      width: min(1100px, 100%);
+      margin: 0 auto;
+      padding: 0 1rem 3.5rem;
+    }
+
+    .section {
+      margin-top: 2.5rem;
+      scroll-margin-top: 1rem;
+    }
+
+    .section-head {
+      margin-bottom: 1rem;
+    }
+
+    .section-head h2 {
+      margin: 0 0 0.35rem;
+      font-size: clamp(1.35rem, 3.2vw, 1.75rem);
+      font-weight: 900;
+      letter-spacing: 0.02em;
+    }
+
+    .section-head p {
+      margin: 0;
+      color: var(--ink-soft);
+      font-size: 1rem;
+      max-width: 40rem;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--lab-teal-dark);
+      background: rgba(46, 196, 182, 0.18);
+      padding: 0.28rem 0.65rem;
+      border-radius: 999px;
+      margin-bottom: 0.45rem;
+    }
+
+    .module {
+      background: var(--panel);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 2px solid rgba(46, 196, 182, 0.22);
+      overflow: hidden;
+      transition: transform 0.35s var(--ease), box-shadow 0.35s;
+    }
+
+    .module:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 18px 40px rgba(22, 50, 63, 0.14);
+    }
+
+    .module-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 0;
+    }
+
+    @media (max-width: 860px) {
+      .module-grid { grid-template-columns: 1fr; }
+    }
+
+    .viz-pane {
+      position: relative;
+      background:
+        linear-gradient(160deg, #d9f3ef 0%, #d7eef8 55%, #eaf6fb 100%);
+      min-height: 340px;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .viz-pane canvas {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 14px;
+      background: linear-gradient(180deg, #c8ebe6, #c5e6f4);
+      border: 2px solid rgba(255, 255, 255, 0.7);
+      box-shadow: inset 0 0 0 1px rgba(26, 155, 142, 0.08);
+      touch-action: none;
+    }
+
+    .info-pane {
+      padding: 1.25rem 1.35rem 1.4rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.9rem;
+    }
+
+    .info-pane h3 {
+      margin: 0;
+      font-size: 1.2rem;
+      font-weight: 900;
+    }
+
+    .principle {
+      background: linear-gradient(90deg, #fff8e8, #eafaf6);
+      border-left: 5px solid var(--lab-amber);
+      border-radius: 12px;
+      padding: 0.85rem 1rem;
+      font-size: 0.95rem;
+      color: var(--ink);
+    }
+
+    .principle strong { color: var(--lab-teal-dark); }
+
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.65rem;
+    }
+
+    .stat {
+      background: var(--lab-mint);
+      border-radius: 14px;
+      padding: 0.7rem 0.85rem;
+      border: 1px solid rgba(26, 155, 142, 0.15);
+    }
+
+    .stat .label {
+      font-size: 0.78rem;
+      color: var(--ink-soft);
+      font-weight: 700;
+    }
+
+    .stat .value {
+      font-family: Outfit, "Noto Sans TC", sans-serif;
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--lab-teal-dark);
+      line-height: 1.2;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      align-items: center;
+    }
+
+    .slider-wrap {
+      flex: 1 1 100%;
+      display: grid;
+      gap: 0.35rem;
+    }
+
+    .slider-wrap label {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--ink-soft);
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--lab-teal);
+      height: 1.4rem;
+      cursor: pointer;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--ink-soft);
+    }
+
+    .legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .dot-blue { background: var(--particle-in); }
+    .dot-red { background: var(--particle-out); }
+
+    .arrow-legend::before {
+      content: "➡";
+      color: var(--lab-coral);
+      font-weight: 900;
+    }
+
+    /* Toggle pair */
+    .toggle-pair {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+    }
+
+    .toggle-btn {
+      border: 2px solid rgba(26, 155, 142, 0.25);
+      background: #f4fbfa;
+      color: var(--ink);
+      border-radius: 14px;
+      padding: 0.7rem 0.6rem;
+      font-weight: 800;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.2s var(--ease);
+    }
+
+    .toggle-btn.active {
+      background: linear-gradient(135deg, var(--lab-teal), var(--lab-cyan));
+      color: #fff;
+      border-color: transparent;
+      box-shadow: 0 6px 16px rgba(26, 155, 142, 0.28);
+    }
+
+    /* Chart */
+    .chart-wrap {
+      background: #f7fcfb;
+      border-radius: 12px;
+      padding: 0.5rem;
+      border: 1px solid rgba(26, 155, 142, 0.12);
+    }
+
+    .chart-wrap canvas {
+      width: 100%;
+      height: 120px;
+      display: block;
+    }
+
+    /* Steps */
+    .steps {
+      display: grid;
+      gap: 0.5rem;
+    }
+
+    .step-btn {
+      text-align: left;
+      border: 2px solid rgba(26, 155, 142, 0.2);
+      background: #f7fcfb;
+      border-radius: 14px;
+      padding: 0.75rem 0.9rem;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.2s var(--ease);
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 0.65rem;
+      align-items: start;
+    }
+
+    .step-btn:hover:not(:disabled) {
+      border-color: var(--lab-teal);
+      transform: translateX(3px);
+    }
+
+    .step-btn.active {
+      background: linear-gradient(90deg, #e6f8f5, #dff3fa);
+      border-color: var(--lab-teal);
+      box-shadow: 0 4px 14px rgba(26, 155, 142, 0.15);
+    }
+
+    .step-btn.done {
+      opacity: 0.85;
+      border-color: rgba(42, 157, 143, 0.45);
+    }
+
+    .step-num {
+      width: 1.7rem;
+      height: 1.7rem;
+      border-radius: 50%;
+      background: var(--lab-teal);
+      color: #fff;
+      font-weight: 900;
+      font-size: 0.85rem;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+    }
+
+    .step-btn.active .step-num {
+      background: var(--lab-coral);
+      animation: pop 0.35s var(--ease);
+    }
+
+    @keyframes pop {
+      0% { transform: scale(0.7); }
+      60% { transform: scale(1.15); }
+      100% { transform: scale(1); }
+    }
+
+    .step-title { font-weight: 800; font-size: 0.95rem; }
+    .step-desc { font-size: 0.82rem; color: var(--ink-soft); margin-top: 0.1rem; }
+
+    /* Concept strip */
+    .concept-strip {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.85rem;
+      margin-top: 1.5rem;
+    }
+
+    @media (max-width: 720px) {
+      .concept-strip { grid-template-columns: 1fr; }
+    }
+
+    .concept {
+      background: var(--panel);
+      border-radius: 16px;
+      padding: 1rem 1.1rem;
+      box-shadow: var(--shadow);
+      border: 2px solid rgba(76, 201, 240, 0.25);
+      animation: fadeUp 0.7s var(--ease) both;
+    }
+
+    .concept:nth-child(2) { animation-delay: 0.08s; }
+    .concept:nth-child(3) { animation-delay: 0.16s; }
+
+    .concept h3 {
+      margin: 0 0 0.35rem;
+      font-size: 1.05rem;
+      font-weight: 900;
+    }
+
+    .concept p { margin: 0; font-size: 0.92rem; color: var(--ink-soft); }
+
+    /* Quiz */
+    .quiz-card {
+      background: var(--panel);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 2px solid rgba(244, 162, 97, 0.35);
+      padding: 1.35rem 1.4rem 1.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .quiz-progress {
+      display: flex;
+      gap: 0.4rem;
+      margin-bottom: 1rem;
+    }
+
+    .quiz-dot {
+      height: 8px;
+      flex: 1;
+      border-radius: 999px;
+      background: #e2eef2;
+      transition: background 0.3s;
+    }
+
+    .quiz-dot.on { background: var(--lab-teal); }
+    .quiz-dot.correct { background: var(--ok); }
+    .quiz-dot.wrong { background: var(--lab-coral); }
+
+    .quiz-q {
+      font-size: clamp(1.05rem, 2.6vw, 1.25rem);
+      font-weight: 900;
+      margin: 0 0 1rem;
+    }
+
+    .options {
+      display: grid;
+      gap: 0.6rem;
+    }
+
+    .option {
+      text-align: left;
+      border: 2px solid rgba(22, 50, 63, 0.12);
+      background: #f7fbfc;
+      border-radius: 14px;
+      padding: 0.85rem 1rem;
+      font-family: inherit;
+      font-size: 0.98rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s var(--ease);
+    }
+
+    .option:hover:not(:disabled) {
+      border-color: var(--lab-teal);
+      background: #eefaf7;
+      transform: translateX(4px);
+    }
+
+    .option.correct {
+      background: #d8f3e8;
+      border-color: var(--ok);
+      color: #0f5c4f;
+    }
+
+    .option.wrong {
+      background: #fde8e3;
+      border-color: var(--lab-coral);
+      color: #8f2f1c;
+    }
+
+    .option:disabled { cursor: default; }
+
+    .feedback {
+      margin-top: 0.9rem;
+      min-height: 1.5rem;
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+
+    .feedback.ok { color: var(--ok); }
+    .feedback.bad { color: var(--lab-coral); }
+
+    .quiz-actions {
+      margin-top: 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+    }
+
+    #fireworks {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 50;
+    }
+
+    .score-banner {
+      display: none;
+      margin-top: 1rem;
+      padding: 1rem;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #e8faf5, #e6f4fb);
+      border: 2px solid rgba(26, 155, 142, 0.3);
+      text-align: center;
+      animation: fadeUp 0.5s var(--ease);
+    }
+
+    .score-banner.show { display: block; }
+
+    .score-banner .big {
+      font-family: Outfit, sans-serif;
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--lab-teal-dark);
+    }
+
+    footer {
+      text-align: center;
+      padding: 1.5rem 1rem 2.5rem;
+      color: var(--ink-soft);
+      font-size: 0.88rem;
+    }
+
+    .key-formula {
+      width: min(1100px, calc(100% - 2rem));
+      margin: 2rem auto 0;
+      background: linear-gradient(135deg, #16323f, #1a5c58);
+      color: #fff;
+      border-radius: var(--radius);
+      padding: 1.25rem 1.4rem;
+      box-shadow: var(--shadow);
+      text-align: center;
+    }
+
+    .key-formula h2 {
+      margin: 0 0 0.4rem;
+      font-size: 1.15rem;
+    }
+
+    .key-formula p {
+      margin: 0;
+      font-size: clamp(1rem, 2.8vw, 1.25rem);
+      font-weight: 800;
+      letter-spacing: 0.02em;
+    }
+
+    .nav-pills {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(10px);
+      background: rgba(240, 251, 248, 0.85);
+      border-bottom: 1px solid rgba(26, 155, 142, 0.15);
+      padding: 0.55rem 1rem;
+      display: flex;
+      gap: 0.45rem;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .nav-pills::-webkit-scrollbar { display: none; }
+
+    .nav-pills a {
+      flex: 0 0 auto;
+      text-decoration: none;
+      color: var(--ink);
+      font-weight: 800;
+      font-size: 0.82rem;
+      padding: 0.45rem 0.85rem;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.75);
+      border: 1px solid rgba(26, 155, 142, 0.2);
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .nav-pills a:hover {
+      background: var(--lab-teal);
+      color: #fff;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.25rem 0.7rem;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 800;
+      background: rgba(46, 196, 182, 0.15);
+      color: var(--lab-teal-dark);
+    }
+
+    .status-pill.warn {
+      background: rgba(231, 111, 81, 0.15);
+      color: #b4452d;
+    }
+
+    .hint {
+      font-size: 0.82rem;
+      color: var(--ink-soft);
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="hero" id="top">
+      <div class="hero-bg" aria-hidden="true"></div>
+      <div class="hero-inner">
+        <p class="brand">氣壓實驗室</p>
+        <h2>氣壓在日常生活中的應用</h2>
+        <p>透過粒子動畫與動手模擬，看懂真空儲物袋、食物包裝與海綿密實袋背後的氣壓原理。</p>
+        <div class="hero-ctas">
+          <a class="btn btn-primary" href="#module1">開始互動體驗</a>
+          <a class="btn btn-ghost" href="#quiz">挑戰知識問答</a>
+        </div>
+      </div>
+    </header>
+
+    <nav class="nav-pills" aria-label="章節導覽">
+      <a href="#concept">核心觀念</a>
+      <a href="#module1">儲物袋</a>
+      <a href="#module2">食物包裝</a>
+      <a href="#module3">海綿實驗</a>
+      <a href="#quiz">問答挑戰</a>
+    </nav>
+
+    <main>
+      <section class="section" id="concept">
+        <div class="section-head">
+          <div class="badge">核心觀念</div>
+          <h2>為什麼袋子會被壓扁？</h2>
+          <p>空氣由許多微小粒子組成。袋內粒子變少時，袋內氣壓下降，袋外大氣壓力就會把袋子向內擠壓。</p>
+        </div>
+        <div class="concept-strip">
+          <article class="concept">
+            <h3>① 抽出空氣</h3>
+            <p>袋內空氣粒子數量減少，密度下降。</p>
+          </article>
+          <article class="concept">
+            <h3>② 氣壓差出現</h3>
+            <p>袋內氣壓 &lt; 袋外大氣壓力，外壓佔優勢。</p>
+          </article>
+          <article class="concept">
+            <h3>③ 被壓凹／壓縮</h3>
+            <p>外部壓力把袋子往內壓，體積縮小並更貼合內容物。</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- Module 1 -->
+      <section class="section" id="module1">
+        <div class="section-head">
+          <div class="badge">模組一</div>
+          <h2>真空儲物袋體驗</h2>
+          <p>抽走袋內空氣，看看被子怎樣被大氣壓力壓縮，並觀察防潮狀態變化。</p>
+        </div>
+        <div class="module">
+          <div class="module-grid">
+            <div class="viz-pane">
+              <canvas id="canvas-storage" width="640" height="380" aria-label="真空儲物袋粒子模擬"></canvas>
+              <div class="legend">
+                <span><i class="dot dot-blue"></i>袋內空氣粒子</span>
+                <span><i class="dot dot-red"></i>袋外空氣粒子</span>
+                <span class="arrow-legend">大氣壓力方向</span>
+              </div>
+            </div>
+            <div class="info-pane">
+              <h3>抽氣幫浦模擬</h3>
+              <div class="principle">
+                <strong>原理：</strong>抽走袋內空氣 → 袋內粒子減少 → 袋內氣壓低於袋外 → 外部大氣壓力向內擠壓，壓縮體積並防潮。
+              </div>
+              <div class="stats">
+                <div class="stat">
+                  <div class="label">袋內粒子密度</div>
+                  <div class="value" id="storage-density">100%</div>
+                </div>
+                <div class="stat">
+                  <div class="label">空間節省</div>
+                  <div class="value" id="storage-save">0%</div>
+                </div>
+                <div class="stat">
+                  <div class="label">袋內相對氣壓</div>
+                  <div class="value" id="storage-pressure">1.00 atm</div>
+                </div>
+                <div class="stat">
+                  <div class="label">防潮狀態</div>
+                  <div class="value" id="storage-moisture" style="font-size:1.05rem">一般</div>
+                </div>
+              </div>
+              <div class="slider-wrap">
+                <label for="storage-slider">抽氣程度：<span id="storage-slider-label">0%</span></label>
+                <input type="range" id="storage-slider" min="0" max="100" value="0" />
+              </div>
+              <div class="controls">
+                <button type="button" class="btn btn-teal" id="storage-pump">啟動抽氣幫浦</button>
+                <button type="button" class="btn btn-coral" id="storage-reset">重置</button>
+              </div>
+              <p class="hint">拖動滑桿或按「啟動抽氣幫浦」，觀察藍點減少、紅箭頭變大、袋子變扁。</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Module 2 -->
+      <section class="section" id="module2">
+        <div class="section-head">
+          <div class="badge">模組二</div>
+          <h2>真空食物包裝與保鮮</h2>
+          <p>對比普通包裝與真空包裝：空氣粒子、細菌滋生曲線與保鮮計時器一次看懂。</p>
+        </div>
+        <div class="module">
+          <div class="module-grid">
+            <div class="viz-pane">
+              <canvas id="canvas-food" width="640" height="380" aria-label="真空食物包裝粒子模擬"></canvas>
+              <div class="legend">
+                <span><i class="dot dot-blue"></i>包裝內空氣</span>
+                <span><i class="dot" style="background:#7b2cbf"></i>細菌示意</span>
+                <span class="arrow-legend">大氣壓力</span>
+              </div>
+            </div>
+            <div class="info-pane">
+              <h3>包裝方式對比</h3>
+              <div class="principle">
+                <strong>原理：</strong>抽走空氣 → 包裝袋受大氣壓力緊貼食物 → 減少與空氣／細菌接觸，減慢細菌滋生，延長保鮮期。
+              </div>
+              <div class="toggle-pair" role="group" aria-label="包裝模式">
+                <button type="button" class="toggle-btn active" id="food-normal" data-mode="normal">普通包裝</button>
+                <button type="button" class="toggle-btn" id="food-vacuum" data-mode="vacuum">真空包裝</button>
+              </div>
+              <div class="stats">
+                <div class="stat">
+                  <div class="label">保鮮計時器</div>
+                  <div class="value" id="food-timer">第 0 天</div>
+                </div>
+                <div class="stat">
+                  <div class="label">細菌相對量</div>
+                  <div class="value" id="food-bacteria">低</div>
+                </div>
+              </div>
+              <div class="chart-wrap">
+                <canvas id="canvas-bacteria" width="400" height="120" aria-label="細菌滋生對比曲線"></canvas>
+              </div>
+              <div class="controls">
+                <button type="button" class="btn btn-teal" id="food-play">播放保鮮過程</button>
+                <button type="button" class="btn btn-coral" id="food-reset">重置計時</button>
+                <span class="status-pill" id="food-status">普通包裝模式</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Module 3 -->
+      <section class="section" id="module3">
+        <div class="section-head">
+          <div class="badge">模組三</div>
+          <h2>海綿密實袋互動小實驗</h2>
+          <p>跟著三個步驟操作：放海綿 → 按壓排氣 → 密封放手，親眼見證氣壓差把海綿「卡住」。</p>
+        </div>
+        <div class="module">
+          <div class="module-grid">
+            <div class="viz-pane">
+              <canvas id="canvas-sponge" width="640" height="400" aria-label="海綿密實袋實驗模擬"></canvas>
+              <div class="legend">
+                <span><i class="dot dot-blue"></i>袋內空氣</span>
+                <span><i class="dot" style="background:#f4a261"></i>海綿</span>
+                <span class="arrow-legend">袋外大氣壓力</span>
+              </div>
+            </div>
+            <div class="info-pane">
+              <h3>動手操作步驟</h3>
+              <div class="principle">
+                <strong>原理：</strong>海綿放入密實袋 → 按壓排氣並密封 → 袋內氣壓小於袋外大氣壓力 → 密實袋保持凹陷，海綿無法完全復原。
+              </div>
+              <div class="steps" id="sponge-steps">
+                <button type="button" class="step-btn active" data-step="1" id="step1">
+                  <span class="step-num">1</span>
+                  <span>
+                    <div class="step-title">把海綿放入密實袋</div>
+                    <div class="step-desc">點擊此步驟，海綿會進入透明密實袋中。</div>
+                  </span>
+                </button>
+                <button type="button" class="step-btn" data-step="2" id="step2" disabled>
+                  <span class="step-num">2</span>
+                  <span>
+                    <div class="step-title">用力按壓排氣</div>
+                    <div class="step-desc">長按或點擊，排出袋內空氣，海綿被壓扁。</div>
+                  </span>
+                </button>
+                <button type="button" class="step-btn" data-step="3" id="step3" disabled>
+                  <span class="step-num">3</span>
+                  <span>
+                    <div class="step-title">密封袋口並放手</div>
+                    <div class="step-desc">密封後放手：外壓大於內壓，袋子保持凹陷。</div>
+                  </span>
+                </button>
+              </div>
+              <div class="stats">
+                <div class="stat">
+                  <div class="label">目前步驟</div>
+                  <div class="value" id="sponge-step-label" style="font-size:1.05rem">步驟 1</div>
+                </div>
+                <div class="stat">
+                  <div class="label">袋內氣壓</div>
+                  <div class="value" id="sponge-pressure">≈ 1.00</div>
+                </div>
+              </div>
+              <div class="controls">
+                <button type="button" class="btn btn-teal" id="sponge-press" disabled>按壓排氣</button>
+                <button type="button" class="btn btn-coral" id="sponge-reset">重做實驗</button>
+              </div>
+              <p class="hint" id="sponge-hint">先完成步驟 1，再進行下一步。</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Quiz -->
+      <section class="section" id="quiz">
+        <div class="section-head">
+          <div class="badge">鞏固練習</div>
+          <h2>氣壓平衡知識問答</h2>
+          <p>三道選擇題，答對會有煙花與讚賞動畫，幫你記住「袋內氣壓 &lt; 袋外大氣壓力 → 被壓凹」。</p>
+        </div>
+        <div class="quiz-card">
+          <div class="quiz-progress" id="quiz-progress" aria-hidden="true">
+            <div class="quiz-dot on"></div>
+            <div class="quiz-dot"></div>
+            <div class="quiz-dot"></div>
+          </div>
+          <p class="quiz-q" id="quiz-question">載入中…</p>
+          <div class="options" id="quiz-options"></div>
+          <div class="feedback" id="quiz-feedback" aria-live="polite"></div>
+          <div class="quiz-actions">
+            <button type="button" class="btn btn-teal" id="quiz-next" hidden>下一題</button>
+            <button type="button" class="btn btn-coral" id="quiz-restart" hidden>再玩一次</button>
+          </div>
+          <div class="score-banner" id="score-banner">
+            <div class="big" id="score-text">3 / 3</div>
+            <p id="score-msg">太棒了！你已經掌握氣壓差的核心觀念。</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div class="key-formula">
+      <h2>記住這句話</h2>
+      <p>袋內氣壓 &lt; 袋外大氣壓力 → 袋子被大氣壓力壓凹／壓縮</p>
+    </div>
+
+    <footer>
+      氣壓實驗室 · 適合課堂互動與自學複習 · 以瀏覽器直接開啟即可使用
+    </footer>
+  </div>
+
+  <canvas id="fireworks"></canvas>
+
+  <script>
+    (() => {
+      "use strict";
+
+      /* ========== Utils ========== */
+      const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+      const lerp = (a, b, t) => a + (b - a) * t;
+
+      function fitCanvas(canvas, cssW, cssH) {
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        canvas.width = Math.round(cssW * dpr);
+        canvas.height = Math.round(cssH * dpr);
+        canvas.style.width = cssW + "px";
+        canvas.style.height = cssH + "px";
+        const ctx = canvas.getContext("2d");
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        return ctx;
+      }
+
+      function resizeToParent(canvas, aspect = 640 / 380) {
+        const parent = canvas.parentElement;
+        const w = Math.max(280, parent.clientWidth - 8);
+        const h = Math.round(w / aspect);
+        return { ctx: fitCanvas(canvas, w, h), w, h };
+      }
+
+      class Particle {
+        constructor(x, y, r, color, vx, vy) {
+          this.x = x;
+          this.y = y;
+          this.r = r;
+          this.color = color;
+          this.vx = vx;
+          this.vy = vy;
+          this.alive = true;
+        }
+        update(bounds, bounce = true) {
+          this.x += this.vx;
+          this.y += this.vy;
+          if (!bounds) return;
+          if (bounce) {
+            if (this.x < bounds.l + this.r || this.x > bounds.r - this.r) this.vx *= -1;
+            if (this.y < bounds.t + this.r || this.y > bounds.b - this.r) this.vy *= -1;
+            this.x = clamp(this.x, bounds.l + this.r, bounds.r - this.r);
+            this.y = clamp(this.y, bounds.t + this.r, bounds.b - this.r);
+          }
+        }
+        draw(ctx) {
+          if (!this.alive) return;
+          ctx.beginPath();
+          ctx.fillStyle = this.color;
+          ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      function drawPressureArrows(ctx, bag, strength, color = "#e76f51") {
+        const n = 5;
+        const len = 10 + strength * 28;
+        const alpha = 0.35 + strength * 0.55;
+        ctx.save();
+        ctx.strokeStyle = color;
+        ctx.fillStyle = color;
+        ctx.globalAlpha = alpha;
+        ctx.lineWidth = 2.5;
+        for (let i = 0; i < n; i++) {
+          const y = bag.y + bag.h * ((i + 0.5) / n);
+          // left -> right into bag
+          arrow(ctx, bag.x - 8 - len, y, bag.x - 4, y);
+          // right -> left into bag
+          arrow(ctx, bag.x + bag.w + 8 + len, y, bag.x + bag.w + 4, y);
+        }
+        // top arrows
+        for (let i = 0; i < 3; i++) {
+          const x = bag.x + bag.w * ((i + 0.5) / 3);
+          arrow(ctx, x, bag.y - 8 - len * 0.7, x, bag.y - 4);
+        }
+        ctx.restore();
+      }
+
+      function arrow(ctx, x1, y1, x2, y2) {
+        const angle = Math.atan2(y2 - y1, x2 - x1);
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.stroke();
+        const head = 7;
+        ctx.beginPath();
+        ctx.moveTo(x2, y2);
+        ctx.lineTo(x2 - head * Math.cos(angle - 0.4), y2 - head * Math.sin(angle - 0.4));
+        ctx.lineTo(x2 - head * Math.cos(angle + 0.4), y2 - head * Math.sin(angle + 0.4));
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      function roundRect(ctx, x, y, w, h, r) {
+        const rr = Math.min(r, w / 2, h / 2);
+        ctx.beginPath();
+        ctx.moveTo(x + rr, y);
+        ctx.arcTo(x + w, y, x + w, y + h, rr);
+        ctx.arcTo(x + w, y + h, x, y + h, rr);
+        ctx.arcTo(x, y + h, x, y, rr);
+        ctx.arcTo(x, y, x + w, y, rr);
+        ctx.closePath();
+      }
+
+      /* ========== Module 1: Storage bag ========== */
+      const storage = {
+        vacuum: 0,
+        pumping: false,
+        particlesIn: [],
+        particlesOut: [],
+        w: 640,
+        h: 380,
+        ctx: null,
+      };
+
+      function initStorageParticles() {
+        storage.particlesIn = [];
+        storage.particlesOut = [];
+        const bag = getStorageBag();
+        for (let i = 0; i < 55; i++) {
+          storage.particlesIn.push(new Particle(
+            lerp(bag.x + 12, bag.x + bag.w - 12, Math.random()),
+            lerp(bag.y + 12, bag.y + bag.h - 12, Math.random()),
+            3 + Math.random() * 2,
+            "#3a86ff",
+            (Math.random() - 0.5) * 1.4,
+            (Math.random() - 0.5) * 1.4
+          ));
+        }
+        for (let i = 0; i < 40; i++) {
+          storage.particlesOut.push(new Particle(
+            Math.random() * storage.w,
+            Math.random() * storage.h,
+            2.5 + Math.random() * 1.5,
+            "#ef476f",
+            (Math.random() - 0.5) * 0.9,
+            (Math.random() - 0.5) * 0.9
+          ));
+        }
+      }
+
+      function getStorageBag() {
+        const t = storage.vacuum / 100;
+        const baseW = storage.w * 0.52;
+        const baseH = storage.h * 0.58;
+        const w = baseW * (1 - t * 0.48);
+        const h = baseH * (1 - t * 0.42);
+        const x = (storage.w - w) / 2;
+        const y = storage.h * 0.18 + (baseH - h) * 0.35;
+        return { x, y, w, h, t };
+      }
+
+      function updateStorageUI() {
+        const t = storage.vacuum / 100;
+        document.getElementById("storage-density").textContent = Math.round((1 - t * 0.92) * 100) + "%";
+        document.getElementById("storage-save").textContent = Math.round(t * 55) + "%";
+        document.getElementById("storage-pressure").textContent = (1 - t * 0.85).toFixed(2) + " atm";
+        const moist = document.getElementById("storage-moisture");
+        if (t < 0.25) moist.textContent = "一般";
+        else if (t < 0.65) moist.textContent = "較佳";
+        else moist.textContent = "優良防潮";
+        document.getElementById("storage-slider").value = String(Math.round(storage.vacuum));
+        document.getElementById("storage-slider-label").textContent = Math.round(storage.vacuum) + "%";
+      }
+
+      function setStorageVacuum(v) {
+        const prev = storage.vacuum;
+        storage.vacuum = clamp(v, 0, 100);
+        const targetCount = Math.round(55 * (1 - storage.vacuum / 100 * 0.92));
+        while (storage.particlesIn.length > targetCount) {
+          const p = storage.particlesIn.pop();
+          // fly toward pump (top-right)
+          if (p) {
+            p.vx = 4 + Math.random() * 3;
+            p.vy = -3 - Math.random() * 2;
+            p._escaping = true;
+            storage.particlesOut.push(p);
+            setTimeout(() => { p.alive = false; }, 400);
+          }
+        }
+        while (storage.particlesIn.length < targetCount && storage.vacuum < prev) {
+          const bag = getStorageBag();
+          storage.particlesIn.push(new Particle(
+            lerp(bag.x + 10, bag.x + bag.w - 10, Math.random()),
+            lerp(bag.y + 10, bag.y + bag.h - 10, Math.random()),
+            3 + Math.random() * 2,
+            "#3a86ff",
+            (Math.random() - 0.5) * 1.2,
+            (Math.random() - 0.5) * 1.2
+          ));
+        }
+        updateStorageUI();
+      }
+
+      function drawStorage() {
+        const ctx = storage.ctx;
+        if (!ctx) return;
+        const { w, h } = storage;
+        ctx.clearRect(0, 0, w, h);
+
+        // soft lab bg dots
+        ctx.fillStyle = "rgba(255,255,255,0.35)";
+        for (let i = 0; i < 18; i++) {
+          ctx.beginPath();
+          ctx.arc((i * 97) % w, (i * 53) % h, 1.5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        const bag = getStorageBag();
+        const t = bag.t;
+
+        // outside particles
+        const outBounds = { l: 0, t: 0, r: w, b: h };
+        storage.particlesOut.forEach((p) => {
+          if (!p.alive) return;
+          if (p._escaping) {
+            p.x += p.vx;
+            p.y += p.vy;
+          } else {
+            // keep outside bag
+            p.update(outBounds, true);
+            if (p.x > bag.x && p.x < bag.x + bag.w && p.y > bag.y && p.y < bag.y + bag.h) {
+              p.x = bag.x - 8;
+            }
+          }
+          p.draw(ctx);
+        });
+
+        // pressure arrows
+        drawPressureArrows(ctx, bag, t);
+
+        // bag
+        ctx.save();
+        roundRect(ctx, bag.x, bag.y, bag.w, bag.h, 16);
+        ctx.fillStyle = "rgba(255,255,255,0.55)";
+        ctx.fill();
+        ctx.strokeStyle = "rgba(26,155,142,0.65)";
+        ctx.lineWidth = 3;
+        ctx.stroke();
+
+        // zipper
+        ctx.fillStyle = "#2a9d8f";
+        roundRect(ctx, bag.x + bag.w * 0.1, bag.y + 4, bag.w * 0.8, 8, 4);
+        ctx.fill();
+
+        // blanket / clothes
+        const clothInset = 14 + t * 8;
+        roundRect(ctx, bag.x + clothInset, bag.y + 22, bag.w - clothInset * 2, bag.h - 36, 10);
+        const clothGrad = ctx.createLinearGradient(bag.x, bag.y, bag.x + bag.w, bag.y + bag.h);
+        clothGrad.addColorStop(0, "#f4a261");
+        clothGrad.addColorStop(1, "#e9c46a");
+        ctx.fillStyle = clothGrad;
+        ctx.fill();
+        ctx.strokeStyle = "rgba(180,100,40,0.35)";
+        ctx.stroke();
+        // folds
+        ctx.strokeStyle = "rgba(255,255,255,0.45)";
+        ctx.lineWidth = 2;
+        for (let i = 0; i < 3; i++) {
+          const yy = bag.y + 40 + i * (bag.h * 0.18);
+          ctx.beginPath();
+          ctx.moveTo(bag.x + clothInset + 8, yy);
+          ctx.quadraticCurveTo(bag.x + bag.w / 2, yy + 6 - t * 4, bag.x + bag.w - clothInset - 8, yy);
+          ctx.stroke();
+        }
+        ctx.restore();
+
+        // inside particles
+        const inBounds = {
+          l: bag.x + 6,
+          t: bag.y + 16,
+          r: bag.x + bag.w - 6,
+          b: bag.y + bag.h - 6,
+        };
+        storage.particlesIn.forEach((p) => {
+          p.vx *= 0.998;
+          p.vy *= 0.998;
+          // slow down as vacuum increases
+          const damp = 1 - t * 0.4;
+          p.x += p.vx * damp;
+          p.y += p.vy * damp;
+          if (p.x < inBounds.l + p.r || p.x > inBounds.r - p.r) p.vx *= -1;
+          if (p.y < inBounds.t + p.r || p.y > inBounds.b - p.r) p.vy *= -1;
+          p.x = clamp(p.x, inBounds.l + p.r, inBounds.r - p.r);
+          p.y = clamp(p.y, inBounds.t + p.r, inBounds.b - p.r);
+          p.draw(ctx);
+        });
+
+        // pump icon
+        ctx.save();
+        ctx.fillStyle = "#16323f";
+        ctx.font = "bold 13px 'Noto Sans TC', sans-serif";
+        ctx.fillText(t > 0.05 ? "抽氣中…" : "待機幫浦", w - 100, 28);
+        ctx.beginPath();
+        ctx.strokeStyle = "#1a9b8e";
+        ctx.lineWidth = 3;
+        ctx.arc(w - 28, 48, 14, 0, Math.PI * 2);
+        ctx.stroke();
+        if (storage.pumping || t > 0) {
+          ctx.beginPath();
+          ctx.strokeStyle = "#2ec4b6";
+          ctx.arc(w - 28, 48, 8, 0, Math.PI * 1.5 * Math.max(t, 0.2));
+          ctx.stroke();
+        }
+        ctx.restore();
+
+        // label
+        ctx.fillStyle = "rgba(22,50,63,0.75)";
+        ctx.font = "bold 14px 'Noto Sans TC', sans-serif";
+        ctx.fillText("真空儲物袋（內含被子）", 16, h - 14);
+      }
+
+      /* ========== Module 2: Food packaging ========== */
+      const food = {
+        mode: "normal", // normal | vacuum
+        vacuumAnim: 0,
+        day: 0,
+        playing: false,
+        playAcc: 0,
+        particles: [],
+        bacteria: [],
+        historyN: [],
+        historyV: [],
+        w: 640,
+        h: 380,
+        ctx: null,
+        chartCtx: null,
+        chartW: 400,
+        chartH: 120,
+      };
+
+      function initFoodParticles() {
+        food.particles = [];
+        food.bacteria = [];
+        for (let i = 0; i < 45; i++) {
+          food.particles.push(new Particle(
+            80 + Math.random() * 400,
+            60 + Math.random() * 240,
+            3 + Math.random() * 2,
+            "#3a86ff",
+            (Math.random() - 0.5) * 1.2,
+            (Math.random() - 0.5) * 1.2
+          ));
+        }
+        for (let i = 0; i < 8; i++) {
+          food.bacteria.push({
+            x: 200 + Math.random() * 200,
+            y: 140 + Math.random() * 100,
+            r: 4 + Math.random() * 3,
+            phase: Math.random() * Math.PI * 2,
+          });
+        }
+        food.historyN = [0.08];
+        food.historyV = [0.05];
+      }
+
+      function setFoodMode(mode) {
+        food.mode = mode;
+        document.getElementById("food-normal").classList.toggle("active", mode === "normal");
+        document.getElementById("food-vacuum").classList.toggle("active", mode === "vacuum");
+        document.getElementById("food-status").textContent =
+          mode === "vacuum" ? "真空包裝模式" : "普通包裝模式";
+        document.getElementById("food-status").classList.toggle("warn", mode === "normal");
+        if (mode === "vacuum") {
+          // animate vacuum
+          const start = food.vacuumAnim;
+          const target = 1;
+          const t0 = performance.now();
+          const run = (now) => {
+            const p = clamp((now - t0) / 900, 0, 1);
+            food.vacuumAnim = lerp(start, target, p);
+            syncFoodParticleCount();
+            if (p < 1) requestAnimationFrame(run);
+          };
+          requestAnimationFrame(run);
+        } else {
+          food.vacuumAnim = 0;
+          syncFoodParticleCount();
+        }
+      }
+
+      function syncFoodParticleCount() {
+        const target = food.mode === "vacuum"
+          ? Math.round(45 * (1 - food.vacuumAnim * 0.95))
+          : 45;
+        while (food.particles.length > target) food.particles.pop();
+        while (food.particles.length < target) {
+          food.particles.push(new Particle(
+            100 + Math.random() * 360,
+            80 + Math.random() * 200,
+            3 + Math.random() * 2,
+            "#3a86ff",
+            (Math.random() - 0.5) * 1.2,
+            (Math.random() - 0.5) * 1.2
+          ));
+        }
+      }
+
+      function bacteriaLevel(day, vacuum) {
+        if (vacuum) return Math.min(1, 0.05 + day * 0.035);
+        return Math.min(1, 0.08 + day * day * 0.012 + day * 0.06);
+      }
+
+      function updateFoodLabels() {
+        document.getElementById("food-timer").textContent = "第 " + Math.floor(food.day) + " 天";
+        const lvl = bacteriaLevel(food.day, food.mode === "vacuum");
+        const el = document.getElementById("food-bacteria");
+        if (lvl < 0.25) el.textContent = "低";
+        else if (lvl < 0.55) el.textContent = "中";
+        else if (lvl < 0.8) el.textContent = "高";
+        else el.textContent = "很高";
+      }
+
+      function drawBacteriaChart() {
+        const ctx = food.chartCtx;
+        if (!ctx) return;
+        const w = food.chartW;
+        const h = food.chartH;
+        ctx.clearRect(0, 0, w, h);
+        ctx.fillStyle = "#f7fcfb";
+        ctx.fillRect(0, 0, w, h);
+
+        // axes
+        ctx.strokeStyle = "#c5d9de";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(36, 10);
+        ctx.lineTo(36, h - 22);
+        ctx.lineTo(w - 10, h - 22);
+        ctx.stroke();
+
+        ctx.fillStyle = "#3d5f6e";
+        ctx.font = "10px 'Noto Sans TC', sans-serif";
+        ctx.fillText("細菌量", 4, 16);
+        ctx.fillText("天數", w - 28, h - 6);
+
+        const maxDay = 14;
+        const plot = (arr, color) => {
+          if (arr.length < 2) return;
+          ctx.beginPath();
+          ctx.strokeStyle = color;
+          ctx.lineWidth = 2.5;
+          arr.forEach((v, i) => {
+            const x = 36 + (i / maxDay) * (w - 50);
+            const y = h - 22 - v * (h - 40);
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          });
+          ctx.stroke();
+        };
+
+        // build full curves preview + current histories
+        const nCurve = [];
+        const vCurve = [];
+        for (let d = 0; d <= maxDay; d++) {
+          nCurve.push(bacteriaLevel(d, false));
+          vCurve.push(bacteriaLevel(d, true));
+        }
+        // faint full curves
+        ctx.globalAlpha = 0.25;
+        plot(nCurve, "#e76f51");
+        plot(vCurve, "#1a9b8e");
+        ctx.globalAlpha = 1;
+
+        // solid up to current day
+        const cur = Math.min(maxDay, Math.floor(food.day));
+        plot(nCurve.slice(0, cur + 1), "#e76f51");
+        plot(vCurve.slice(0, cur + 1), "#1a9b8e");
+
+        // legend
+        ctx.font = "bold 11px 'Noto Sans TC', sans-serif";
+        ctx.fillStyle = "#e76f51";
+        ctx.fillText("● 普通包裝", 48, 18);
+        ctx.fillStyle = "#1a9b8e";
+        ctx.fillText("● 真空包裝", 130, 18);
+
+        // marker
+        const mx = 36 + (Math.min(food.day, maxDay) / maxDay) * (w - 50);
+        ctx.strokeStyle = "#16323f";
+        ctx.setLineDash([3, 3]);
+        ctx.beginPath();
+        ctx.moveTo(mx, 10);
+        ctx.lineTo(mx, h - 22);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+
+      function getFoodBag() {
+        const t = food.mode === "vacuum" ? food.vacuumAnim : 0;
+        const baseW = food.w * 0.58;
+        const baseH = food.h * 0.5;
+        const w = baseW * (1 - t * 0.12);
+        const h = baseH * (1 - t * 0.28);
+        return {
+          x: (food.w - w) / 2,
+          y: food.h * 0.22 + (baseH - h) * 0.4,
+          w,
+          h,
+          t,
+        };
+      }
+
+      function drawFood() {
+        const ctx = food.ctx;
+        if (!ctx) return;
+        const { w, h } = food;
+        ctx.clearRect(0, 0, w, h);
+
+        const bag = getFoodBag();
+        const t = bag.t;
+
+        // outside particles (atmosphere)
+        ctx.globalAlpha = 0.55;
+        for (let i = 0; i < 20; i++) {
+          const px = (i * 73 + performance.now() * 0.02) % w;
+          const py = (i * 41) % h;
+          if (px > bag.x && px < bag.x + bag.w && py > bag.y && py < bag.y + bag.h) continue;
+          ctx.beginPath();
+          ctx.fillStyle = "#ef476f";
+          ctx.arc(px, py, 2.2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.globalAlpha = 1;
+
+        drawPressureArrows(ctx, bag, t);
+
+        // package
+        ctx.save();
+        roundRect(ctx, bag.x, bag.y, bag.w, bag.h, 14);
+        ctx.fillStyle = t > 0.5 ? "rgba(220,245,240,0.65)" : "rgba(255,255,255,0.5)";
+        ctx.fill();
+        ctx.strokeStyle = t > 0.3 ? "#1a9b8e" : "#7a9eab";
+        ctx.lineWidth = 3;
+        ctx.stroke();
+
+        // meat / food
+        const foodPad = 18 + t * 10;
+        roundRect(ctx, bag.x + foodPad, bag.y + foodPad * 0.8, bag.w - foodPad * 2, bag.h - foodPad * 1.6, 12);
+        const mg = ctx.createLinearGradient(bag.x, bag.y, bag.x + bag.w, bag.y + bag.h);
+        mg.addColorStop(0, "#c1121f");
+        mg.addColorStop(0.5, "#e63946");
+        mg.addColorStop(1, "#9d0208");
+        ctx.fillStyle = mg;
+        ctx.fill();
+        // fat marbling
+        ctx.strokeStyle = "rgba(255,230,200,0.55)";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(bag.x + foodPad + 10, bag.y + bag.h * 0.4);
+        ctx.quadraticCurveTo(bag.x + bag.w * 0.5, bag.y + bag.h * 0.35, bag.x + bag.w - foodPad - 10, bag.y + bag.h * 0.55);
+        ctx.stroke();
+        ctx.restore();
+
+        // air particles inside
+        const bounds = {
+          l: bag.x + 8,
+          t: bag.y + 8,
+          r: bag.x + bag.w - 8,
+          b: bag.y + bag.h - 8,
+        };
+        food.particles.forEach((p) => {
+          p.update(bounds, true);
+          p.draw(ctx);
+        });
+
+        // bacteria
+        const bLvl = bacteriaLevel(food.day, food.mode === "vacuum");
+        const showCount = Math.round(bLvl * 12);
+        food.bacteria.forEach((b, i) => {
+          if (i >= showCount) return;
+          const pulse = 1 + Math.sin(performance.now() * 0.004 + b.phase) * 0.15;
+          ctx.beginPath();
+          ctx.fillStyle = "rgba(123,44,191,0.75)";
+          ctx.arc(b.x, b.y, b.r * pulse * (0.7 + bLvl), 0, Math.PI * 2);
+          ctx.fill();
+          // keep bacteria near food
+          b.x += Math.sin(performance.now() * 0.001 + b.phase) * 0.15;
+          b.y += Math.cos(performance.now() * 0.0012 + b.phase) * 0.12;
+          b.x = clamp(b.x, bag.x + 20, bag.x + bag.w - 20);
+          b.y = clamp(b.y, bag.y + 20, bag.y + bag.h - 20);
+        });
+
+        ctx.fillStyle = "rgba(22,50,63,0.8)";
+        ctx.font = "bold 14px 'Noto Sans TC', sans-serif";
+        ctx.fillText(food.mode === "vacuum" ? "真空包裝：袋緊貼食物" : "普通包裝：袋內仍有空氣", 16, h - 14);
+
+        drawBacteriaChart();
+      }
+
+      /* ========== Module 3: Sponge experiment ========== */
+      const sponge = {
+        step: 0, // 0 idle, 1 in bag, 2 pressing, 3 sealed
+        press: 0,
+        sealed: false,
+        bagIn: false,
+        particles: [],
+        w: 640,
+        h: 400,
+        ctx: null,
+        pressHeld: false,
+      };
+
+      function initSpongeParticles(count = 50) {
+        sponge.particles = [];
+        for (let i = 0; i < count; i++) {
+          sponge.particles.push(new Particle(
+            120 + Math.random() * 400,
+            80 + Math.random() * 240,
+            3 + Math.random() * 2,
+            "#3a86ff",
+            (Math.random() - 0.5) * 1.3,
+            (Math.random() - 0.5) * 1.3
+          ));
+        }
+      }
+
+      function setSpongeStep(step) {
+        sponge.step = step;
+        document.querySelectorAll(".step-btn").forEach((btn) => {
+          const s = Number(btn.dataset.step);
+          btn.classList.toggle("active", s === step);
+          btn.classList.toggle("done", s < step);
+        });
+        document.getElementById("sponge-step-label").textContent = "步驟 " + step;
+        const pressBtn = document.getElementById("sponge-press");
+        const hint = document.getElementById("sponge-hint");
+
+        if (step === 1) {
+          sponge.bagIn = true;
+          sponge.press = 0;
+          sponge.sealed = false;
+          initSpongeParticles(50);
+          document.getElementById("step2").disabled = false;
+          document.getElementById("step3").disabled = true;
+          pressBtn.disabled = true;
+          hint.textContent = "海綿已放入密實袋。接著進行步驟 2：按壓排氣。";
+          document.getElementById("sponge-pressure").textContent = "≈ 1.00";
+        } else if (step === 2) {
+          document.getElementById("step3").disabled = true;
+          pressBtn.disabled = false;
+          hint.textContent = "點擊或長按「按壓排氣」，排出袋內空氣。排氣足夠後可進行步驟 3。";
+        } else if (step === 3) {
+          sponge.sealed = true;
+          sponge.pressHeld = false;
+          pressBtn.disabled = true;
+          // lock vacuum level
+          const locked = Math.max(sponge.press, 0.55);
+          sponge.press = locked;
+          const target = Math.round(50 * (1 - locked * 0.9));
+          while (sponge.particles.length > target) sponge.particles.pop();
+          document.getElementById("sponge-pressure").textContent = "≈ " + (1 - locked * 0.8).toFixed(2);
+          hint.textContent = "已密封並放手！袋外氣壓 > 袋內氣壓，海綿無法完全復原，袋子保持凹陷。";
+        }
+      }
+
+      function resetSponge() {
+        sponge.step = 0;
+        sponge.press = 0;
+        sponge.sealed = false;
+        sponge.bagIn = false;
+        sponge.pressHeld = false;
+        initSpongeParticles(0);
+        document.querySelectorAll(".step-btn").forEach((btn) => {
+          btn.classList.remove("active", "done");
+          btn.disabled = Number(btn.dataset.step) !== 1;
+        });
+        document.getElementById("step1").disabled = false;
+        document.getElementById("step1").classList.add("active");
+        document.getElementById("sponge-press").disabled = true;
+        document.getElementById("sponge-step-label").textContent = "準備開始";
+        document.getElementById("sponge-pressure").textContent = "≈ 1.00";
+        document.getElementById("sponge-hint").textContent = "點擊步驟 1，把海綿放入密實袋。";
+      }
+
+      function getSpongeBag() {
+        const p = sponge.press;
+        const baseW = sponge.w * 0.55;
+        const baseH = sponge.h * 0.55;
+        let w = baseW;
+        let h = baseH;
+        if (sponge.bagIn) {
+          w = baseW * (1 - p * 0.22);
+          h = baseH * (1 - p * 0.38);
+        }
+        return {
+          x: (sponge.w - w) / 2,
+          y: sponge.h * 0.2 + (baseH - h) * 0.5,
+          w,
+          h,
+          p,
+        };
+      }
+
+      function drawSponge() {
+        const ctx = sponge.ctx;
+        if (!ctx) return;
+        const { w, h } = sponge;
+        ctx.clearRect(0, 0, w, h);
+
+        // table
+        ctx.fillStyle = "rgba(255,255,255,0.4)";
+        roundRect(ctx, 40, h - 48, w - 80, 28, 8);
+        ctx.fill();
+
+        if (!sponge.bagIn) {
+          // sponge alone
+          const sx = w / 2 - 70;
+          const sy = h / 2 - 40;
+          drawSpongeBody(ctx, sx, sy, 140, 90, 0);
+          ctx.fillStyle = "rgba(22,50,63,0.75)";
+          ctx.font = "bold 14px 'Noto Sans TC', sans-serif";
+          ctx.fillText("準備中的海綿（尚未入袋）", 16, h - 14);
+          return;
+        }
+
+        const bag = getSpongeBag();
+        drawPressureArrows(ctx, bag, bag.p);
+
+        // bag
+        ctx.save();
+        roundRect(ctx, bag.x, bag.y, bag.w, bag.h, 14);
+        ctx.fillStyle = "rgba(255,255,255,0.42)";
+        ctx.fill();
+        ctx.strokeStyle = sponge.sealed ? "#1a9b8e" : "#5b8a9a";
+        ctx.lineWidth = 3;
+        ctx.stroke();
+
+        // seal line
+        if (sponge.sealed) {
+          ctx.strokeStyle = "#e76f51";
+          ctx.lineWidth = 4;
+          ctx.beginPath();
+          ctx.moveTo(bag.x + 16, bag.y + 12);
+          ctx.lineTo(bag.x + bag.w - 16, bag.y + 12);
+          ctx.stroke();
+          ctx.fillStyle = "#e76f51";
+          ctx.font = "bold 12px 'Noto Sans TC', sans-serif";
+          ctx.fillText("已密封", bag.x + bag.w - 58, bag.y + 28);
+        } else {
+          ctx.fillStyle = "#2a9d8f";
+          roundRect(ctx, bag.x + bag.w * 0.15, bag.y + 5, bag.w * 0.7, 7, 3);
+          ctx.fill();
+        }
+
+        // sponge inside
+        const pad = 22 + bag.p * 6;
+        const sh = (bag.h - pad * 1.5) * (1 - bag.p * 0.35);
+        drawSpongeBody(
+          ctx,
+          bag.x + pad,
+          bag.y + pad * 0.9 + (bag.h - pad * 1.5 - sh) * 0.5,
+          bag.w - pad * 2,
+          Math.max(28, sh),
+          bag.p
+        );
+        ctx.restore();
+
+        // particles
+        const bounds = {
+          l: bag.x + 6,
+          t: bag.y + 18,
+          r: bag.x + bag.w - 6,
+          b: bag.y + bag.h - 6,
+        };
+        const target = sponge.sealed
+          ? Math.round(50 * (1 - bag.p * 0.9))
+          : Math.round(50 * (1 - bag.p * 0.85));
+        while (sponge.particles.length > target) {
+          const gone = sponge.particles.pop();
+          // escape visual briefly omitted for simplicity
+          void gone;
+        }
+        sponge.particles.forEach((p) => {
+          p.update(bounds, true);
+          p.draw(ctx);
+        });
+
+        // escaping particles when pressing
+        if (sponge.pressHeld && !sponge.sealed) {
+          for (let i = 0; i < 2; i++) {
+            ctx.beginPath();
+            ctx.fillStyle = "rgba(58,134,255,0.55)";
+            const ex = bag.x + bag.w * 0.5 + (Math.random() - 0.5) * 40;
+            const ey = bag.y - 10 - Math.random() * 30;
+            ctx.arc(ex, ey, 2 + Math.random() * 2, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
+
+        ctx.fillStyle = "rgba(22,50,63,0.8)";
+        ctx.font = "bold 14px 'Noto Sans TC', sans-serif";
+        let label = "密實袋中的海綿";
+        if (sponge.sealed) label = "密封後：外壓 > 內壓，保持凹陷";
+        else if (bag.p > 0.2) label = "按壓排氣中…粒子減少";
+        ctx.fillText(label, 16, h - 14);
+
+        if (!sponge.sealed) {
+          document.getElementById("sponge-pressure").textContent =
+            "≈ " + (1 - bag.p * 0.75).toFixed(2);
+        }
+      }
+
+      function drawSpongeBody(ctx, x, y, w, h, squash) {
+        roundRect(ctx, x, y, w, h, 12);
+        const g = ctx.createLinearGradient(x, y, x + w, y + h);
+        g.addColorStop(0, "#f4a261");
+        g.addColorStop(1, "#e76f51");
+        ctx.fillStyle = g;
+        ctx.fill();
+        ctx.strokeStyle = "rgba(180,80,40,0.35)";
+        ctx.stroke();
+        // pores
+        ctx.fillStyle = "rgba(255,255,255,0.35)";
+        const cols = 5;
+        const rows = 3;
+        for (let r = 0; r < rows; r++) {
+          for (let c = 0; c < cols; c++) {
+            const px = x + ((c + 0.5) / cols) * w;
+            const py = y + ((r + 0.5) / rows) * h;
+            ctx.beginPath();
+            ctx.arc(px, py, 3 + (1 - squash) * 2, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
+      }
+
+      /* ========== Quiz + fireworks ========== */
+      const quizData = [
+        {
+          q: "真空儲物袋抽氣後會變扁，主要原因是？",
+          options: [
+            "袋內空氣粒子變多，把袋子撐開後又彈回來",
+            "袋內氣壓低於袋外大氣壓力，外壓把袋子向內擠壓",
+            "袋子本身會收縮變小，與氣壓無關",
+            "抽氣幫浦直接把塑膠袋吸進機器",
+          ],
+          answer: 1,
+          explain: "正確！袋內粒子減少 → 袋內氣壓下降 → 袋外大氣壓力把袋子壓扁。",
+        },
+        {
+          q: "真空食物包裝比較能保鮮，是因為？",
+          options: [
+            "真空會讓食物溫度自動降低",
+            "包裝袋變透明後細菌看不見食物",
+            "減少食物與空氣／細菌接觸，減慢細菌滋生",
+            "真空會把細菌全部吸走並消滅",
+          ],
+          answer: 2,
+          explain: "正確！抽走空氣後袋子緊貼食物，細菌較難大量滋生，保鮮期較長。",
+        },
+        {
+          q: "海綿密實袋實驗中，密封並放手後海綿無法完全復原，因為？",
+          options: [
+            "海綿被膠水黏住了",
+            "袋外大氣壓力仍大於袋內氣壓，持續把袋子壓凹",
+            "袋內氣壓大於袋外，把海綿向外推不回來",
+            "海綿自己失去彈性，永遠回不去",
+          ],
+          answer: 1,
+          explain: "正確！密封後袋內空氣進不來，外壓持續大於內壓，袋子保持凹陷。",
+        },
+      ];
+
+      const quizState = {
+        index: 0,
+        score: 0,
+        locked: false,
+        results: [],
+      };
+
+      function renderQuiz() {
+        const item = quizData[quizState.index];
+        document.getElementById("quiz-question").textContent =
+          "第 " + (quizState.index + 1) + " 題｜" + item.q;
+        const box = document.getElementById("quiz-options");
+        box.innerHTML = "";
+        item.options.forEach((text, i) => {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "option";
+          btn.textContent = String.fromCharCode(65 + i) + ". " + text;
+          btn.addEventListener("click", () => answerQuiz(i));
+          box.appendChild(btn);
+        });
+        document.getElementById("quiz-feedback").textContent = "";
+        document.getElementById("quiz-feedback").className = "feedback";
+        document.getElementById("quiz-next").hidden = true;
+        document.getElementById("quiz-restart").hidden = true;
+        document.getElementById("score-banner").classList.remove("show");
+        updateQuizDots();
+        quizState.locked = false;
+      }
+
+      function updateQuizDots() {
+        const dots = document.querySelectorAll(".quiz-dot");
+        dots.forEach((d, i) => {
+          d.classList.remove("on", "correct", "wrong");
+          if (quizState.results[i] === true) d.classList.add("correct");
+          else if (quizState.results[i] === false) d.classList.add("wrong");
+          else if (i === quizState.index) d.classList.add("on");
+        });
+      }
+
+      function answerQuiz(choice) {
+        if (quizState.locked) return;
+        quizState.locked = true;
+        const item = quizData[quizState.index];
+        const options = document.querySelectorAll(".option");
+        options.forEach((btn, i) => {
+          btn.disabled = true;
+          if (i === item.answer) btn.classList.add("correct");
+          if (i === choice && choice !== item.answer) btn.classList.add("wrong");
+        });
+        const fb = document.getElementById("quiz-feedback");
+        if (choice === item.answer) {
+          quizState.score += 1;
+          quizState.results[quizState.index] = true;
+          fb.textContent = "✔ " + item.explain;
+          fb.className = "feedback ok";
+          launchFireworks();
+        } else {
+          quizState.results[quizState.index] = false;
+          fb.textContent = "✘ 再想一次：記住「袋內氣壓 < 袋外大氣壓力 → 被壓凹」。" ;
+          fb.className = "feedback bad";
+        }
+        updateQuizDots();
+        if (quizState.index < quizData.length - 1) {
+          document.getElementById("quiz-next").hidden = false;
+        } else {
+          showScore();
+        }
+      }
+
+      function showScore() {
+        document.getElementById("quiz-next").hidden = true;
+        document.getElementById("quiz-restart").hidden = false;
+        const banner = document.getElementById("score-banner");
+        banner.classList.add("show");
+        document.getElementById("score-text").textContent =
+          quizState.score + " / " + quizData.length;
+        const msg = document.getElementById("score-msg");
+        if (quizState.score === 3) {
+          msg.textContent = "完美！你已經牢牢掌握氣壓差與日常生活應用。";
+          launchFireworks(true);
+        } else if (quizState.score >= 2) {
+          msg.textContent = "很不錯！再複習一次模組動畫，就能更加分。";
+        } else {
+          msg.textContent = "沒關係，回到上方三個模組再操作一次，然後重挑戰！";
+        }
+      }
+
+      /* Fireworks */
+      const fw = {
+        canvas: null,
+        ctx: null,
+        particles: [],
+        running: false,
+      };
+
+      function launchFireworks(big = false) {
+        const canvas = document.getElementById("fireworks");
+        fw.canvas = canvas;
+        fw.ctx = canvas.getContext("2d");
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        const bursts = big ? 5 : 3;
+        for (let b = 0; b < bursts; b++) {
+          const cx = window.innerWidth * (0.2 + Math.random() * 0.6);
+          const cy = window.innerHeight * (0.2 + Math.random() * 0.4);
+          const colors = ["#2ec4b6", "#4cc9f0", "#f4a261", "#e76f51", "#ffd166", "#3a86ff"];
+          for (let i = 0; i < 36; i++) {
+            const ang = (Math.PI * 2 * i) / 36 + Math.random() * 0.2;
+            const spd = 2 + Math.random() * 4;
+            fw.particles.push({
+              x: cx,
+              y: cy,
+              vx: Math.cos(ang) * spd,
+              vy: Math.sin(ang) * spd,
+              life: 1,
+              color: colors[i % colors.length],
+              r: 2 + Math.random() * 2,
+            });
+          }
+        }
+        if (!fw.running) {
+          fw.running = true;
+          requestAnimationFrame(tickFireworks);
+        }
+      }
+
+      function tickFireworks() {
+        const ctx = fw.ctx;
+        ctx.clearRect(0, 0, fw.canvas.width, fw.canvas.height);
+        fw.particles.forEach((p) => {
+          p.x += p.vx;
+          p.y += p.vy;
+          p.vy += 0.06;
+          p.life -= 0.016;
+          ctx.globalAlpha = Math.max(0, p.life);
+          ctx.beginPath();
+          ctx.fillStyle = p.color;
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fill();
+        });
+        ctx.globalAlpha = 1;
+        fw.particles = fw.particles.filter((p) => p.life > 0);
+        if (fw.particles.length) requestAnimationFrame(tickFireworks);
+        else {
+          fw.running = false;
+          ctx.clearRect(0, 0, fw.canvas.width, fw.canvas.height);
+        }
+      }
+
+      /* ========== Main loop & wiring ========== */
+      let lastTs = 0;
+
+      function frame(ts) {
+        const dt = Math.min(0.05, (ts - lastTs) / 1000 || 0.016);
+        lastTs = ts;
+
+        // storage pump
+        if (storage.pumping) {
+          setStorageVacuum(storage.vacuum + dt * 28);
+          if (storage.vacuum >= 100) storage.pumping = false;
+        }
+
+        // food playback
+        if (food.playing) {
+          food.day = Math.min(14, food.day + dt * 2.2);
+          updateFoodLabels();
+          if (food.day >= 14) food.playing = false;
+        }
+
+        // sponge press
+        if (sponge.pressHeld && sponge.step === 2 && !sponge.sealed) {
+          sponge.press = clamp(sponge.press + dt * 0.55, 0, 1);
+          if (sponge.press >= 0.55) {
+            document.getElementById("step3").disabled = false;
+            document.getElementById("sponge-hint").textContent =
+              "排氣足夠了！可以點擊步驟 3：密封袋口並放手。";
+          }
+        } else if (sponge.step === 2 && !sponge.sealed && !sponge.pressHeld) {
+          // slight rebound if not sealed
+          sponge.press = clamp(sponge.press - dt * 0.25, 0, 1);
+        }
+
+        drawStorage();
+        drawFood();
+        drawSponge();
+        requestAnimationFrame(frame);
+      }
+
+      function resizeAll() {
+        let r = resizeToParent(document.getElementById("canvas-storage"), 640 / 380);
+        storage.ctx = r.ctx; storage.w = r.w; storage.h = r.h;
+
+        r = resizeToParent(document.getElementById("canvas-food"), 640 / 380);
+        food.ctx = r.ctx; food.w = r.w; food.h = r.h;
+
+        r = resizeToParent(document.getElementById("canvas-sponge"), 640 / 400);
+        sponge.ctx = r.ctx; sponge.w = r.w; sponge.h = r.h;
+
+        const chart = document.getElementById("canvas-bacteria");
+        const cw = Math.max(240, chart.parentElement.clientWidth - 8);
+        const ch = 120;
+        food.chartCtx = fitCanvas(chart, cw, ch);
+        food.chartW = cw;
+        food.chartH = ch;
+
+        // re-init particle positions roughly on first resize only if empty
+        if (!storage.particlesIn.length) initStorageParticles();
+        if (!food.particles.length) initFoodParticles();
+      }
+
+      function bindUI() {
+        const slider = document.getElementById("storage-slider");
+        slider.addEventListener("input", () => {
+          storage.pumping = false;
+          setStorageVacuum(Number(slider.value));
+        });
+        document.getElementById("storage-pump").addEventListener("click", () => {
+          storage.pumping = true;
+        });
+        document.getElementById("storage-reset").addEventListener("click", () => {
+          storage.pumping = false;
+          setStorageVacuum(0);
+          initStorageParticles();
+        });
+
+        document.getElementById("food-normal").addEventListener("click", () => setFoodMode("normal"));
+        document.getElementById("food-vacuum").addEventListener("click", () => setFoodMode("vacuum"));
+        document.getElementById("food-play").addEventListener("click", () => {
+          food.playing = true;
+        });
+        document.getElementById("food-reset").addEventListener("click", () => {
+          food.playing = false;
+          food.day = 0;
+          updateFoodLabels();
+        });
+
+        document.getElementById("step1").addEventListener("click", () => setSpongeStep(1));
+        document.getElementById("step2").addEventListener("click", () => {
+          if (sponge.bagIn) setSpongeStep(2);
+        });
+        document.getElementById("step3").addEventListener("click", () => {
+          if (sponge.press >= 0.5) setSpongeStep(3);
+        });
+
+        const pressBtn = document.getElementById("sponge-press");
+        const startPress = () => {
+          if (sponge.step === 2 && !sponge.sealed) sponge.pressHeld = true;
+        };
+        const endPress = () => { sponge.pressHeld = false; };
+        pressBtn.addEventListener("mousedown", startPress);
+        pressBtn.addEventListener("mouseup", endPress);
+        pressBtn.addEventListener("mouseleave", endPress);
+        pressBtn.addEventListener("touchstart", (e) => { e.preventDefault(); startPress(); }, { passive: false });
+        pressBtn.addEventListener("touchend", endPress);
+        pressBtn.addEventListener("click", () => {
+          // single click also adds some press
+          if (sponge.step === 2 && !sponge.sealed) {
+            sponge.press = clamp(sponge.press + 0.2, 0, 1);
+            if (sponge.press >= 0.55) {
+              document.getElementById("step3").disabled = false;
+              document.getElementById("sponge-hint").textContent =
+                "排氣足夠了！可以點擊步驟 3：密封袋口並放手。";
+            }
+          }
+        });
+        document.getElementById("sponge-reset").addEventListener("click", resetSponge);
+
+        document.getElementById("quiz-next").addEventListener("click", () => {
+          quizState.index += 1;
+          renderQuiz();
+        });
+        document.getElementById("quiz-restart").addEventListener("click", () => {
+          quizState.index = 0;
+          quizState.score = 0;
+          quizState.results = [];
+          renderQuiz();
+        });
+
+        window.addEventListener("resize", () => {
+          resizeAll();
+          if (fw.canvas) {
+            fw.canvas.width = window.innerWidth;
+            fw.canvas.height = window.innerHeight;
+          }
+        });
+      }
+
+      // boot
+      bindUI();
+      resizeAll();
+      initStorageParticles();
+      initFoodParticles();
+      resetSponge();
+      updateStorageUI();
+      updateFoodLabels();
+      setFoodMode("normal");
+      renderQuiz();
+      requestAnimationFrame(frame);
+    })();
+  </script>
+</body>
+</html>
