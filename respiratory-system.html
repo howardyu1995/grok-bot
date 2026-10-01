@@ -3,27 +3,21 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="小五人體呼吸系統互動教室：課本剖面圖風格，認識吸氣與呼氣" />
-  <title>人體呼吸系統｜小五課本風互動教室</title>
+  <meta name="description" content="小五人體呼吸系統遊戲：課本剖面舞台，動手學吸氣呼氣" />
+  <title>人體呼吸系統｜小五呼吸遊戲</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     :root {
-      --bg-top: #eef7f3;
-      --bg-bottom: #e7f0f8;
-      --panel: #ffffff;
-      --ink: #1e3a4c;
-      --muted: #5a7384;
-      --teal: #0f8f7f;
-      --teal-soft: #d7f3ee;
-      --sky: #2b8fd6;
-      --lung: #f4a89a;
-      --lung-deep: #e07a6a;
-      --dia: #d97b9a;
-      --rib: #c5a57a;
-      --line: #9bb4c4;
-      --warn: #d97706;
-      --o2: #2b8fd6;
-      --co2: #e11d48;
+      --ink: #1a3344;
+      --muted: #5c7383;
+      --teal: #0d7f72;
+      --teal-soft: #d4f1eb;
+      --sky: #2186c9;
+      --paper: #f7fbf9;
+      --stage: #eef6f3;
+      --dock: #ffffff;
+      --line: rgba(26, 51, 68, 0.12);
+      --rose: #d4536d;
     }
 
     * { box-sizing: border-box; }
@@ -31,52 +25,339 @@
     html, body {
       margin: 0;
       min-height: 100%;
+      min-height: 100dvh;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       color: var(--ink);
       background:
-        radial-gradient(ellipse 80% 50% at 10% 0%, rgba(15, 143, 127, 0.12), transparent 55%),
-        radial-gradient(ellipse 70% 45% at 90% 10%, rgba(43, 143, 214, 0.1), transparent 50%),
-        linear-gradient(165deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
+        radial-gradient(ellipse 90% 60% at 50% -10%, rgba(13, 127, 114, 0.14), transparent 55%),
+        radial-gradient(circle at 100% 80%, rgba(33, 134, 201, 0.08), transparent 40%),
+        linear-gradient(180deg, #e8f4ef 0%, #e6eef5 100%);
     }
 
-    .panel {
-      background: var(--panel);
-      border: 1px solid rgba(30, 58, 76, 0.1);
-      box-shadow: 0 10px 28px rgba(30, 58, 76, 0.08);
+    .game-frame {
+      max-width: 1200px;
+      margin: 0 auto;
+      min-height: 100dvh;
+      padding: 12px 12px 16px;
+      display: grid;
+      grid-template-rows: auto auto minmax(0, 1fr) auto;
+      gap: 10px;
+    }
+
+    @media (min-width: 900px) {
+      .game-frame {
+        padding: 16px 20px 20px;
+        gap: 12px;
+        height: 100dvh;
+        max-height: 100dvh;
+        overflow: hidden;
+      }
+    }
+
+    .topbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px 16px;
+      animation: fadeSlide 0.45s ease both;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: clamp(1.55rem, 3.2vw, 2.1rem);
+      font-weight: 800;
+      letter-spacing: 0.01em;
+      line-height: 1.15;
+      color: var(--ink);
+    }
+    .brand p {
+      margin: 2px 0 0;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--teal);
+    }
+
+    .mode-nav {
+      display: flex;
+      gap: 6px;
+      padding: 4px;
+      background: rgba(255,255,255,0.72);
+      border: 1px solid var(--line);
+      border-radius: 999px;
     }
 
     .tab-btn {
-      transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+      border: 0;
+      background: transparent;
       color: var(--muted);
+      font-size: 0.92rem;
+      font-weight: 700;
+      padding: 0.65rem 1.1rem;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s, transform 0.15s;
     }
+    .tab-btn:hover { color: var(--ink); }
     .tab-btn.active {
-      background: var(--teal-soft);
-      color: var(--teal);
-      box-shadow: inset 0 0 0 1px rgba(15, 143, 127, 0.35);
-      font-weight: 700;
+      background: var(--teal);
+      color: #fff;
+      transform: translateY(-1px);
     }
 
-    .mode-chip, .slow-btn, .org-chip {
-      border: 1px solid rgba(30, 58, 76, 0.14);
-      background: #f7fbfa;
-      transition: border-color 0.2s, background 0.2s, color 0.2s, transform 0.15s;
-      min-height: 46px;
-    }
-    .mode-chip.active, .slow-btn.active, .org-chip.active {
-      border-color: rgba(15, 143, 127, 0.55);
-      background: var(--teal-soft);
-      color: var(--teal);
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      font-size: 0.78rem;
       font-weight: 700;
     }
+    .legend span {
+      padding: 0.35rem 0.7rem;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.75);
+    }
+    .legend .o2 { color: #0b5f8a; background: #e7f3fb; border-color: #b6d9ef; }
+    .legend .co2 { color: #9f1239; background: #fde8ee; border-color: #f5c0cd; }
 
-    .gauge-card {
-      background: #f5faf9;
-      border: 1px solid rgba(30, 58, 76, 0.08);
+    .coach-banner {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px 12px;
+      padding: 0.7rem 1rem;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.82);
+      border: 1px solid rgba(13, 127, 114, 0.22);
+      animation: fadeSlide 0.5s ease 0.05s both;
+    }
+    #coachText {
+      margin: 0;
+      flex: 1;
+      min-width: 200px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      line-height: 1.45;
+    }
+    #skipDemo {
+      border: 1px solid rgba(13, 127, 114, 0.35);
+      background: #fff;
+      color: var(--teal);
+      font-weight: 800;
+      font-size: 0.85rem;
+      border-radius: 10px;
+      padding: 0.5rem 0.85rem;
+      cursor: pointer;
+    }
+    #skipDemo.hidden { display: none; }
+
+    .stage {
+      position: relative;
+      border-radius: 22px;
+      background: var(--stage);
+      border: 1px solid var(--line);
+      overflow: hidden;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      min-height: 360px;
+      animation: stageIn 0.55s ease 0.08s both;
+    }
+
+    .stage-hud {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 10px 12px 0;
+      z-index: 2;
+    }
+
+    #stepRow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .step-chip {
+      min-width: 72px;
+      padding: 0.35rem 0.55rem;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.78);
+      text-align: center;
+      transition: background 0.25s, border-color 0.25s, transform 0.2s;
+    }
+    .step-chip .lbl {
+      font-size: 0.65rem;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .step-chip .val {
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: var(--ink);
+      line-height: 1.25;
+    }
+    .step-chip.on-in {
+      background: #e5f3fb;
+      border-color: rgba(33, 134, 201, 0.45);
+      transform: translateY(-1px);
+    }
+    .step-chip.on-out {
+      background: #fde8ee;
+      border-color: rgba(212, 83, 109, 0.4);
+      transform: translateY(-1px);
+    }
+
+    #phaseHint {
+      font-size: 0.92rem;
+      font-weight: 800;
+      color: var(--teal);
+      background: rgba(255,255,255,0.85);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 0.4rem 0.85rem;
+    }
+
+    .stage-canvas-wrap {
+      position: relative;
+      min-height: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px 10px 0;
+    }
+
+    #anatomyCanvas {
+      display: block;
+      width: 100%;
+      max-height: min(52vh, 520px);
+      height: auto;
+      touch-action: none;
+      cursor: grab;
+      border-radius: 16px;
+      background: linear-gradient(180deg, #f9fcfb 0%, #eef5f2 100%);
+    }
+    #anatomyCanvas.dragging { cursor: grabbing; }
+
+    #canvasTip {
+      position: absolute;
+      left: 16px;
+      right: 16px;
+      bottom: 8px;
+      margin: 0;
+      pointer-events: none;
+      font-size: 0.8rem;
+      font-weight: 600;
+      line-height: 1.4;
+      color: var(--ink);
+      background: rgba(255,255,255,0.88);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 0.5rem 0.75rem;
+    }
+
+    .stage-status {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      padding: 8px 12px 12px;
+    }
+    .stat {
+      text-align: center;
+      padding: 0.45rem 0.25rem;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.8);
+      border: 1px solid var(--line);
+    }
+    .stat .k {
+      font-size: 0.68rem;
+      color: var(--muted);
+      font-weight: 650;
+    }
+    .stat .v {
+      font-size: 0.86rem;
+      font-weight: 800;
+      margin-top: 2px;
+    }
+
+    .dock {
+      background: var(--dock);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 12px 12px 14px;
+      max-height: min(42vh, 420px);
+      overflow: auto;
+      animation: fadeSlide 0.5s ease 0.12s both;
+    }
+
+    @media (min-width: 900px) {
+      .dock { max-height: none; overflow: auto; }
+      #anatomyCanvas { max-height: none; height: 100%; object-fit: contain; }
+      .stage-canvas-wrap { height: 100%; }
+    }
+
+    .tab-panel.hidden { display: none !important; }
+
+    .dock-grid {
+      display: grid;
+      gap: 12px;
+    }
+    @media (min-width: 800px) {
+      .dock-grid.explore {
+        grid-template-columns: 1.1fr 1fr 0.95fr;
+        align-items: start;
+      }
+      .dock-grid.challenge {
+        grid-template-columns: 1.2fr 1fr;
+        align-items: start;
+      }
+    }
+
+    .block-title {
+      margin: 0 0 8px;
+      font-size: 0.82rem;
+      font-weight: 800;
+      color: var(--ink);
+    }
+
+    .mode-chip, .slow-btn {
+      border: 1px solid var(--line);
+      background: var(--paper);
+      color: var(--ink);
+      font-weight: 700;
+      font-size: 0.84rem;
+      border-radius: 12px;
+      min-height: 44px;
+      padding: 0.45rem 0.6rem;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.15s;
+    }
+    .mode-chip.active, .slow-btn.active {
+      background: var(--teal-soft);
+      border-color: rgba(13, 127, 114, 0.45);
+      color: var(--teal);
+      transform: translateY(-1px);
+    }
+
+    .chip-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+    }
+    .slow-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
+      gap: 6px;
+      margin-top: 8px;
     }
 
     .range-bio {
       -webkit-appearance: none;
       appearance: none;
+      width: 100%;
       height: 12px;
       border-radius: 999px;
       background: linear-gradient(90deg, #fb7185 0%, #94a3b8 50%, #38bdf8 100%);
@@ -87,453 +368,463 @@
       width: 28px;
       height: 28px;
       border-radius: 50%;
-      background: radial-gradient(circle at 35% 35%, #ecfeff, #0f8f7f 60%, #0b6d61);
-      border: 3px solid #99f6e4;
-      box-shadow: 0 2px 8px rgba(15, 143, 127, 0.35);
+      background: #0d7f72;
+      border: 3px solid #b8f0e6;
       cursor: grab;
     }
     .range-bio::-moz-range-thumb {
       width: 28px;
       height: 28px;
       border-radius: 50%;
-      background: #0f8f7f;
-      border: 3px solid #99f6e4;
+      background: #0d7f72;
+      border: 3px solid #b8f0e6;
       cursor: grab;
     }
 
-    .breath-btn {
-      user-select: none;
-      touch-action: none;
-      transition: transform 0.12s ease, box-shadow 0.12s ease;
+    .org-info {
+      margin-top: 8px;
+      padding: 0.65rem 0.75rem;
+      border-radius: 12px;
+      background: #eef8f5;
+      border: 1px dashed rgba(13, 127, 114, 0.35);
     }
-    .breath-btn:active, .breath-btn.pressed {
-      transform: scale(0.97);
-      box-shadow: 0 0 0 4px rgba(15, 143, 127, 0.25);
+    #orgInfoTitle {
+      margin: 0 0 2px;
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: var(--teal);
     }
-
-    .step-chip {
-      border: 1px solid rgba(30, 58, 76, 0.1);
-      background: #f7fbfa;
-      transition: all 0.25s ease;
-    }
-    .step-chip.on-in {
-      border-color: rgba(43, 143, 214, 0.55);
-      background: #e8f4fc;
-      transform: translateY(-1px);
-    }
-    .step-chip.on-out {
-      border-color: rgba(225, 29, 72, 0.45);
-      background: #fde8ee;
-      transform: translateY(-1px);
+    #orgInfoBody {
+      margin: 0;
+      font-size: 0.84rem;
+      line-height: 1.45;
+      color: var(--ink);
     }
 
-    #anatomyCanvas {
-      display: block;
-      width: 100%;
-      height: auto;
-      touch-action: none;
-      cursor: grab;
-      border-radius: 1rem;
-      background:
-        linear-gradient(180deg, #f8fcfb 0%, #eef5f8 100%);
-      border: 1px solid rgba(30, 58, 76, 0.1);
+    .gauge-mini {
+      display: grid;
+      gap: 6px;
     }
-    #anatomyCanvas.dragging { cursor: grabbing; }
+    .gauge-card {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 0.55rem 0.7rem;
+      font-size: 0.84rem;
+    }
+
+    #autoModeDesc, #scoreComment {
+      margin: 8px 0 0;
+      font-size: 0.82rem;
+      line-height: 1.45;
+      color: var(--muted);
+      font-weight: 600;
+    }
 
     #waveCanvas {
       display: block;
       width: 100%;
-      height: 130px;
-      border-radius: 0.75rem;
-      background: #f8fafc;
-      border: 1px solid rgba(30, 58, 76, 0.1);
+      height: 110px;
+      border-radius: 12px;
+      background: #f5faf8;
+      border: 1px solid var(--line);
     }
 
-    .star { color: #cbd5e1; transition: color 0.25s, transform 0.25s; }
-    .star.lit {
-      color: #f59e0b;
-      transform: scale(1.1);
-      text-shadow: 0 0 8px rgba(245, 158, 11, 0.35);
+    .breath-btn {
+      width: 100%;
+      border: 0;
+      border-radius: 18px;
+      padding: 1.15rem 1rem;
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: #fff;
+      background: linear-gradient(180deg, #1aa392, #0d7f72);
+      cursor: pointer;
+      user-select: none;
+      touch-action: none;
+      transition: transform 0.12s ease;
     }
-
-    .coach-banner {
-      background: linear-gradient(120deg, #d7f3ee, #e7f3fc);
-      border: 1px solid rgba(15, 143, 127, 0.28);
+    .breath-btn span {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 650;
+      opacity: 0.9;
+      margin-top: 0.25rem;
     }
+    .breath-btn:active, .breath-btn.pressed { transform: scale(0.98); }
 
     .progress-track {
-      height: 10px;
+      height: 8px;
       border-radius: 999px;
-      background: #e2e8f0;
+      background: #e5eef1;
       overflow: hidden;
+      flex: 1;
     }
     .progress-fill {
       height: 100%;
       width: 0%;
       border-radius: 999px;
-      background: linear-gradient(90deg, #0f8f7f, #2b8fd6);
+      background: var(--teal);
       transition: width 0.12s linear;
     }
 
-    .knowledge-row:nth-child(even) { background: #f5faf9; }
+    .star { color: #d1d9e0; font-size: 1.6rem; transition: color 0.25s, transform 0.25s; }
+    .star.lit { color: #eab308; transform: scale(1.08); }
 
+    .action-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .action-row button {
+      flex: 1;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: var(--paper);
+      font-weight: 800;
+      font-size: 0.85rem;
+      padding: 0.7rem 0.5rem;
+      cursor: pointer;
+      color: var(--ink);
+    }
+    #startChallenge { background: var(--teal-soft); border-color: rgba(13,127,114,0.35); color: var(--teal); }
+    #stopChallenge { flex: 0.55; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.84rem;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    th {
+      text-align: left;
+      padding: 0.55rem 0.7rem;
+      background: var(--teal-soft);
+      color: var(--teal);
+      font-weight: 800;
+    }
+    td {
+      padding: 0.55rem 0.7rem;
+      border-top: 1px solid var(--line);
+      color: var(--ink);
+    }
+    .knowledge-row:nth-child(even) { background: #f5faf8; }
+
+    .ext-grid {
+      display: grid;
+      gap: 8px;
+    }
+    @media (min-width: 700px) {
+      .ext-grid { grid-template-columns: 1fr 1fr; }
+    }
+    .ext-card {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 0.7rem 0.8rem;
+      background: var(--paper);
+    }
+    .ext-card h4 {
+      margin: 0 0 4px;
+      font-size: 0.88rem;
+      font-weight: 800;
+      color: var(--teal);
+    }
+    .ext-card p {
+      margin: 0;
+      font-size: 0.8rem;
+      line-height: 1.45;
+      color: var(--muted);
+      font-weight: 550;
+    }
+    .ext-card .why {
+      margin-top: 4px;
+      font-size: 0.72rem;
+      font-weight: 750;
+      color: var(--teal);
+    }
+
+    .scroll-soft { }
     .scroll-soft::-webkit-scrollbar { width: 8px; }
     .scroll-soft::-webkit-scrollbar-thumb {
-      background: rgba(15, 143, 127, 0.35);
+      background: rgba(13, 127, 114, 0.3);
       border-radius: 999px;
     }
 
-    .ext-card h4 { color: var(--teal); }
-    .org-info {
-      min-height: 4.5rem;
-      background: #f0faf7;
-      border: 1px dashed rgba(15, 143, 127, 0.35);
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes stageIn {
+      from { opacity: 0; transform: scale(0.985); }
+      to { opacity: 1; transform: scale(1); }
     }
 
-    #canvasTip { pointer-events: none; }
+    @media (max-width: 640px) {
+      .stage-status { grid-template-columns: repeat(2, 1fr); }
+      .legend { width: 100%; }
+      .mode-nav { width: 100%; justify-content: space-between; }
+      .tab-btn { flex: 1; text-align: center; padding-left: 0.4rem; padding-right: 0.4rem; font-size: 0.86rem; }
+    }
   </style>
 </head>
 <body>
-  <div class="min-h-screen px-3 py-4 sm:px-5 lg:px-8 lg:py-6 max-w-[1440px] mx-auto">
-    <header class="mb-4">
-      <div class="panel rounded-2xl px-4 py-4 sm:px-6 sm:py-5 flex flex-col gap-3">
-        <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
-          <div>
-            <p class="text-sm font-semibold text-teal-700 mb-1">小五常識 · 課本剖面圖風格</p>
-            <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-800 leading-tight">人體呼吸系統</h1>
-            <p class="mt-1.5 text-slate-600 text-sm sm:text-base max-w-2xl leading-relaxed">
-              像翻開自然課本一樣：看看肺、氣管和橫膈膜，怎樣把空氣吸進來、再吐出去。
-            </p>
-          </div>
-          <div class="flex flex-wrap gap-2 text-sm">
-            <span class="px-3 py-1.5 rounded-full bg-sky-100 text-sky-800 border border-sky-200">藍色＝氧氣 Ｏ₂</span>
-            <span class="px-3 py-1.5 rounded-full bg-rose-100 text-rose-800 border border-rose-200">紅色＝二氧化碳 ＣＯ₂</span>
-          </div>
-        </div>
-        <div id="coachBanner" class="coach-banner rounded-xl px-3 py-2.5 sm:px-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-          <p id="coachText" class="text-sm sm:text-[15px] text-slate-800 leading-relaxed font-medium">
-            先看示範：肺部正在慢慢呼吸。也可以點圖上的器官，讀讀說明！
-          </p>
-          <button id="skipDemo" type="button" class="shrink-0 rounded-lg px-3 py-2 text-sm font-bold bg-white text-teal-800 border border-teal-300 hover:bg-teal-50">
-            我要自己玩
-          </button>
-        </div>
+  <div class="game-frame">
+    <header class="topbar">
+      <div class="brand">
+        <h1>人體呼吸系統</h1>
+        <p>小五 · 課本剖面遊戲</p>
+      </div>
+      <nav class="mode-nav" role="tablist" aria-label="遊戲模式">
+        <button type="button" class="tab-btn active" data-tab="explore" role="tab" aria-selected="true">玩玩看</button>
+        <button type="button" class="tab-btn" data-tab="challenge" role="tab" aria-selected="false">小挑戰</button>
+        <button type="button" class="tab-btn" data-tab="knowledge" role="tab" aria-selected="false">小知識</button>
+      </nav>
+      <div class="legend">
+        <span class="o2">藍＝氧氣 Ｏ₂</span>
+        <span class="co2">紅＝二氧化碳 ＣＯ₂</span>
       </div>
     </header>
 
-    <main class="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-5">
-      <section class="lg:col-span-7">
-        <div class="panel rounded-2xl p-3 sm:p-4 h-full flex flex-col">
-          <div class="flex items-center justify-between gap-2 mb-2 px-1">
-            <h2 class="text-lg font-bold text-slate-800">課本風身體剖面</h2>
-            <p id="phaseHint" class="text-sm font-bold text-teal-700" aria-live="polite">準備中</p>
-          </div>
+    <div id="coachBanner" class="coach-banner">
+      <p id="coachText">先看示範：肺部正在慢慢呼吸。也可以點圖上的器官，讀讀說明！</p>
+      <button id="skipDemo" type="button">我要自己玩</button>
+    </div>
 
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5 mb-3" id="stepRow">
-            <div class="step-chip rounded-lg px-2 py-2 text-center" data-step="1">
-              <div class="text-[11px] text-slate-500">步驟 1</div>
-              <div class="text-xs sm:text-sm font-bold text-slate-800 leading-snug" id="step1Text">橫膈膜動</div>
-            </div>
-            <div class="step-chip rounded-lg px-2 py-2 text-center" data-step="2">
-              <div class="text-[11px] text-slate-500">步驟 2</div>
-              <div class="text-xs sm:text-sm font-bold text-slate-800 leading-snug" id="step2Text">胸腔變大／小</div>
-            </div>
-            <div class="step-chip rounded-lg px-2 py-2 text-center" data-step="3">
-              <div class="text-[11px] text-slate-500">步驟 3</div>
-              <div class="text-xs sm:text-sm font-bold text-slate-800 leading-snug" id="step3Text">氣壓變低／高</div>
-            </div>
-            <div class="step-chip rounded-lg px-2 py-2 text-center" data-step="4">
-              <div class="text-[11px] text-slate-500">步驟 4</div>
-              <div class="text-xs sm:text-sm font-bold text-slate-800 leading-snug" id="step4Text">空氣進／出</div>
-            </div>
+    <section class="stage" aria-label="呼吸解剖舞台">
+      <div class="stage-hud">
+        <div id="stepRow">
+          <div class="step-chip" data-step="1">
+            <div class="lbl">步驟 1</div>
+            <div class="val" id="step1Text">橫膈膜動</div>
           </div>
-
-          <div class="flex flex-wrap gap-2 mb-2">
-            <button type="button" id="slowIn" class="slow-btn rounded-xl px-3 py-2 text-sm font-bold">▶ 吸氣慢動作</button>
-            <button type="button" id="slowOut" class="slow-btn rounded-xl px-3 py-2 text-sm font-bold">▶ 呼氣慢動作</button>
-            <button type="button" id="stopSlow" class="rounded-xl px-3 py-2 text-sm font-semibold bg-slate-100 text-slate-600 border border-slate-200">停止慢動作</button>
+          <div class="step-chip" data-step="2">
+            <div class="lbl">步驟 2</div>
+            <div class="val" id="step2Text">胸腔變大／小</div>
           </div>
-
-          <div class="relative flex-1 min-h-[300px] sm:min-h-[420px]">
-            <canvas id="anatomyCanvas" width="720" height="660" aria-label="人體呼吸系統課本剖面圖"></canvas>
-            <p id="canvasTip" class="absolute bottom-3 left-3 right-3 text-xs sm:text-sm text-slate-800 bg-white/85 rounded-xl px-3 py-2 border border-slate-200 leading-relaxed">
-              點器官看說明；抓住綠色圓點拖橫膈膜：往下＝吸氣，往上＝呼氣。
-            </p>
+          <div class="step-chip" data-step="3">
+            <div class="lbl">步驟 3</div>
+            <div class="val" id="step3Text">氣壓變低／高</div>
           </div>
-
-          <div id="orgInfo" class="org-info mt-3 rounded-xl px-3 py-3">
-            <p class="text-xs font-bold text-teal-700 mb-0.5" id="orgInfoTitle">點一下圖上的器官吧</p>
-            <p class="text-sm text-slate-700 leading-relaxed" id="orgInfoBody">可以點：氣管、左肺、右肺、肋骨／肋間肌、橫膈膜。</p>
+          <div class="step-chip" data-step="4">
+            <div class="lbl">步驟 4</div>
+            <div class="val" id="step4Text">空氣進／出</div>
           </div>
+        </div>
+        <p id="phaseHint" aria-live="polite">準備中</p>
+      </div>
 
-          <div class="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-2 text-center text-sm">
-            <div class="gauge-card rounded-xl px-2 py-2.5">
-              <div class="text-slate-500 text-xs mb-0.5">現在狀態</div>
-              <div id="hudPhase" class="font-bold text-teal-800">平衡</div>
+      <div class="stage-canvas-wrap">
+        <canvas id="anatomyCanvas" width="720" height="660" aria-label="人體呼吸系統課本剖面圖"></canvas>
+        <p id="canvasTip">點器官看說明；抓住綠色圓點拖橫膈膜：往下＝吸氣，往上＝呼氣。</p>
+      </div>
+
+      <div class="stage-status">
+        <div class="stat"><div class="k">現在狀態</div><div class="v" id="hudPhase">平衡</div></div>
+        <div class="stat"><div class="k">胸腔大小</div><div class="v" id="hudVolume">2350 mL</div></div>
+        <div class="stat"><div class="k">裡面氣壓</div><div class="v" id="hudPressure">一樣高</div></div>
+        <div class="stat"><div class="k">空氣方向</div><div class="v" id="hudFlow">暫時不動</div></div>
+      </div>
+    </section>
+
+    <section class="dock scroll-soft" aria-label="操作面板">
+      <div id="panel-explore" class="tab-panel dock-grid explore">
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <p class="block-title" style="margin:0">自己拉看看</p>
+            <span id="sliderLabel" style="font-size:0.8rem;font-weight:800;color:var(--teal)">平衡</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:0.72rem;color:var(--muted);font-weight:700;margin-bottom:4px">
+            <span>呼氣 ←</span><span>中間</span><span>→ 吸氣</span>
+          </div>
+          <input id="breathSlider" class="range-bio" type="range" min="-100" max="100" value="0" aria-label="吸氣呼氣滑桿" />
+
+          <p class="block-title" style="margin-top:12px">自動示範</p>
+          <div class="chip-row">
+            <button type="button" class="mode-chip" data-mode="idle">暫停</button>
+            <button type="button" class="mode-chip active" data-mode="calm">慢慢呼吸</button>
+            <button type="button" class="mode-chip" data-mode="exercise">跑步呼吸</button>
+          </div>
+          <p id="autoModeDesc">正在示範「慢慢呼吸」。看藍色進來、紅色出去。</p>
+        </div>
+
+        <div>
+          <p class="block-title">慢動作重播</p>
+          <div class="slow-row">
+            <button type="button" id="slowIn" class="slow-btn">▶ 吸氣慢動作</button>
+            <button type="button" id="slowOut" class="slow-btn">▶ 呼氣慢動作</button>
+            <button type="button" id="stopSlow" class="slow-btn" style="min-width:4.5rem">停止</button>
+          </div>
+          <div id="orgInfo" class="org-info">
+            <p id="orgInfoTitle">點一下圖上的器官吧</p>
+            <p id="orgInfoBody">可以點：氣管、左肺、右肺、肋骨／肋間肌、橫膈膜。</p>
+          </div>
+          <p style="margin:10px 0 0;font-size:0.8rem;line-height:1.45;color:var(--muted);font-weight:600">
+            <strong style="color:var(--sky)">吸氣：</strong>橫膈膜往下 → 胸腔變大 → 裡面變鬆 → 空氣進來。<br />
+            <strong style="color:var(--rose)">呼氣：</strong>橫膈膜往上 → 胸腔變小 → 裡面變擠 → 空氣出去。
+          </p>
+        </div>
+
+        <div>
+          <p class="block-title">現在身體怎麼了？</p>
+          <div class="gauge-mini">
+            <div class="gauge-card" style="display:flex;justify-content:space-between;gap:8px">
+              <span>橫膈膜</span>
+              <strong id="gaugeDiaphragm" style="color:var(--teal)">在中間</strong>
             </div>
-            <div class="gauge-card rounded-xl px-2 py-2.5">
-              <div class="text-slate-500 text-xs mb-0.5">胸腔大小</div>
-              <div id="hudVolume" class="font-bold text-sky-800">2350 mL</div>
+            <div class="gauge-card">
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+                <span>胸腔大小</span>
+                <strong id="gaugeVolume" style="color:var(--sky)">2350 mL</strong>
+              </div>
+              <div style="height:8px;border-radius:999px;background:#e5eef1;overflow:hidden">
+                <div id="volumeBar" style="height:100%;width:50%;border-radius:999px;background:linear-gradient(90deg,#0d7f72,#2186c9)"></div>
+              </div>
             </div>
-            <div class="gauge-card rounded-xl px-2 py-2.5">
-              <div class="text-slate-500 text-xs mb-0.5">裡面氣壓</div>
-              <div id="hudPressure" class="font-bold text-amber-700">一樣高</div>
+            <div class="gauge-card">
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+                <span>裡面的氣壓</span>
+                <strong id="gaugePressure" style="color:#b45309">一樣高</strong>
+              </div>
+              <div style="position:relative;height:8px;border-radius:999px;background:#e5eef1">
+                <div style="position:absolute;left:50%;top:0;bottom:0;width:1px;background:#94a3b8"></div>
+                <div id="pressureMarker" style="position:absolute;top:50%;transform:translateY(-50%);width:14px;height:14px;border-radius:50%;background:#f59e0b;border:2px solid #fff;left:calc(50% - 7px)"></div>
+              </div>
             </div>
-            <div class="gauge-card rounded-xl px-2 py-2.5">
-              <div class="text-slate-500 text-xs mb-0.5">空氣方向</div>
-              <div id="hudFlow" class="font-bold text-slate-800">暫時不動</div>
+            <div class="gauge-card" style="display:flex;justify-content:space-between;gap:8px">
+              <span>空氣在做什麼</span>
+              <strong id="gaugeFlow">暫時不動</strong>
             </div>
           </div>
         </div>
-      </section>
+      </div>
 
-      <section class="lg:col-span-5">
-        <div class="panel rounded-2xl p-3 sm:p-4 flex flex-col min-h-[520px] lg:min-h-full">
-          <div class="flex gap-1 p-1 rounded-xl bg-slate-100 border border-slate-200 mb-4" role="tablist">
-            <button type="button" class="tab-btn active flex-1 rounded-lg px-2 py-3 text-sm font-semibold" data-tab="explore" role="tab" aria-selected="true">玩玩看</button>
-            <button type="button" class="tab-btn flex-1 rounded-lg px-2 py-3 text-sm font-semibold" data-tab="challenge" role="tab" aria-selected="false">小挑戰</button>
-            <button type="button" class="tab-btn flex-1 rounded-lg px-2 py-3 text-sm font-semibold" data-tab="knowledge" role="tab" aria-selected="false">小知識</button>
+      <div id="panel-challenge" class="tab-panel hidden dock-grid challenge">
+        <div>
+          <p class="block-title">老師出題</p>
+          <p id="challengeInstruction" style="margin:0;font-size:0.95rem;font-weight:800;line-height:1.4">
+            按「開始玩」後，跟著綠線節奏：按住＝吸氣，放開＝呼氣。
+          </p>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:8px">
+            <div class="progress-track"><div id="challengeProgress" class="progress-fill"></div></div>
+            <span id="challengeTimeLeft" style="font-size:0.75rem;color:var(--muted);font-weight:700;width:3.2rem;text-align:right">—</span>
           </div>
-
-          <!-- 玩玩看 -->
-          <div id="panel-explore" class="tab-panel flex-1 flex flex-col gap-4 scroll-soft overflow-y-auto max-h-[70vh] lg:max-h-none pr-1">
-            <div>
-              <div class="flex items-center justify-between mb-2">
-                <label for="breathSlider" class="text-sm font-bold text-slate-800">自己拉看看</label>
-                <span id="sliderLabel" class="text-sm font-bold text-teal-700">平衡</span>
-              </div>
-              <div class="flex justify-between text-xs text-slate-500 mb-1.5 px-0.5 font-medium">
-                <span>呼氣 ←</span><span>中間</span><span>→ 吸氣</span>
-              </div>
-              <input id="breathSlider" class="range-bio w-full" type="range" min="-100" max="100" value="0" aria-label="吸氣呼氣滑桿" />
+          <canvas id="waveCanvas" width="560" height="110" aria-label="呼吸節奏比對" style="margin-top:10px"></canvas>
+        </div>
+        <div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;text-align:center">
+            <div class="gauge-card">
+              <div style="font-size:0.72rem;color:var(--muted)">吸得夠不夠</div>
+              <div id="scoreCapacity" style="font-size:1.35rem;font-weight:800;color:var(--teal)">—</div>
             </div>
-
-            <div>
-              <p class="text-sm font-bold text-slate-800 mb-2">自動示範</p>
-              <div class="grid grid-cols-3 gap-2">
-                <button type="button" class="mode-chip rounded-xl px-2 py-2 text-sm font-semibold" data-mode="idle">暫停</button>
-                <button type="button" class="mode-chip active rounded-xl px-2 py-2 text-sm font-semibold" data-mode="calm">慢慢呼吸</button>
-                <button type="button" class="mode-chip rounded-xl px-2 py-2 text-sm font-semibold" data-mode="exercise">跑步呼吸</button>
-              </div>
-              <p id="autoModeDesc" class="mt-2 text-sm text-slate-600 leading-relaxed">
-                正在示範「慢慢呼吸」。看左邊藍色進來、紅色出去。
-              </p>
-            </div>
-
-            <div>
-              <p class="text-sm font-bold text-slate-800 mb-2">現在身體怎麼了？</p>
-              <div class="space-y-2">
-                <div class="gauge-card rounded-xl px-3 py-3 flex justify-between items-center gap-2">
-                  <span class="text-slate-600 text-sm">橫膈膜</span>
-                  <span id="gaugeDiaphragm" class="text-sm font-bold text-teal-800 text-right">在中間</span>
-                </div>
-                <div class="gauge-card rounded-xl px-3 py-3">
-                  <div class="flex justify-between text-sm mb-1.5">
-                    <span class="text-slate-600">胸腔大小</span>
-                    <span id="gaugeVolume" class="font-bold text-sky-800">2350 mL</span>
-                  </div>
-                  <div class="h-3 rounded-full bg-slate-200 overflow-hidden">
-                    <div id="volumeBar" class="h-full rounded-full bg-gradient-to-r from-teal-600 to-sky-500" style="width:50%"></div>
-                  </div>
-                  <div class="flex justify-between text-xs text-slate-500 mt-1">
-                    <span>比較小 2100</span><span>比較大 2600</span>
-                  </div>
-                </div>
-                <div class="gauge-card rounded-xl px-3 py-3">
-                  <div class="flex justify-between text-sm mb-1.5">
-                    <span class="text-slate-600">裡面的氣壓</span>
-                    <span id="gaugePressure" class="font-bold text-amber-700">一樣高</span>
-                  </div>
-                  <div class="relative h-3 rounded-full bg-slate-200">
-                    <div class="absolute left-1/2 top-0 bottom-0 w-px bg-slate-400"></div>
-                    <div id="pressureMarker" class="absolute top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-amber-400 border-2 border-white shadow" style="left:calc(50% - 8px)"></div>
-                  </div>
-                  <div class="flex justify-between text-xs text-slate-500 mt-1">
-                    <span>← 比較鬆（會進來）</span>
-                    <span>比較擠（會出去）→</span>
-                  </div>
-                </div>
-                <div class="gauge-card rounded-xl px-3 py-3 flex justify-between items-center gap-2">
-                  <span class="text-slate-600 text-sm">空氣在做什麼</span>
-                  <span id="gaugeFlow" class="text-sm font-bold text-slate-800 text-right">暫時不動</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="gauge-card rounded-xl px-3 py-3 text-sm text-slate-700 leading-relaxed">
-              <p class="font-bold text-teal-800 mb-1">記一句就好</p>
-              <p><span class="text-sky-700 font-bold">吸氣：</span>橫膈膜往下 → 胸腔變大 → 裡面變鬆 → 空氣進來。</p>
-              <p class="mt-1"><span class="text-rose-700 font-bold">呼氣：</span>橫膈膜往上 → 胸腔變小 → 裡面變擠 → 空氣出去。</p>
+            <div class="gauge-card">
+              <div style="font-size:0.72rem;color:var(--muted)">節奏跟得上嗎</div>
+              <div id="scoreExchange" style="font-size:1.35rem;font-weight:800;color:var(--sky)">—</div>
             </div>
           </div>
-
-          <!-- 小挑戰 -->
-          <div id="panel-challenge" class="tab-panel hidden flex-1 flex flex-col gap-3 scroll-soft overflow-y-auto max-h-[70vh] lg:max-h-none pr-1">
-            <div class="gauge-card rounded-xl px-3 py-3">
-              <p class="text-xs text-slate-500 mb-1">老師出題</p>
-              <p id="challengeInstruction" class="text-base font-bold text-slate-800 leading-snug">
-                按「開始玩」後，跟著綠線節奏：按住＝吸氣，放開＝呼氣。
-              </p>
-              <div class="mt-2 flex items-center gap-2">
-                <div class="progress-track flex-1"><div id="challengeProgress" class="progress-fill"></div></div>
-                <span id="challengeTimeLeft" class="text-xs text-slate-500 w-14 text-right">—</span>
-              </div>
+          <div style="text-align:center;margin:8px 0">
+            <div id="starRow" aria-label="星星分數">
+              <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
             </div>
-
-            <canvas id="waveCanvas" width="560" height="130" aria-label="呼吸節奏比對"></canvas>
-
-            <div class="grid grid-cols-2 gap-2 text-center text-sm">
-              <div class="gauge-card rounded-xl px-2 py-2.5">
-                <div class="text-slate-500 text-xs">吸得夠不夠</div>
-                <div id="scoreCapacity" class="text-xl font-bold text-teal-800">—</div>
-              </div>
-              <div class="gauge-card rounded-xl px-2 py-2.5">
-                <div class="text-slate-500 text-xs">節奏跟得上嗎</div>
-                <div id="scoreExchange" class="text-xl font-bold text-sky-800">—</div>
-              </div>
-            </div>
-
-            <div class="text-center">
-              <div class="flex justify-center gap-1 text-3xl mb-1" id="starRow" aria-label="星星分數">
-                <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
-              </div>
-              <p id="scoreComment" class="text-sm text-slate-700 min-h-[1.5rem] leading-relaxed">準備好了嗎？盡力就很棒！</p>
-            </div>
-
-            <button id="breathButton" type="button"
-              class="breath-btn w-full rounded-2xl py-6 text-lg sm:text-xl font-bold
-                     bg-gradient-to-b from-teal-400 to-teal-700 text-white shadow-md border border-teal-300"
-              aria-label="按住吸氣，放開呼氣">
-              按住＝吸氣　放開＝呼氣
-              <span class="block text-sm font-semibold opacity-90 mt-1">也可以按鍵盤空白鍵</span>
-            </button>
-
-            <div class="flex gap-2">
-              <button id="startChallenge" type="button" class="flex-1 rounded-xl py-3 text-sm font-bold bg-teal-100 text-teal-900 border border-teal-300 hover:bg-teal-200">開始玩</button>
-              <button id="retryChallenge" type="button" class="flex-1 rounded-xl py-3 text-sm font-bold bg-sky-50 text-sky-900 border border-sky-200 hover:bg-sky-100">再玩一次</button>
-              <button id="stopChallenge" type="button" class="rounded-xl px-3 py-3 text-sm font-semibold bg-slate-100 text-slate-700 border border-slate-200">結束</button>
-            </div>
-            <p class="text-xs text-slate-500 leading-relaxed">綠色虛線是目標節奏；藍色是你的呼吸。跟上快慢就得分！</p>
+            <p id="scoreComment">準備好了嗎？盡力就很棒！</p>
           </div>
-
-          <!-- 小知識 -->
-          <div id="panel-knowledge" class="tab-panel hidden flex-1 flex flex-col gap-4 scroll-soft overflow-y-auto max-h-[70vh] lg:max-h-none pr-1">
-            <div>
-              <h3 class="text-sm font-bold text-slate-800 mb-2">吸氣和呼氣差在哪？</h3>
-              <div class="overflow-hidden rounded-xl border border-slate-200">
-                <table class="w-full text-sm">
-                  <thead class="bg-teal-50 text-teal-900">
-                    <tr>
-                      <th class="text-left px-3 py-2.5 font-bold">部位</th>
-                      <th class="text-left px-3 py-2.5 font-bold">吸氣時</th>
-                      <th class="text-left px-3 py-2.5 font-bold">呼氣時</th>
-                    </tr>
-                  </thead>
-                  <tbody class="text-slate-700">
-                    <tr class="knowledge-row border-t border-slate-100">
-                      <td class="px-3 py-2.5 font-semibold">橫膈膜</td>
-                      <td class="px-3 py-2.5">用力往下、變平</td>
-                      <td class="px-3 py-2.5">放鬆往上、拱起來</td>
-                    </tr>
-                    <tr class="knowledge-row border-t border-slate-100">
-                      <td class="px-3 py-2.5 font-semibold">肋骨／肋間肌</td>
-                      <td class="px-3 py-2.5">往外往上張開</td>
-                      <td class="px-3 py-2.5">往內往下收回</td>
-                    </tr>
-                    <tr class="knowledge-row border-t border-slate-100">
-                      <td class="px-3 py-2.5 font-semibold">胸腔空間</td>
-                      <td class="px-3 py-2.5">變大</td>
-                      <td class="px-3 py-2.5">變小</td>
-                    </tr>
-                    <tr class="knowledge-row border-t border-slate-100">
-                      <td class="px-3 py-2.5 font-semibold">裡面氣壓</td>
-                      <td class="px-3 py-2.5">變低（比較鬆）</td>
-                      <td class="px-3 py-2.5">變高（比較擠）</td>
-                    </tr>
-                    <tr class="knowledge-row border-t border-slate-100">
-                      <td class="px-3 py-2.5 font-semibold">空氣</td>
-                      <td class="px-3 py-2.5">帶氧氣進來（藍）</td>
-                      <td class="px-3 py-2.5">把二氧化碳送出（紅）</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            <div>
-              <h3 class="text-sm font-bold text-slate-800 mb-2">生活小知識</h3>
-              <div class="space-y-2">
-                <article class="gauge-card rounded-xl px-3 py-3">
-                  <h4 class="text-sm font-bold text-amber-700 mb-1">氣喘時為什麼會喘？</h4>
-                  <p class="text-sm text-slate-600 leading-relaxed">氣管變窄，空氣進出不順，呼氣更吃力。有氣喘要聽醫生和家人指示。</p>
-                </article>
-                <article class="gauge-card rounded-xl px-3 py-3">
-                  <h4 class="text-sm font-bold text-rose-700 mb-1">氣胸是什麼？（進階）</h4>
-                  <p class="text-sm text-slate-600 leading-relaxed">空氣跑進不該去的縫隙，肺可能癟下來。突然很喘、胸痛要立刻告訴大人。</p>
-                </article>
-                <article class="gauge-card rounded-xl px-3 py-3">
-                  <h4 class="text-sm font-bold text-sky-700 mb-1">跑步時為什麼喘得快？</h4>
-                  <p class="text-sm text-slate-600 leading-relaxed">肌肉需要更多氧氣，也產生更多二氧化碳，所以呼吸又快又深。</p>
-                </article>
-              </div>
-            </div>
-
-            <div>
-              <h3 class="text-sm font-bold text-slate-800 mb-2">再多懂一點（延伸知識）</h3>
-              <div class="space-y-2 ext-card">
-                <article class="gauge-card rounded-xl px-3 py-3">
-                  <h4 class="text-sm font-bold mb-1">鼻子的功勞</h4>
-                  <p class="text-sm text-slate-600 leading-relaxed">鼻子能過濾灰塵、溫暖空氣，還能聞味道。常常用嘴巴狂喘，喉嚨比較容易乾。</p>
-                  <p class="text-xs text-teal-700 font-semibold mt-1">為什麼重要：保護氣管與肺，讓進來的空氣更舒適。</p>
-                </article>
-                <article class="gauge-card rounded-xl px-3 py-3">
-                  <h4 class="text-sm font-bold mb-1">氣管裡的「小掃把」</h4>
-                  <p class="text-sm text-slate-600 leading-relaxed">氣管壁有細細的纖毛，像小掃把，把灰塵和黏液慢慢掃到喉嚨，再咳出來或吞下去。</p>
-                  <p class="text-xs text-teal-700 font-semibold mt-1">為什麼重要：肺部才不會堆積髒東西。</p>
-                </article>
-                <article class="gauge-card rounded-xl px-3 py-3">
-                  <h4 class="text-sm font-bold mb-1">肺活量小實驗</h4>
-                  <p class="text-sm text-slate-600 leading-relaxed">安靜坐一分鐘，數自己呼吸幾次；再慢跑或快走後再數一次。通常運動後會比較快、比較深。</p>
-                  <p class="text-xs text-teal-700 font-semibold mt-1">為什麼重要：親身體會「身體越用力，呼吸越忙」。需大人陪同安全運動。</p>
-                </article>
-                <article class="gauge-card rounded-xl px-3 py-3">
-                  <h4 class="text-sm font-bold mb-1">一氧化碳很危險</h4>
-                  <p class="text-sm text-slate-600 leading-relaxed">燒炭、密閉車庫開引擎，可能產生一氧化碳。它會搶走血液裡氧氣的位置，讓人昏迷。</p>
-                  <p class="text-xs text-teal-700 font-semibold mt-1">為什麼重要：安全第一——通風、不在密閉空間燒東西。</p>
-                </article>
-                <article class="gauge-card rounded-xl px-3 py-3">
-                  <h4 class="text-sm font-bold mb-1">抽菸會傷肺</h4>
-                  <p class="text-sm text-slate-600 leading-relaxed">菸霧讓氣管變髒、纖毛變懶、肺彈性變差，久了就容易喘。二手菸也會影響身邊的人。</p>
-                  <p class="text-xs text-teal-700 font-semibold mt-1">為什麼重要：保護自己和家人的呼吸系統。</p>
-                </article>
-                <article class="gauge-card rounded-xl px-3 py-3">
-                  <h4 class="text-sm font-bold mb-1">爬山為什麼比較喘？</h4>
-                  <p class="text-sm text-slate-600 leading-relaxed">高山上空氣比較「稀」，同樣吸一口氣，得到的氧氣比較少，所以會喘得快一點。</p>
-                  <p class="text-xs text-teal-700 font-semibold mt-1">為什麼重要：了解環境也會影響呼吸。</p>
-                </article>
-                <article class="gauge-card rounded-xl px-3 py-3">
-                  <h4 class="text-sm font-bold mb-1">打噴嚏和咳嗽</h4>
-                  <p class="text-sm text-slate-600 leading-relaxed">鼻子或氣管被刺激時，身體用大力氣把東西噴出去，這是保護反應。記得遮口鼻、洗手。</p>
-                  <p class="text-xs text-teal-700 font-semibold mt-1">為什麼重要：保護自己，也減少傳染給同學。</p>
-                </article>
-                <article class="gauge-card rounded-xl px-3 py-3">
-                  <h4 class="text-sm font-bold mb-1">健康呼吸小習慣</h4>
-                  <p class="text-sm text-slate-600 leading-relaxed">運動前暖身；氣喘要聽醫生；覺得呼吸困難要告訴大人。不要隨便用紙袋裝自己救急——那是舊迷思，可能不安全。</p>
-                  <p class="text-xs text-teal-700 font-semibold mt-1">為什麼重要：養成正確習慣，比「硬撐」更重要。</p>
-                </article>
-              </div>
-            </div>
+          <button id="breathButton" type="button" class="breath-btn" aria-label="按住吸氣，放開呼氣">
+            按住＝吸氣　放開＝呼氣
+            <span>也可以按鍵盤空白鍵</span>
+          </button>
+          <div class="action-row">
+            <button id="startChallenge" type="button">開始玩</button>
+            <button id="retryChallenge" type="button">再玩一次</button>
+            <button id="stopChallenge" type="button">結束</button>
           </div>
         </div>
-      </section>
-    </main>
+      </div>
 
-    <footer class="mt-4 text-center text-xs text-slate-500 pb-2 leading-relaxed">
-      課堂示意動畫 · 數字有簡化 · 不能拿來當看病依據 · 剖面圖為課本教學風格
-    </footer>
+      <div id="panel-knowledge" class="tab-panel hidden" style="display:grid;gap:14px">
+        <div>
+          <p class="block-title">吸氣和呼氣差在哪？</p>
+          <table>
+            <thead>
+              <tr><th>部位</th><th>吸氣時</th><th>呼氣時</th></tr>
+            </thead>
+            <tbody>
+              <tr class="knowledge-row"><td><strong>橫膈膜</strong></td><td>用力往下、變平</td><td>放鬆往上、拱起來</td></tr>
+              <tr class="knowledge-row"><td><strong>肋骨／肋間肌</strong></td><td>往外往上張開</td><td>往內往下收回</td></tr>
+              <tr class="knowledge-row"><td><strong>胸腔空間</strong></td><td>變大</td><td>變小</td></tr>
+              <tr class="knowledge-row"><td><strong>裡面氣壓</strong></td><td>變低（比較鬆）</td><td>變高（比較擠）</td></tr>
+              <tr class="knowledge-row"><td><strong>空氣</strong></td><td>帶氧氣進來（藍）</td><td>把二氧化碳送出（紅）</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div>
+          <p class="block-title">生活小知識</p>
+          <div class="ext-grid">
+            <article class="ext-card">
+              <h4>氣喘時為什麼會喘？</h4>
+              <p>氣管變窄，空氣進出不順，呼氣更吃力。有氣喘要聽醫生和家人指示。</p>
+            </article>
+            <article class="ext-card">
+              <h4>氣胸是什麼？（進階）</h4>
+              <p>空氣跑進不該去的縫隙，肺可能癟下來。突然很喘、胸痛要立刻告訴大人。</p>
+            </article>
+            <article class="ext-card">
+              <h4>跑步時為什麼喘得快？</h4>
+              <p>肌肉需要更多氧氣，也產生更多二氧化碳，所以呼吸又快又深。</p>
+            </article>
+          </div>
+        </div>
+        <div>
+          <p class="block-title">再多懂一點（延伸知識）</p>
+          <div class="ext-grid ext-card-wrap">
+            <article class="ext-card">
+              <h4>鼻子的功勞</h4>
+              <p>鼻子能過濾灰塵、溫暖空氣，還能聞味道。常常用嘴巴狂喘，喉嚨比較容易乾。</p>
+              <p class="why">為什麼重要：保護氣管與肺，讓進來的空氣更舒適。</p>
+            </article>
+            <article class="ext-card">
+              <h4>氣管裡的「小掃把」</h4>
+              <p>氣管壁有細細的纖毛，像小掃把，把灰塵和黏液慢慢掃到喉嚨，再咳出來或吞下去。</p>
+              <p class="why">為什麼重要：肺部才不會堆積髒東西。</p>
+            </article>
+            <article class="ext-card">
+              <h4>肺活量小實驗</h4>
+              <p>安靜坐一分鐘，數自己呼吸幾次；再慢跑或快走後再數一次。通常運動後會比較快、比較深。</p>
+              <p class="why">為什麼重要：親身體會「身體越用力，呼吸越忙」。需大人陪同安全運動。</p>
+            </article>
+            <article class="ext-card">
+              <h4>一氧化碳很危險</h4>
+              <p>燒炭、密閉車庫開引擎，可能產生一氧化碳。它會搶走血液裡氧氣的位置，讓人昏迷。</p>
+              <p class="why">為什麼重要：安全第一。通風、不在密閉空間燒東西。</p>
+            </article>
+            <article class="ext-card">
+              <h4>抽菸會傷肺</h4>
+              <p>菸霧讓氣管變髒、纖毛變懶、肺彈性變差，久了就容易喘。二手菸也會影響身邊的人。</p>
+              <p class="why">為什麼重要：保護自己和家人的呼吸系統。</p>
+            </article>
+            <article class="ext-card">
+              <h4>爬山為什麼比較喘？</h4>
+              <p>高山上空氣比較「稀」，同樣吸一口氣，得到的氧氣比較少，所以會喘得快一點。</p>
+              <p class="why">為什麼重要：了解環境也會影響呼吸。</p>
+            </article>
+            <article class="ext-card">
+              <h4>打噴嚏和咳嗽</h4>
+              <p>鼻子或氣管被刺激時，身體用大力氣把東西噴出去，這是保護反應。記得遮口鼻、洗手。</p>
+              <p class="why">為什麼重要：保護自己，也減少傳染給同學。</p>
+            </article>
+            <article class="ext-card">
+              <h4>健康呼吸小習慣</h4>
+              <p>運動前暖身；氣喘要聽醫生；覺得呼吸困難要告訴大人。不要隨便用紙袋裝自己救急，那是舊迷思，可能不安全。</p>
+              <p class="why">為什麼重要：養成正確習慣，比硬撐更重要。</p>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
   </div>
 
-  <script>
+
+<script>
     (() => {
       'use strict';
 
@@ -1616,4 +1907,3 @@
   </script>
 </body>
 </html>
-
