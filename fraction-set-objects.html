@@ -884,29 +884,44 @@
 
     <!-- PRACTICE B -->
     <section class="stage screen" id="screen-practiceB" data-screen="practiceB">
-      <h2>練習 B：動手分物再取份</h2>
+      <h2>練習 B：自己決定要分幾份</h2>
       <div class="q-progress" id="practiceBProgress">第 1 / 10 題</div>
-      <p class="lead" id="practiceBLead">把物資拖進（或點選後放入）份盤，每份要一樣多。</p>
+      <p class="lead" id="practiceBLead">看分數想一想：要等分成幾份？再自己加份盤、把物件放進去。</p>
       <div class="narration"><span class="badge">題目</span><p id="practiceBPrompt"></p></div>
       <div class="layout-split">
         <div class="sort-board">
-          <div class="phase-chip" id="practiceBPhaseChip">步驟 1：分物入盤</div>
+          <div class="phase-chip" id="practiceBPhaseChip">步驟 1：決定份數並分物</div>
           <div class="pool-zone" id="practiceBPoolZone">
             <p class="zone-title">物資區（還沒分出去的）</p>
             <div class="item-pool" id="practiceBPool" aria-label="物資區"></div>
           </div>
           <div class="tray-zone">
-            <p class="zone-title">份盤（分母＝份數）· 點選盤可放入已拿起的物件</p>
+            <p class="zone-title">份盤區 · 先想好要幾個份盤，再分物（每盤要一樣多）</p>
+            <div class="btn-row" style="margin:0 0 10px">
+              <button type="button" class="secondary" id="practiceBAddTray">＋ 加一份盤</button>
+              <button type="button" class="ghost" id="practiceBRemoveTray">− 拿走一份盤</button>
+              <span class="chip" id="practiceBTrayCount">現有 0 個份盤</span>
+            </div>
             <div class="tray-grid" id="practiceBTrays" aria-label="份盤"></div>
+            <p id="practiceBEmptyTrays" class="readout" style="margin-top:8px">還沒有份盤。按「＋ 加一份盤」開始。</p>
           </div>
           <div class="btn-row" style="margin-top:0">
-            <button type="button" class="ghost" id="practiceBResetSort">重新分物</button>
-            <button type="button" class="secondary" id="practiceBAutoHint">示範均分一格</button>
-            <button type="button" class="primary" id="practiceBCheckEqual">檢查是否等分</button>
+            <button type="button" class="ghost" id="practiceBResetSort">重新開始</button>
+            <button type="button" class="secondary" id="practiceBThinkHint">想一想提示</button>
+            <button type="button" class="primary" id="practiceBCheckEqual">檢查我的分法</button>
           </div>
         </div>
         <div>
-          <p style="font-weight:800;margin:0 0 8px" id="practiceBSideHint">先把全部物件放入份盤，每盤數量要相同。</p>
+          <div class="fraction-card" style="margin-bottom:12px">
+            <div style="font-weight:800;color:var(--muted)">題目裏的分數</div>
+            <div class="fraction-stack">
+              <div class="num" id="practiceBFracNum">?</div>
+              <div class="bar" title="分線"></div>
+              <div class="den" id="practiceBFracDen">?</div>
+            </div>
+            <p class="readout" id="practiceBFracAsk">哪個數告訴我們「要等分成幾份」？</p>
+          </div>
+          <p style="font-weight:800;margin:0 0 8px" id="practiceBSideHint">先自己決定份盤數量，再把全部物件放入，每盤一樣多。</p>
           <p class="readout" id="practiceBSelected">物資區尚餘 — 個</p>
           <div class="count-meter" id="practiceBCountMeter">？</div>
           <p class="readout" id="practiceBCountLabel">取份後這裏會顯示總個數</p>
@@ -993,6 +1008,8 @@
         practiceBPickedId: null,
         practiceBSelectedTrays: new Set(),
         practiceBEqualOk: false,
+        practiceBHintLevel: 0,
+        practiceBPickHintLevel: 0,
         autoTimer: null,
         dragItemId: null
       };
@@ -1527,14 +1544,39 @@
         state.practiceBEqualOk = false;
         state.practiceBPickedId = null;
         state.practiceBSelectedTrays = new Set();
+        state.practiceBHintLevel = 0;
+        state.practiceBPickHintLevel = 0;
         state.practiceBItems = [];
         state.practiceBPool = [];
+        // 不預先給定份盤數：由學生自行加減發現「分母＝要分幾份」
         state.practiceBTrays = [];
         for (let i = 0; i < q.total; i++) {
           state.practiceBItems.push({ id: "b" + i, icon: q.icon });
           state.practiceBPool.push("b" + i);
         }
-        for (let t = 0; t < q.den; t++) state.practiceBTrays.push([]);
+      }
+
+      function addPracticeBTray() {
+        if (state.practiceBPhase !== "sort" && state.practiceBPhase !== "done") {
+          enterSortPhase();
+        }
+        if (state.practiceBTrays.length >= 12) return;
+        state.practiceBTrays.push([]);
+        state.practiceBEqualOk = false;
+        state.practiceBSelectedTrays = new Set();
+        paintPracticeB();
+      }
+
+      function removePracticeBTray() {
+        if (state.practiceBPhase !== "sort") enterSortPhase();
+        if (!state.practiceBTrays.length) return;
+        const last = state.practiceBTrays.pop();
+        // 盤內物件放回物資區
+        last.forEach(function (id) { state.practiceBPool.push(id); });
+        state.practiceBEqualOk = false;
+        state.practiceBSelectedTrays = new Set();
+        state.practiceBPickedId = null;
+        paintPracticeB();
       }
 
       function findItemLocation(id) {
@@ -1596,20 +1638,35 @@
         const selectedEl = document.getElementById("practiceBSelected");
         const meter = document.getElementById("practiceBCountMeter");
         const label = document.getElementById("practiceBCountLabel");
+        const trayCountEl = document.getElementById("practiceBTrayCount");
+        const emptyEl = document.getElementById("practiceBEmptyTrays");
+        const fracAsk = document.getElementById("practiceBFracAsk");
+
+        document.getElementById("practiceBFracNum").textContent = String(q.num);
+        document.getElementById("practiceBFracDen").textContent = String(q.den);
+        trayCountEl.textContent = "現有 " + state.practiceBTrays.length + " 個份盤";
+        emptyEl.hidden = state.practiceBTrays.length > 0;
 
         if (state.practiceBPhase === "sort") {
-          chip.textContent = "步驟 1：分物入盤（分母＝" + q.den + "）";
-          hint.textContent = "拖動物件到份盤，或先點物件再點份盤。每盤個數要相同。";
-          selectedEl.textContent = "物資區尚餘 " + poolLeft + " 個 · 已放入 " + (q.total - poolLeft) + " 個";
+          chip.textContent = "步驟 1：自己決定要分幾份，再分物";
+          hint.textContent = "先加份盤，再拖／點放物件。全部放完且每盤一樣多，才算等分。";
+          selectedEl.textContent = "物資區尚餘 " + poolLeft + " 個 · 已放入 " + (q.total - poolLeft) +
+            " 個 · 份盤 " + state.practiceBTrays.length + " 個";
           meter.textContent = "？";
-          label.textContent = "等分成功後，再點選要取的份（分子＝" + q.num + "）";
-        } else {
-          chip.textContent = "步驟 2：取份（分子＝" + q.num + "）";
-          hint.textContent = "點選恰好 " + q.num + " 個份盤，再按「確認取份答案」。";
+          label.textContent = "等分成功後，再想想要取幾份。";
+          fracAsk.textContent = "哪個數告訴我們「要等分成幾份」？用＋/− 準備份盤試試。";
+          document.getElementById("practiceBFracNum").className = "num";
+          document.getElementById("practiceBFracDen").className = "den hl";
+        } else if (state.practiceBPhase === "pick" || state.practiceBPhase === "done") {
+          chip.textContent = state.practiceBPhase === "done" ? "完成！" : "步驟 2：自己決定取幾份";
+          hint.textContent = "分子告訴我們取幾份。點選份盤後按確認。";
           selectedEl.textContent = "已取 " + state.practiceBSelectedTrays.size + " 份";
           const count = selectedCount();
           meter.textContent = String(count);
           label.textContent = "高亮份盤裏共有 " + count + " 個" + q.label;
+          fracAsk.textContent = "哪個數告訴我們「要取幾份」？";
+          document.getElementById("practiceBFracNum").className = "num hl";
+          document.getElementById("practiceBFracDen").className = "den";
         }
       }
 
@@ -1764,6 +1821,7 @@
           paintPracticeB();
         };
 
+        // empty state drop: ignore
         updatePracticeBSide();
       }
 
@@ -1774,14 +1832,17 @@
           "第 " + (state.practiceBIndex + 1) + " / " + practiceBQuestions.length + " 題";
         document.getElementById("practiceBPrompt").textContent =
           q.total + " 個" + q.label + "的 " + q.num + "/" + q.den +
-          " 是多少？請把物件放進 " + q.den + " 個份盤（每盤一樣多），再取 " + q.num + " 份。";
+          " 是多少？先看分數，自己決定要準備幾個份盤，把物件等分放好，再取其中幾份。";
         document.getElementById("practiceBLead").textContent =
-          "操作：拖曳物件，或「先點物件 → 再點份盤」；雙擊份盤中的物件可放回物資區。";
+          "不會先告訴你要分幾盤——請從分數裏自己發現。可用＋/− 加減份盤。";
         document.getElementById("practiceBFeedback").className = "feedback";
         document.getElementById("practiceBFeedback").textContent = "";
         document.getElementById("practiceBConfirm").disabled = true;
         paintPracticeB();
       }
+
+      document.getElementById("practiceBAddTray").addEventListener("click", addPracticeBTray);
+      document.getElementById("practiceBRemoveTray").addEventListener("click", removePracticeBTray);
 
       document.getElementById("practiceBResetSort").addEventListener("click", function () {
         initPracticeBModel();
@@ -1790,49 +1851,105 @@
         paintPracticeB();
       });
 
-      document.getElementById("practiceBAutoHint").addEventListener("click", function () {
+      document.getElementById("practiceBThinkHint").addEventListener("click", function () {
         const q = practiceBQuestions[state.practiceBIndex];
-        const per = q.total / q.den;
-        // fill first empty-ish tray toward equal as a gentle hint (one tray only)
-        let target = 0;
-        for (let i = 0; i < state.practiceBTrays.length; i++) {
-          if (state.practiceBTrays[i].length < per) { target = i; break; }
-        }
-        while (state.practiceBTrays[target].length < per && state.practiceBPool.length) {
-          moveItemToTray(state.practiceBPool[0], target);
-        }
-        state.practiceBPickedId = null;
         const feedback = document.getElementById("practiceBFeedback");
-        feedback.className = "feedback show ok";
-        feedback.textContent = "已示範把第 " + (target + 1) + " 份盤放到 " + per + " 個。請繼續把其餘物件均分到其他份盤。";
-        paintPracticeB();
+        const level = state.practiceBPhase === "pick" ? state.practiceBPickHintLevel : state.practiceBHintLevel;
+
+        if (state.practiceBPhase === "pick") {
+          if (level === 0) {
+            feedback.className = "feedback show ok";
+            feedback.textContent = "提示：看分數上面的分子——它告訴我們要取幾份。";
+            state.practiceBPickHintLevel = 1;
+          } else if (level === 1) {
+            feedback.className = "feedback show ok";
+            feedback.textContent = "再想：分子在分線上面。數一數你現在點亮了幾份，要和分子一樣。";
+            state.practiceBPickHintLevel = 2;
+          } else {
+            feedback.className = "feedback show ok";
+            feedback.textContent = "分子是 " + q.num + "，請點選 " + q.num + " 個份盤。";
+          }
+          return;
+        }
+
+        // sort phase discovery hints
+        if (level === 0) {
+          feedback.className = "feedback show ok";
+          feedback.textContent = "提示：分數裏有分子和分母。哪一個表示「把整體等分成幾份」？";
+          state.practiceBHintLevel = 1;
+        } else if (level === 1) {
+          feedback.className = "feedback show ok";
+          feedback.textContent = "再想：分母在分線下面。看看右邊分數卡下面那個數，用＋/− 準備同樣多個份盤。";
+          document.getElementById("practiceBFracDen").className = "den hl";
+          state.practiceBHintLevel = 2;
+        } else {
+          feedback.className = "feedback show ok";
+          feedback.textContent = "分母是 " + q.den + "，所以要準備 " + q.den + " 個份盤，再把物件均分進去。";
+        }
       });
 
       document.getElementById("practiceBCheckEqual").addEventListener("click", function () {
         const q = practiceBQuestions[state.practiceBIndex];
         const feedback = document.getElementById("practiceBFeedback");
+        const trayN = state.practiceBTrays.length;
+
+        if (trayN === 0) {
+          feedback.className = "feedback show bad";
+          feedback.textContent = "還沒有份盤。先想分數要你等分成幾份，再按「＋ 加一份盤」。";
+          return;
+        }
         if (state.practiceBPool.length > 0) {
           feedback.className = "feedback show bad";
           feedback.textContent = "物資區還有物件未分完，請全部放入份盤。";
           return;
         }
+
         const counts = state.practiceBTrays.map(function (t) { return t.length; });
-        const per = q.total / q.den;
-        const equal = counts.every(function (c) { return c === per; });
-        if (!equal) {
+        const allEqual = counts.length > 0 && counts.every(function (c) { return c === counts[0] && c > 0; });
+
+        if (trayN !== q.den) {
           state.practiceBEqualOk = false;
           feedback.className = "feedback show bad";
-          feedback.textContent = "還未等分：每份應是 " + per + " 個。現在各份是 " + counts.join("、") + "。請調整後再檢查。";
+          if (state.practiceBHintLevel < 1) {
+            feedback.textContent = "份盤數量好像不對。再看看分數——哪個數告訴我們要分成幾份？（現有 " + trayN + " 個份盤）";
+            state.practiceBHintLevel = 1;
+          } else if (state.practiceBHintLevel < 2) {
+            feedback.textContent = "看看分母（分數下面）。用＋/− 把份盤調成和分母一樣多，再均分物件。";
+            document.getElementById("practiceBFracDen").className = "den hl";
+            state.practiceBHintLevel = 2;
+          } else {
+            feedback.textContent = "要分成 " + q.den + " 份（分母是 " + q.den + "）。現在有 " + trayN +
+              " 個份盤，請用＋/− 調整後再檢查。";
+          }
+          paintPracticeB();
+          return;
+        }
+
+        if (!allEqual) {
+          state.practiceBEqualOk = false;
+          feedback.className = "feedback show bad";
+          feedback.textContent = "份盤數對了，但每盤個數還不一樣（現在是 " + counts.join("、") +
+            "）。請調成每盤一樣多。";
           paintPracticeB();
           document.querySelectorAll("#practiceBTrays .tray").forEach(function (el, i) {
-            if (counts[i] !== per) el.classList.add("unequal");
+            if (counts[i] !== counts[0]) el.classList.add("unequal");
           });
           return;
         }
+
+        const per = counts[0];
+        if (per * trayN !== q.total) {
+          // shouldn't happen if pool empty and trays hold all
+          feedback.className = "feedback show bad";
+          feedback.textContent = "請確認全部物件都在份盤裏。";
+          return;
+        }
+
         state.practiceBEqualOk = true;
         enterPickPhase();
         feedback.className = "feedback show ok";
-        feedback.textContent = "等分成功！每份 " + per + " 個。現在點選要取的 " + q.num + " 份盤。";
+        feedback.textContent = "你發現了：要等分成 " + q.den + " 份，每份 " + per +
+          " 個。接下來，分子告訴我們取幾份——自己點選再確認。";
         paintPracticeB();
       });
 
@@ -1841,23 +1958,32 @@
         const feedback = document.getElementById("practiceBFeedback");
         if (state.practiceBPhase !== "pick" || !state.practiceBEqualOk) {
           feedback.className = "feedback show bad";
-          feedback.textContent = "請先完成分物並通過「檢查是否等分」。";
+          feedback.textContent = "請先自己分好份盤，並通過「檢查我的分法」。";
           return;
         }
         const picked = state.practiceBSelectedTrays.size;
         const count = selectedCount();
         if (picked !== q.num) {
           feedback.className = "feedback show bad";
-          feedback.textContent = "分子是 " + q.num + "，請恰好點選 " + q.num + " 個份盤。（現在選了 " + picked + " 份）";
+          if (state.practiceBPickHintLevel < 1) {
+            feedback.textContent = "取的份數還不對。再看分數上面的分子——它表示要取幾份。（現在取了 " + picked + " 份）";
+            state.practiceBPickHintLevel = 1;
+          } else if (state.practiceBPickHintLevel < 2) {
+            feedback.textContent = "分子在分線上面。請點選和分子相同數量的份盤。";
+            document.getElementById("practiceBFracNum").className = "num hl";
+            state.practiceBPickHintLevel = 2;
+          } else {
+            feedback.textContent = "分子是 " + q.num + "，請恰好點選 " + q.num + " 個份盤。（現在選了 " + picked + " 份）";
+          }
           return;
         }
         if (count === q.answer) {
           state.practiceBPhase = "done";
           document.getElementById("practiceBConfirm").disabled = true;
           feedback.className = "feedback show ok";
-          feedback.textContent = "正確！你親手把 " + q.total + " 個等分成 " + q.den +
-            " 份，再取 " + q.num + " 份，數得 " + q.answer + " 個" + q.label + "。";
-          document.getElementById("practiceBPhaseChip").textContent = "完成！";
+          feedback.textContent = "正確！你自己發現要分成 " + q.den + " 份、取 " + q.num +
+            " 份，數得 " + q.answer + " 個" + q.label + "。";
+          updatePracticeBSide();
         } else {
           feedback.className = "feedback show bad";
           feedback.textContent = "取份份數對了，但總個數是 " + count + "。請再數高亮份盤裏的物件。";
