@@ -502,6 +502,158 @@
 
     .group-inner .toy { min-width: 48px; flex: 1 1 48px; max-width: 64px; }
 
+    .q-progress {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 800;
+      font-size: 0.9rem;
+      color: var(--accent-dark);
+      background: #e8f8f2;
+      border: 2px solid #9fd0be;
+      border-radius: 999px;
+      padding: 4px 12px;
+      margin-bottom: 10px;
+    }
+
+    .sort-board {
+      display: grid;
+      gap: 12px;
+    }
+
+    .pool-zone, .tray-zone {
+      border-radius: 16px;
+      padding: 12px;
+      border: 3px dashed #94a3b8;
+      background: #f8fafc;
+      min-height: 88px;
+      transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+    }
+
+    .pool-zone {
+      border-color: #7dd3c0;
+      background: linear-gradient(180deg, #f7fcf9, #eef8f4);
+    }
+
+    .pool-zone.drag-over,
+    .tray.drag-over {
+      border-color: var(--warm);
+      background: #fffbeb;
+      box-shadow: 0 0 0 4px rgba(217, 119, 6, 0.15);
+    }
+
+    .zone-title {
+      font-weight: 900;
+      font-size: 0.9rem;
+      margin: 0 0 8px;
+      color: var(--muted);
+    }
+
+    .item-pool {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      min-height: 56px;
+    }
+
+    .manip-item {
+      appearance: none;
+      border: 3px solid #cbd5e1;
+      background: #fff;
+      border-radius: 14px;
+      width: 56px;
+      height: 56px;
+      font-size: 1.55rem;
+      cursor: grab;
+      touch-action: none;
+      box-shadow: 0 3px 0 rgba(26, 51, 68, 0.1);
+      transition: transform 0.12s, border-color 0.15s, box-shadow 0.15s;
+      user-select: none;
+    }
+
+    .manip-item:active { cursor: grabbing; }
+    .manip-item.picked {
+      border-color: var(--warm);
+      transform: scale(1.08);
+      box-shadow: 0 0 0 4px rgba(217, 119, 6, 0.25);
+    }
+    .manip-item.flying {
+      opacity: 0.35;
+      transform: scale(0.9);
+    }
+
+    .tray-grid {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    }
+
+    .tray {
+      border: 3px solid #94a3b8;
+      border-radius: 16px;
+      padding: 10px;
+      background: #fff;
+      min-height: 120px;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s, transform 0.15s;
+    }
+
+    .tray.target-active {
+      border-color: var(--accent);
+      background: #ecfdf5;
+      animation: pulseRing 1.2s ease infinite;
+    }
+
+    .tray.selected {
+      border-color: var(--warm);
+      background: #fffbeb;
+      transform: scale(1.02);
+    }
+
+    .tray.unequal {
+      border-color: var(--danger);
+      background: #fff7ed;
+    }
+
+    .tray.equal-ok {
+      border-color: var(--ok);
+    }
+
+    .tray-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 900;
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .tray-items {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      min-height: 56px;
+    }
+
+    .phase-chip {
+      display: inline-block;
+      font-weight: 900;
+      font-size: 0.8rem;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #e0f2fe;
+      color: #075985;
+      margin-bottom: 8px;
+    }
+
+    .count-meter {
+      font-size: 2rem;
+      font-weight: 900;
+      margin: 8px 0;
+      animation: popIn 0.3s ease;
+    }
+
     .step-dots {
       display: flex;
       gap: 6px;
@@ -681,6 +833,7 @@
     <!-- PRACTICE A -->
     <section class="stage screen" id="screen-practiceA" data-screen="practiceA">
       <h2>練習 A：寫出分數</h2>
+      <div class="q-progress" id="practiceAProgress">第 1 / 10 題</div>
       <p class="lead">先數全部（分母），再數指定部分（分子）。</p>
       <div class="narration"><span class="badge">提示</span><p id="practiceAPrompt">蘋果佔全部水果的幾分之幾？</p></div>
       <div class="layout-split">
@@ -700,6 +853,7 @@
           <div class="feedback" id="practiceAFeedback"></div>
           <div class="btn-row">
             <button type="button" class="ghost" id="practiceAReplay">重播解說 A</button>
+            <button type="button" class="secondary" id="practiceAPrevQ">上一題</button>
             <button type="button" class="primary" id="practiceANextQ">下一題</button>
           </div>
         </div>
@@ -730,25 +884,37 @@
 
     <!-- PRACTICE B -->
     <section class="stage screen" id="screen-practiceB" data-screen="practiceB">
-      <h2>練習 B：等分後找出數量</h2>
-      <p class="lead" id="practiceBLead">把物件等分成份，再取其中幾份。</p>
+      <h2>練習 B：動手分物再取份</h2>
+      <div class="q-progress" id="practiceBProgress">第 1 / 10 題</div>
+      <p class="lead" id="practiceBLead">把物資拖進（或點選後放入）份盤，每份要一樣多。</p>
       <div class="narration"><span class="badge">題目</span><p id="practiceBPrompt"></p></div>
       <div class="layout-split">
-        <div>
-          <div class="btn-row" style="margin-top:0;margin-bottom:8px">
-            <button type="button" class="ghost" id="splitRow">橫分</button>
-            <button type="button" class="ghost" id="splitCol">直分</button>
+        <div class="sort-board">
+          <div class="phase-chip" id="practiceBPhaseChip">步驟 1：分物入盤</div>
+          <div class="pool-zone" id="practiceBPoolZone">
+            <p class="zone-title">物資區（還沒分出去的）</p>
+            <div class="item-pool" id="practiceBPool" aria-label="物資區"></div>
           </div>
-          <div class="group-wrap" id="practiceBGroups"></div>
+          <div class="tray-zone">
+            <p class="zone-title">份盤（分母＝份數）· 點選盤可放入已拿起的物件</p>
+            <div class="tray-grid" id="practiceBTrays" aria-label="份盤"></div>
+          </div>
+          <div class="btn-row" style="margin-top:0">
+            <button type="button" class="ghost" id="practiceBResetSort">重新分物</button>
+            <button type="button" class="secondary" id="practiceBAutoHint">示範均分一格</button>
+            <button type="button" class="primary" id="practiceBCheckEqual">檢查是否等分</button>
+          </div>
         </div>
         <div>
-          <p style="font-weight:800;margin:0 0 8px">點選要取的份（對應分子）</p>
-          <p class="readout" id="practiceBSelected">已取 0 份</p>
-          <div class="choice-grid" id="practiceBChoices"></div>
+          <p style="font-weight:800;margin:0 0 8px" id="practiceBSideHint">先把全部物件放入份盤，每盤數量要相同。</p>
+          <p class="readout" id="practiceBSelected">物資區尚餘 — 個</p>
+          <div class="count-meter" id="practiceBCountMeter">？</div>
+          <p class="readout" id="practiceBCountLabel">取份後這裏會顯示總個數</p>
           <div class="feedback" id="practiceBFeedback"></div>
           <div class="btn-row">
             <button type="button" class="ghost" id="practiceBReplay">重播解說 B</button>
-            <button type="button" class="primary" id="practiceBCheck">確認答案</button>
+            <button type="button" class="secondary" id="practiceBPrevQ">上一題</button>
+            <button type="button" class="primary" id="practiceBConfirm" disabled>確認取份答案</button>
             <button type="button" class="secondary" id="practiceBNextQ">下一題</button>
           </div>
         </div>
@@ -820,16 +986,23 @@
         practiceAIndex: 0,
         practiceBIndex: 0,
         challengeIndex: 0,
-        practiceBSplit: "row",
-        practiceBSelectedGroups: new Set(),
-        autoTimer: null
+        practiceBPhase: "sort",
+        practiceBItems: [],
+        practiceBPool: [],
+        practiceBTrays: [],
+        practiceBPickedId: null,
+        practiceBSelectedTrays: new Set(),
+        practiceBEqualOk: false,
+        autoTimer: null,
+        dragItemId: null
       };
 
       function chineseFraction(n, d) {
         const map = {
           0: "零", 1: "一", 2: "二", 3: "三", 4: "四", 5: "五",
-          6: "六", 7: "七", 8: "八", 9: "九", 10: "十",
-          12: "十二", 14: "十四", 15: "十五", 16: "十六", 18: "十八"
+          6: "六", 7: "七", 8: "八", 9: "九", 10: "十", 11: "十一",
+          12: "十二", 13: "十三", 14: "十四", 15: "十五", 16: "十六",
+          18: "十八", 20: "二十"
         };
         const dn = map[d] || String(d);
         const nn = map[n] || String(n);
@@ -1041,64 +1214,101 @@
       });
 
       /* ---------- PRACTICE A ---------- */
+      function makeA(prompt, fruits, highlight, answer, choices, whyOk, whyBad, wholeFilter) {
+        return {
+          prompt: prompt,
+          fruits: fruits,
+          highlight: highlight,
+          answer: answer,
+          choices: choices,
+          whyOk: whyOk,
+          whyBad: whyBad || {},
+          wholeFilter: wholeFilter || null
+        };
+      }
+
       const practiceAQuestions = [
-        {
-          prompt: "蘋果佔全部水果的幾分之幾？",
-          fruits: ["🍎", "🍎", "🍎", "🍎", "🍎", "🍎", "🍎", "🍊", "🍊", "🍌"],
-          highlight: "🍎",
-          answer: "7/10",
-          choices: ["7/10", "7/3", "3/10", "10/7"],
-          whyBad: {
-            "7/3": "分母不能用「其他水果」的數量，要用全部 10 個。",
-            "3/10": "那是橙＋香蕉的份額，不是蘋果。",
-            "10/7": "分子、分母放反了。"
-          },
-          whyOk: "全部 10 個是分母，蘋果 7 個是分子 → 7/10。"
-        },
-        {
-          prompt: "橙佔全部水果的幾分之幾？",
-          fruits: ["🍎", "🍎", "🍊", "🍊", "🍊", "🍌", "🍌", "🥝"],
-          highlight: "🍊",
-          answer: "3/8",
-          choices: ["3/8", "3/5", "5/8", "0/8"],
-          whyBad: {
-            "3/5": "分母錯了：不能只用非橙的數量。整體是全部 8 個。",
-            "5/8": "那是非橙的數量。",
-            "0/8": "橙有 3 個，不是 0。"
-          },
-          whyOk: "全部 8 個 → 分母 8；橙 3 個 → 分子 3。"
-        },
-        {
-          prompt: "奇異果佔全部水果的幾分之幾？（禮盒裏有沒有奇異果？）",
-          fruits: ["🍎", "🍎", "🍊", "🍊", "🍌", "🍌", "🍇", "🍇", "🍇"],
-          highlight: "🥝",
-          answer: "0/9",
-          choices: ["0/9", "9/0", "1/9", "0/0"],
-          whyBad: {
-            "9/0": "分母不可以是 0；而且分子、分母反了。",
-            "1/9": "禮盒裏沒有奇異果。",
-            "0/0": "分母不可以是 0。"
-          },
-          whyOk: "沒有奇異果 → 分子 0；全部 9 個 → 分母 9。0/9＝0。"
-        },
-        {
-          prompt: "紅蘋果佔「全部蘋果」的幾分之幾？（注意：整體變成全部蘋果）",
-          fruits: ["🍎", "🍎", "🍎", "🍏", "🍏", "🍊", "🍊"],
-          highlight: "🍎",
-          wholeFilter: function (f) { return f === "🍎" || f === "🍏"; },
-          answer: "3/5",
-          choices: ["3/5", "3/7", "2/5", "5/7"],
-          whyBad: {
-            "3/7": "若整體是「全部水果」才是 3/7；題目改以全部蘋果為整體。",
-            "2/5": "那是青蘋果佔全部蘋果。",
-            "5/7": "那是全部蘋果佔全部水果。"
-          },
-          whyOk: "全部蘋果有 5 個（分母），紅蘋果 3 個（分子）→ 3/5。"
-        }
+        makeA("蘋果佔全部水果的幾分之幾？",
+          ["🍎", "🍎", "🍎", "🍎", "🍎", "🍎", "🍎", "🍊", "🍊", "🍌"], "🍎", "7/10",
+          ["7/10", "7/3", "3/10", "10/7"],
+          "全部 10 個是分母，蘋果 7 個是分子 → 7/10。",
+          { "7/3": "分母要用全部 10 個，不是其他水果。", "3/10": "那是非蘋果的份額。", "10/7": "分子、分母放反了。" }),
+        makeA("橙佔全部水果的幾分之幾？",
+          ["🍎", "🍎", "🍊", "🍊", "🍊", "🍌", "🍌", "🥝"], "🍊", "3/8",
+          ["3/8", "3/5", "5/8", "0/8"],
+          "全部 8 個 → 分母 8；橙 3 個 → 分子 3。",
+          { "3/5": "分母錯了：整體是全部 8 個。", "5/8": "那是非橙。", "0/8": "橙有 3 個。" }),
+        makeA("香蕉佔全部水果的幾分之幾？",
+          ["🍎", "🍊", "🍊", "🍌", "🍌", "🍌", "🍌", "🥝", "🥝"], "🍌", "4/9",
+          ["4/9", "4/5", "5/9", "2/9"],
+          "全部 9 個，香蕉 4 個 → 4/9。",
+          { "4/5": "分母不能用其他水果數量。", "5/9": "那是非香蕉。", "2/9": "奇異果才是 2 個。" }),
+        makeA("奇異果佔全部水果的幾分之幾？（禮盒裏有沒有奇異果？）",
+          ["🍎", "🍎", "🍊", "🍊", "🍌", "🍌", "🍇", "🍇", "🍇"], "🥝", "0/9",
+          ["0/9", "9/0", "1/9", "0/0"],
+          "沒有奇異果 → 分子 0；全部 9 個 → 分母 9。0/9＝0。",
+          { "9/0": "分母不可以是 0。", "1/9": "禮盒裏沒有奇異果。", "0/0": "分母不可以是 0。" }),
+        makeA("葡萄佔全部水果的幾分之幾？",
+          ["🍇", "🍇", "🍇", "🍇", "🍎", "🍊", "🍌"], "🍇", "4/7",
+          ["4/7", "4/3", "3/7", "7/4"],
+          "全部 7 個，葡萄 4 個 → 4/7。",
+          { "4/3": "分母要用全部。", "3/7": "那是非葡萄。", "7/4": "分子分母反了。" }),
+        makeA("紅蘋果佔「全部蘋果」的幾分之幾？（整體＝全部蘋果）",
+          ["🍎", "🍎", "🍎", "🍏", "🍏", "🍊", "🍊"], "🍎", "3/5",
+          ["3/5", "3/7", "2/5", "5/7"],
+          "全部蘋果 5 個（分母），紅蘋果 3 個（分子）→ 3/5。",
+          { "3/7": "整體不是全部水果。", "2/5": "那是青蘋果。", "5/7": "那是蘋果佔全部水果。" },
+          function (f) { return f === "🍎" || f === "🍏"; }),
+        makeA("青蘋果佔全部水果的幾分之幾？",
+          ["🍎", "🍎", "🍏", "🍏", "🍏", "🍊", "🍌", "🍌"], "🍏", "3/8",
+          ["3/8", "3/5", "5/8", "2/8"],
+          "全部 8 個，青蘋果 3 個 → 3/8。",
+          { "3/5": "分母要用全部水果。", "5/8": "那是紅蘋果＋橙＋香蕉？再數清楚。", "2/8": "紅蘋果才是 2 個。" }),
+        makeA("草莓佔全部水果的幾分之幾？",
+          ["🍓", "🍓", "🍎", "🍊", "🍊", "🍌"], "🍓", "2/6",
+          ["2/6", "2/4", "4/6", "2/2"],
+          "全部 6 個，草莓 2 個 → 2/6。（不必約分）",
+          { "2/4": "分母不能用非草莓。", "4/6": "那是非草莓。", "2/2": "整體不是只有草莓。" }),
+        makeA("梨佔全部水果的幾分之幾？",
+          ["🍐", "🍐", "🍐", "🍎", "🍎", "🍊", "🍊", "🍊", "🍌", "🥝"], "🍐", "3/10",
+          ["3/10", "3/7", "7/10", "3/3"],
+          "全部 10 個，梨 3 個 → 3/10。",
+          { "3/7": "分母錯用其他水果。", "7/10": "那是非梨。", "3/3": "整體不是只有梨。" }),
+        makeA("芒果佔全部水果的幾分之幾？（這盒沒有芒果）",
+          ["🍎", "🍎", "🍎", "🍊", "🍌", "🍌"], "🥭", "0/6",
+          ["0/6", "1/6", "6/6", "0/0"],
+          "沒有芒果 → 0/6＝0。",
+          { "1/6": "圖中沒有芒果。", "6/6": "那是全部水果＝1，不是芒果。", "0/0": "分母不可以是 0。" }),
+        makeA("橙和香蕉一共佔全部水果的幾分之幾？",
+          ["🍎", "🍎", "🍊", "🍊", "🍌", "🍌", "🍌", "🥝"], "🍊🍌", "5/8",
+          ["5/8", "5/3", "3/8", "2/8"],
+          "橙 2＋香蕉 3＝5；全部 8 → 5/8。",
+          { "5/3": "分母要用全部。", "3/8": "只數了香蕉。", "2/8": "只數了橙。" }),
+        makeA("紅色水果（蘋果＋草莓）佔全部的幾分之幾？",
+          ["🍎", "🍎", "🍓", "🍊", "🍌", "🥝"], "🍎🍓", "3/6",
+          ["3/6", "3/3", "2/6", "1/6"],
+          "蘋果 2＋草莓 1＝3；全部 6 → 3/6。",
+          { "3/3": "分母不是只有紅色水果。", "2/6": "漏了草莓。", "1/6": "只數了草莓。" })
       ];
+
+      // multi-highlight support for combined parts
+      function isPartFruit(f, highlight) {
+        if (!highlight) return false;
+        if (highlight.length <= 2) return f === highlight;
+        // e.g. "🍊🍌" or "🍎🍓"
+        for (let i = 0; i < highlight.length; ) {
+          const cp = highlight.codePointAt(i);
+          const ch = String.fromCodePoint(cp);
+          if (f === ch) return true;
+          i += ch.length;
+        }
+        return false;
+      }
 
       function renderPracticeA() {
         const q = practiceAQuestions[state.practiceAIndex];
+        document.getElementById("practiceAProgress").textContent =
+          "第 " + (state.practiceAIndex + 1) + " / " + practiceAQuestions.length + " 題";
         document.getElementById("practiceAPrompt").textContent = q.prompt;
         const grid = document.getElementById("practiceAGrid");
         grid.innerHTML = "";
@@ -1107,7 +1317,7 @@
           btn.type = "button";
           btn.className = "fruit";
           btn.textContent = f;
-          const isPart = f === q.highlight;
+          const isPart = isPartFruit(f, q.highlight);
           const isWhole = q.wholeFilter ? q.wholeFilter(f) : true;
           if (isWhole) btn.classList.add("whole");
           if (isPart) btn.classList.add("part");
@@ -1116,6 +1326,8 @@
         });
         document.getElementById("practiceANum").textContent = "?";
         document.getElementById("practiceADen").textContent = "?";
+        document.getElementById("practiceANum").className = "num";
+        document.getElementById("practiceADen").className = "den";
         document.getElementById("practiceARead").textContent = "選擇正確分數";
         const feedback = document.getElementById("practiceAFeedback");
         feedback.className = "feedback";
@@ -1159,6 +1371,10 @@
 
       document.getElementById("practiceANextQ").addEventListener("click", function () {
         state.practiceAIndex = (state.practiceAIndex + 1) % practiceAQuestions.length;
+        renderPracticeA();
+      });
+      document.getElementById("practiceAPrevQ").addEventListener("click", function () {
+        state.practiceAIndex = (state.practiceAIndex - 1 + practiceAQuestions.length) % practiceAQuestions.length;
         renderPracticeA();
       });
       document.getElementById("practiceAReplay").addEventListener("click", function () {
@@ -1289,148 +1505,371 @@
         setScreen("practiceB");
       });
 
-      /* ---------- PRACTICE B ---------- */
+      /* ---------- PRACTICE B：拖／點分物 ---------- */
       const practiceBQuestions = [
         { total: 10, num: 3, den: 5, icon: "🧸", answer: 6, label: "布娃娃" },
         { total: 16, num: 3, den: 4, icon: "🌀", answer: 12, label: "陀螺" },
-        { total: 18, num: 5, den: 6, icon: "⭐", answer: 15, label: "貼紙" }
+        { total: 18, num: 5, den: 6, icon: "⭐", answer: 15, label: "貼紙" },
+        { total: 12, num: 2, den: 3, icon: "🍪", answer: 8, label: "餅乾" },
+        { total: 8, num: 3, den: 4, icon: "🎈", answer: 6, label: "氣球" },
+        { total: 15, num: 2, den: 5, icon: "🧁", answer: 6, label: "杯子蛋糕" },
+        { total: 14, num: 3, den: 7, icon: "🍫", answer: 6, label: "朱古力豆" },
+        { total: 9, num: 2, den: 3, icon: "🐰", answer: 6, label: "小兔子" },
+        { total: 20, num: 3, den: 5, icon: "🔵", answer: 12, label: "圓點貼紙" },
+        { total: 12, num: 1, den: 4, icon: "✏️", answer: 3, label: "鉛筆" },
+        { total: 16, num: 1, den: 2, icon: "🍬", answer: 8, label: "糖果" },
+        { total: 18, num: 2, den: 3, icon: "🐸", answer: 12, label: "小青蛙" }
       ];
 
-      function groupPracticeB(total, den, split) {
-        const per = total / den;
-        const groups = [];
-        if (split === "col") {
-          // vertical-ish: distribute by columns metaphor — still equal sized groups
-          for (let g = 0; g < den; g++) {
-            const items = [];
-            for (let i = 0; i < per; i++) items.push(g * per + i);
-            groups.push(items);
-          }
-        } else {
-          for (let g = 0; g < den; g++) {
-            const items = [];
-            for (let i = 0; i < per; i++) items.push(g * per + i);
-            groups.push(items);
-          }
+      function initPracticeBModel() {
+        const q = practiceBQuestions[state.practiceBIndex];
+        state.practiceBPhase = "sort";
+        state.practiceBEqualOk = false;
+        state.practiceBPickedId = null;
+        state.practiceBSelectedTrays = new Set();
+        state.practiceBItems = [];
+        state.practiceBPool = [];
+        state.practiceBTrays = [];
+        for (let i = 0; i < q.total; i++) {
+          state.practiceBItems.push({ id: "b" + i, icon: q.icon });
+          state.practiceBPool.push("b" + i);
         }
-        return groups;
+        for (let t = 0; t < q.den; t++) state.practiceBTrays.push([]);
+      }
+
+      function findItemLocation(id) {
+        if (state.practiceBPool.indexOf(id) !== -1) return { place: "pool", index: -1 };
+        for (let t = 0; t < state.practiceBTrays.length; t++) {
+          if (state.practiceBTrays[t].indexOf(id) !== -1) return { place: "tray", index: t };
+        }
+        return null;
+      }
+
+      function removeItemFromAll(id) {
+        state.practiceBPool = state.practiceBPool.filter(function (x) { return x !== id; });
+        state.practiceBTrays = state.practiceBTrays.map(function (tray) {
+          return tray.filter(function (x) { return x !== id; });
+        });
+      }
+
+      function moveItemToPool(id) {
+        removeItemFromAll(id);
+        state.practiceBPool.push(id);
+        state.practiceBEqualOk = false;
+        if (state.practiceBPhase !== "sort") enterSortPhase();
+      }
+
+      function moveItemToTray(id, trayIndex) {
+        removeItemFromAll(id);
+        state.practiceBTrays[trayIndex].push(id);
+        state.practiceBEqualOk = false;
+        if (state.practiceBPhase !== "sort") enterSortPhase();
+      }
+
+      function enterSortPhase() {
+        state.practiceBPhase = "sort";
+        state.practiceBSelectedTrays = new Set();
+        state.practiceBEqualOk = false;
+        document.getElementById("practiceBConfirm").disabled = true;
+      }
+
+      function enterPickPhase() {
+        state.practiceBPhase = "pick";
+        state.practiceBPickedId = null;
+        state.practiceBSelectedTrays = new Set();
+        document.getElementById("practiceBConfirm").disabled = false;
+      }
+
+      function selectedCount() {
+        var n = 0;
+        state.practiceBSelectedTrays.forEach(function (ti) {
+          n += state.practiceBTrays[ti].length;
+        });
+        return n;
+      }
+
+      function updatePracticeBSide() {
+        const q = practiceBQuestions[state.practiceBIndex];
+        const poolLeft = state.practiceBPool.length;
+        const chip = document.getElementById("practiceBPhaseChip");
+        const hint = document.getElementById("practiceBSideHint");
+        const selectedEl = document.getElementById("practiceBSelected");
+        const meter = document.getElementById("practiceBCountMeter");
+        const label = document.getElementById("practiceBCountLabel");
+
+        if (state.practiceBPhase === "sort") {
+          chip.textContent = "步驟 1：分物入盤（分母＝" + q.den + "）";
+          hint.textContent = "拖動物件到份盤，或先點物件再點份盤。每盤個數要相同。";
+          selectedEl.textContent = "物資區尚餘 " + poolLeft + " 個 · 已放入 " + (q.total - poolLeft) + " 個";
+          meter.textContent = "？";
+          label.textContent = "等分成功後，再點選要取的份（分子＝" + q.num + "）";
+        } else {
+          chip.textContent = "步驟 2：取份（分子＝" + q.num + "）";
+          hint.textContent = "點選恰好 " + q.num + " 個份盤，再按「確認取份答案」。";
+          selectedEl.textContent = "已取 " + state.practiceBSelectedTrays.size + " 份";
+          const count = selectedCount();
+          meter.textContent = String(count);
+          label.textContent = "高亮份盤裏共有 " + count + " 個" + q.label;
+        }
+      }
+
+      function bindItemInteractions(btn, id, trayIndex) {
+        btn.draggable = state.practiceBPhase === "sort";
+        if (state.practiceBPhase !== "sort") {
+          btn.style.cursor = "pointer";
+          btn.draggable = false;
+        }
+        btn.addEventListener("dragstart", function (e) {
+          if (state.practiceBPhase !== "sort") {
+            e.preventDefault();
+            return;
+          }
+          state.dragItemId = id;
+          btn.classList.add("flying");
+          e.dataTransfer.setData("text/plain", id);
+          e.dataTransfer.effectAllowed = "move";
+        });
+        btn.addEventListener("dragend", function () {
+          state.dragItemId = null;
+          btn.classList.remove("flying");
+          document.querySelectorAll(".drag-over").forEach(function (el) {
+            el.classList.remove("drag-over");
+          });
+        });
+        btn.addEventListener("click", function (e) {
+          e.stopPropagation();
+          if (state.practiceBPhase === "pick" && typeof trayIndex === "number") {
+            if (state.practiceBSelectedTrays.has(trayIndex)) state.practiceBSelectedTrays.delete(trayIndex);
+            else state.practiceBSelectedTrays.add(trayIndex);
+            paintPracticeB();
+            return;
+          }
+          if (state.practiceBPhase !== "sort") return;
+          if (state.practiceBPickedId === id) {
+            state.practiceBPickedId = null;
+          } else {
+            state.practiceBPickedId = id;
+          }
+          paintPracticeB();
+        });
+      }
+
+      function paintPracticeB() {
+        const q = practiceBQuestions[state.practiceBIndex];
+        const poolEl = document.getElementById("practiceBPool");
+        const traysEl = document.getElementById("practiceBTrays");
+        poolEl.innerHTML = "";
+        traysEl.innerHTML = "";
+
+        state.practiceBPool.forEach(function (id) {
+          const item = state.practiceBItems.find(function (x) { return x.id === id; });
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "manip-item" + (state.practiceBPickedId === id ? " picked" : "");
+          btn.textContent = item.icon;
+          btn.setAttribute("aria-label", q.label);
+          bindItemInteractions(btn, id);
+          poolEl.appendChild(btn);
+        });
+
+        state.practiceBTrays.forEach(function (tray, ti) {
+          const trayEl = document.createElement("div");
+          trayEl.className = "tray";
+          trayEl.dataset.tray = String(ti);
+          if (state.practiceBPhase === "sort" && state.practiceBPickedId) {
+            trayEl.classList.add("target-active");
+          }
+          if (state.practiceBSelectedTrays.has(ti)) trayEl.classList.add("selected");
+          if (state.practiceBEqualOk && state.practiceBPhase !== "sort") trayEl.classList.add("equal-ok");
+
+          const head = document.createElement("div");
+          head.className = "tray-head";
+          const pickHint = state.practiceBPhase === "pick" ? " · 點此取份" : "";
+          head.innerHTML = "<span>第 " + (ti + 1) + " 份" + pickHint + "</span><span>" + tray.length + " 個</span>";
+          trayEl.appendChild(head);
+
+          const inner = document.createElement("div");
+          inner.className = "tray-items";
+          tray.forEach(function (id) {
+            const item = state.practiceBItems.find(function (x) { return x.id === id; });
+            const btn = document.createElement("button");
+            btn.type = "button";
+            btn.className = "manip-item" + (state.practiceBPickedId === id ? " picked" : "");
+            btn.textContent = item.icon;
+            btn.setAttribute("aria-label", state.practiceBPhase === "pick" ? "取這一份" : "物件");
+            bindItemInteractions(btn, id, ti);
+            btn.addEventListener("dblclick", function (e) {
+              e.stopPropagation();
+              if (state.practiceBPhase === "sort") {
+                moveItemToPool(id);
+                state.practiceBPickedId = null;
+                paintPracticeB();
+              }
+            });
+            inner.appendChild(btn);
+          });
+          trayEl.appendChild(inner);
+
+          trayEl.addEventListener("dragover", function (e) {
+            if (state.practiceBPhase !== "sort") return;
+            e.preventDefault();
+            trayEl.classList.add("drag-over");
+          });
+          trayEl.addEventListener("dragleave", function () {
+            trayEl.classList.remove("drag-over");
+          });
+          trayEl.addEventListener("drop", function (e) {
+            e.preventDefault();
+            trayEl.classList.remove("drag-over");
+            const id = e.dataTransfer.getData("text/plain") || state.dragItemId;
+            if (!id) return;
+            moveItemToTray(id, ti);
+            state.practiceBPickedId = null;
+            paintPracticeB();
+          });
+          trayEl.addEventListener("click", function () {
+            if (state.practiceBPhase === "sort") {
+              if (state.practiceBPickedId) {
+                moveItemToTray(state.practiceBPickedId, ti);
+                state.practiceBPickedId = null;
+                paintPracticeB();
+              }
+              return;
+            }
+            if (state.practiceBPhase === "pick") {
+              if (state.practiceBSelectedTrays.has(ti)) state.practiceBSelectedTrays.delete(ti);
+              else state.practiceBSelectedTrays.add(ti);
+              paintPracticeB();
+            }
+          });
+
+          traysEl.appendChild(trayEl);
+        });
+
+        // pool as drop target to return items
+        const poolZone = document.getElementById("practiceBPoolZone");
+        poolZone.ondragover = function (e) {
+          if (state.practiceBPhase !== "sort") return;
+          e.preventDefault();
+          poolZone.classList.add("drag-over");
+        };
+        poolZone.ondragleave = function () { poolZone.classList.remove("drag-over"); };
+        poolZone.ondrop = function (e) {
+          e.preventDefault();
+          poolZone.classList.remove("drag-over");
+          const id = e.dataTransfer.getData("text/plain") || state.dragItemId;
+          if (!id) return;
+          moveItemToPool(id);
+          state.practiceBPickedId = null;
+          paintPracticeB();
+        };
+
+        updatePracticeBSide();
       }
 
       function renderPracticeB() {
         const q = practiceBQuestions[state.practiceBIndex];
-        state.practiceBSelectedGroups = new Set();
+        initPracticeBModel();
+        document.getElementById("practiceBProgress").textContent =
+          "第 " + (state.practiceBIndex + 1) + " / " + practiceBQuestions.length + " 題";
         document.getElementById("practiceBPrompt").textContent =
-          q.total + " 個" + q.label + "的 " + q.num + "/" + q.den + " 是多少？先等分成 " + q.den + " 份，再取 " + q.num + " 份。";
-        document.getElementById("practiceBLead").textContent = "可用橫分或直分，只要每份個數相同。";
-        document.getElementById("practiceBSelected").textContent = "已取 0 份";
+          q.total + " 個" + q.label + "的 " + q.num + "/" + q.den +
+          " 是多少？請把物件放進 " + q.den + " 個份盤（每盤一樣多），再取 " + q.num + " 份。";
+        document.getElementById("practiceBLead").textContent =
+          "操作：拖曳物件，或「先點物件 → 再點份盤」；雙擊份盤中的物件可放回物資區。";
         document.getElementById("practiceBFeedback").className = "feedback";
         document.getElementById("practiceBFeedback").textContent = "";
-
-        const groups = groupPracticeB(q.total, q.den, state.practiceBSplit);
-        const wrap = document.getElementById("practiceBGroups");
-        wrap.innerHTML = "";
-        wrap.style.gridTemplateColumns = state.practiceBSplit === "col" ? "repeat(" + Math.min(q.den, 4) + ", 1fr)" : "1fr";
-
-        groups.forEach(function (items, gi) {
-          const g = document.createElement("button");
-          g.type = "button";
-          g.className = "group";
-          g.style.textAlign = "left";
-          g.style.cursor = "pointer";
-          g.innerHTML = '<div class="count-tag">第 ' + (gi + 1) + " 份・" + items.length + " 個（點選）</div>";
-          const inner = document.createElement("div");
-          inner.className = "group-inner";
-          items.forEach(function () {
-            const t = document.createElement("div");
-            t.className = "toy";
-            t.textContent = q.icon;
-            inner.appendChild(t);
-          });
-          g.appendChild(inner);
-          g.addEventListener("click", function () {
-            if (state.practiceBSelectedGroups.has(gi)) state.practiceBSelectedGroups.delete(gi);
-            else state.practiceBSelectedGroups.add(gi);
-            g.classList.toggle("selected");
-            document.getElementById("practiceBSelected").textContent =
-              "已取 " + state.practiceBSelectedGroups.size + " 份";
-          });
-          wrap.appendChild(g);
-        });
-
-        const choices = document.getElementById("practiceBChoices");
-        choices.innerHTML = "";
-        const perGroup = q.total / q.den;
-        const opts = [q.answer, q.answer - perGroup, perGroup, q.total - q.answer]
-          .filter(function (v, i, a) { return v > 0 && a.indexOf(v) === i; })
-          .slice(0, 4);
-        while (opts.length < 4) opts.push(opts[opts.length - 1] + 1);
-        opts.sort(function () { return Math.random() - 0.5; });
-        opts.forEach(function (n) {
-          const b = document.createElement("button");
-          b.type = "button";
-          b.className = "choice";
-          b.textContent = n + " 個";
-          b.dataset.value = String(n);
-          choices.appendChild(b);
-        });
+        document.getElementById("practiceBConfirm").disabled = true;
+        paintPracticeB();
       }
 
-      document.getElementById("splitRow").addEventListener("click", function () {
-        state.practiceBSplit = "row";
-        renderPracticeB();
-      });
-      document.getElementById("splitCol").addEventListener("click", function () {
-        state.practiceBSplit = "col";
-        renderPracticeB();
+      document.getElementById("practiceBResetSort").addEventListener("click", function () {
+        initPracticeBModel();
+        document.getElementById("practiceBFeedback").className = "feedback";
+        document.getElementById("practiceBFeedback").textContent = "";
+        paintPracticeB();
       });
 
-      document.getElementById("practiceBCheck").addEventListener("click", function () {
+      document.getElementById("practiceBAutoHint").addEventListener("click", function () {
+        const q = practiceBQuestions[state.practiceBIndex];
+        const per = q.total / q.den;
+        // fill first empty-ish tray toward equal as a gentle hint (one tray only)
+        let target = 0;
+        for (let i = 0; i < state.practiceBTrays.length; i++) {
+          if (state.practiceBTrays[i].length < per) { target = i; break; }
+        }
+        while (state.practiceBTrays[target].length < per && state.practiceBPool.length) {
+          moveItemToTray(state.practiceBPool[0], target);
+        }
+        state.practiceBPickedId = null;
+        const feedback = document.getElementById("practiceBFeedback");
+        feedback.className = "feedback show ok";
+        feedback.textContent = "已示範把第 " + (target + 1) + " 份盤放到 " + per + " 個。請繼續把其餘物件均分到其他份盤。";
+        paintPracticeB();
+      });
+
+      document.getElementById("practiceBCheckEqual").addEventListener("click", function () {
         const q = practiceBQuestions[state.practiceBIndex];
         const feedback = document.getElementById("practiceBFeedback");
-        const selected = document.querySelector("#practiceBChoices .choice.correct, #practiceBChoices .choice.incorrect");
-        // prefer last clicked marked via event — use selected choice with aria
-        const picked = document.querySelector("#practiceBChoices .choice[data-picked='1']");
-        const groupOk = state.practiceBSelectedGroups.size === q.num;
-        const count = state.practiceBSelectedGroups.size * (q.total / q.den);
-
-        if (!picked) {
+        if (state.practiceBPool.length > 0) {
           feedback.className = "feedback show bad";
-          feedback.textContent = "請先點選下方的數量答案；也請在圖中點取 " + q.num + " 份。";
+          feedback.textContent = "物資區還有物件未分完，請全部放入份盤。";
           return;
         }
-        const val = Number(picked.dataset.value);
-        document.querySelectorAll("#practiceBChoices .choice").forEach(function (el) {
-          el.disabled = true;
-          if (Number(el.dataset.value) === q.answer) el.classList.add("correct");
-        });
-        if (val === q.answer && groupOk) {
-          feedback.className = "feedback show ok";
-          feedback.textContent = "正確！等分成 " + q.den + " 份後取 " + q.num + " 份，共 " + q.answer + " 個。（你數到的高亮也是 " + count + " 個）";
-        } else if (val === q.answer && !groupOk) {
+        const counts = state.practiceBTrays.map(function (t) { return t.length; });
+        const per = q.total / q.den;
+        const equal = counts.every(function (c) { return c === per; });
+        if (!equal) {
+          state.practiceBEqualOk = false;
           feedback.className = "feedback show bad";
-          feedback.textContent = "數量對了，但圖中應點取恰好 " + q.num + " 份來對應分子。再試一次吧——可按下一題重設。";
-          document.querySelectorAll("#practiceBChoices .choice").forEach(function (el) { el.disabled = false; el.classList.remove("correct", "incorrect"); });
-          picked.classList.add("correct");
-        } else {
-          picked.classList.add("incorrect");
-          feedback.className = "feedback show bad";
-          feedback.textContent = "再看看：分母 " + q.den + "＝等分份數，分子 " + q.num + "＝取幾份。不要用乘除心算代替圖示。";
+          feedback.textContent = "還未等分：每份應是 " + per + " 個。現在各份是 " + counts.join("、") + "。請調整後再檢查。";
+          paintPracticeB();
+          document.querySelectorAll("#practiceBTrays .tray").forEach(function (el, i) {
+            if (counts[i] !== per) el.classList.add("unequal");
+          });
+          return;
         }
+        state.practiceBEqualOk = true;
+        enterPickPhase();
+        feedback.className = "feedback show ok";
+        feedback.textContent = "等分成功！每份 " + per + " 個。現在點選要取的 " + q.num + " 份盤。";
+        paintPracticeB();
       });
 
-      document.getElementById("practiceBChoices").addEventListener("click", function (e) {
-        const btn = e.target.closest(".choice");
-        if (!btn || btn.disabled) return;
-        document.querySelectorAll("#practiceBChoices .choice").forEach(function (el) {
-          el.dataset.picked = "0";
-          el.style.outline = "";
-        });
-        btn.dataset.picked = "1";
-        btn.style.outline = "3px solid " + getComputedStyle(document.documentElement).getPropertyValue("--warm");
+      document.getElementById("practiceBConfirm").addEventListener("click", function () {
+        const q = practiceBQuestions[state.practiceBIndex];
+        const feedback = document.getElementById("practiceBFeedback");
+        if (state.practiceBPhase !== "pick" || !state.practiceBEqualOk) {
+          feedback.className = "feedback show bad";
+          feedback.textContent = "請先完成分物並通過「檢查是否等分」。";
+          return;
+        }
+        const picked = state.practiceBSelectedTrays.size;
+        const count = selectedCount();
+        if (picked !== q.num) {
+          feedback.className = "feedback show bad";
+          feedback.textContent = "分子是 " + q.num + "，請恰好點選 " + q.num + " 個份盤。（現在選了 " + picked + " 份）";
+          return;
+        }
+        if (count === q.answer) {
+          state.practiceBPhase = "done";
+          document.getElementById("practiceBConfirm").disabled = true;
+          feedback.className = "feedback show ok";
+          feedback.textContent = "正確！你親手把 " + q.total + " 個等分成 " + q.den +
+            " 份，再取 " + q.num + " 份，數得 " + q.answer + " 個" + q.label + "。";
+          document.getElementById("practiceBPhaseChip").textContent = "完成！";
+        } else {
+          feedback.className = "feedback show bad";
+          feedback.textContent = "取份份數對了，但總個數是 " + count + "。請再數高亮份盤裏的物件。";
+        }
       });
 
       document.getElementById("practiceBNextQ").addEventListener("click", function () {
         state.practiceBIndex = (state.practiceBIndex + 1) % practiceBQuestions.length;
+        renderPracticeB();
+      });
+      document.getElementById("practiceBPrevQ").addEventListener("click", function () {
+        state.practiceBIndex = (state.practiceBIndex - 1 + practiceBQuestions.length) % practiceBQuestions.length;
         renderPracticeB();
       });
       document.getElementById("practiceBReplay").addEventListener("click", function () {
