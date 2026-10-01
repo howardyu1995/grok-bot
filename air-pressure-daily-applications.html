@@ -896,73 +896,154 @@
       mask: radial-gradient(circle 9px, transparent 98%, #000 100%);
       -webkit-mask: radial-gradient(circle 9px, transparent 98%, #000 100%);
     }
+
+    html, body { height: 100%; }
+    body { overflow: hidden; }
+
+    .page {
+      height: 100dvh;
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+      overflow: hidden;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      padding: 0.55rem 0.9rem;
+      background: #0f6f68;
+      color: #fff;
+    }
+
+    .topbar h1 {
+      margin: 0;
+      font-size: 1.15rem;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .topbar .formula {
+      margin: 0;
+      font-size: 0.82rem;
+      font-weight: 700;
+      opacity: 0.92;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 0.35rem;
+      flex-wrap: wrap;
+    }
+
+    .tabs button {
+      appearance: none;
+      border: 0;
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: 800;
+      font-size: 0.82rem;
+      border-radius: 999px;
+      padding: 0.4rem 0.75rem;
+      background: rgba(255, 255, 255, 0.16);
+      color: #fff;
+    }
+
+    .tabs button[aria-selected="true"] {
+      background: #fff;
+      color: #0f6f68;
+    }
+
+    main.board {
+      min-height: 0;
+      overflow: hidden;
+      padding: 0.7rem 0.9rem 0.85rem;
+    }
+
+    .section {
+      display: none;
+      height: 100%;
+      margin: 0;
+    }
+
+    .section.is-on {
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+
+    .section-head {
+      flex: 0 0 auto;
+      margin-bottom: 0.45rem;
+    }
+
+    .section.is-on .module {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      overflow: hidden;
+      transform: none;
+    }
+
+    .section.is-on .module:hover { transform: none; }
+
+    .section.is-on .module-grid {
+      flex: 1;
+      min-height: 0;
+      height: 100%;
+      align-items: stretch;
+    }
+
+    .section.is-on .viz-pane,
+    .section.is-on .info-pane {
+      min-height: 0;
+      overflow: auto;
+      position: static;
+      max-height: none;
+    }
+
+    #quiz.is-on .quiz-card,
+    #concept.is-on {
+      flex: 1;
+      min-height: 0;
+      overflow: auto;
+    }
+
+    @media (max-width: 860px) {
+      html, body, .page {
+        height: auto;
+        overflow: auto;
+      }
+      .page { display: block; min-height: 100dvh; }
+      .topbar { flex-wrap: wrap; }
+      main.board { overflow: visible; height: auto; }
+      .section.is-on { display: block; height: auto; }
+      .section.is-on .module,
+      .section.is-on .module-grid {
+        display: block;
+        height: auto;
+        overflow: visible;
+      }
+      .section.is-on .viz-pane { height: 56vh; }
+    }
   </style>
 </head>
 <body>
   <div class="page">
-    <header class="hero" id="top">
-      <div class="hero-bg" aria-hidden="true"></div>
-      <div class="hero-visual" aria-hidden="true">
-        <svg viewBox="0 0 420 336" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <linearGradient id="bagFill" x1="0" y1="0" x2="1" y2="1">
-              <stop stop-color="#ffffff" stop-opacity="0.28"/>
-              <stop offset="1" stop-color="#d7f7f2" stop-opacity="0.18"/>
-            </linearGradient>
-            <linearGradient id="quilt" x1="0" y1="0" x2="1" y2="1">
-              <stop stop-color="#f4a261"/>
-              <stop offset="1" stop-color="#e76f51"/>
-            </linearGradient>
-          </defs>
-          <!-- outer particles -->
-          <g fill="#ef476f" opacity="0.75">
-            <circle cx="48" cy="70" r="4"><animate attributeName="cy" values="70;62;70" dur="2.4s" repeatCount="indefinite"/></circle>
-            <circle cx="78" cy="120" r="3.5"><animate attributeName="cx" values="78;70;78" dur="2.8s" repeatCount="indefinite"/></circle>
-            <circle cx="36" cy="180" r="3"/><circle cx="360" cy="64" r="4"/><circle cx="390" cy="140" r="3.5"/>
-            <circle cx="372" cy="210" r="3"/><circle cx="402" cy="250" r="3.5"/>
-          </g>
-          <!-- pressure arrows -->
-          <g stroke="#ffd6a5" stroke-width="3" fill="#ffd6a5" opacity="0.9">
-            <path d="M20 150 L70 150"/><polygon points="70,150 58,144 58,156"/>
-            <path d="M400 150 L350 150"/><polygon points="350,150 362,144 362,156"/>
-            <path d="M20 200 L70 200"/><polygon points="70,200 58,194 58,206"/>
-            <path d="M400 200 L350 200"/><polygon points="350,200 362,194 362,206"/>
-            <path d="M210 28 L210 70"/><polygon points="210,70 204,58 216,58"/>
-          </g>
-          <!-- vacuum bag -->
-          <rect x="92" y="78" width="236" height="190" rx="28" fill="url(#bagFill)" stroke="#ffffff" stroke-width="4" opacity="0.95"/>
-          <rect x="118" y="88" width="184" height="10" rx="5" fill="#2ec4b6"/>
-          <rect x="118" y="118" width="184" height="118" rx="16" fill="#efe6d6"/>
-          <path d="M140 148 H280 M140 178 H280 M164 128 V220 M210 128 V220 M256 128 V220" stroke="#c4a574" stroke-width="1.4" opacity=".7"/>
-          <path d="M130 160 Q210 176 300 158" stroke="#b08958" stroke-opacity=".45" stroke-width="3" fill="none"/>
-          <!-- inner particles (fewer) -->
-          <g fill="#3a86ff">
-            <circle cx="150" cy="140" r="3.5"><animate attributeName="cx" values="150;158;150" dur="2s" repeatCount="indefinite"/></circle>
-            <circle cx="250" cy="165" r="3"/><circle cx="200" cy="200" r="2.8"/>
-            <circle cx="175" cy="185" r="2.5"/>
-          </g>
-        </svg>
-      </div>
-      <div class="hero-inner">
-        <h1 class="brand">氣壓實驗室</h1>
-        <p class="tagline">氣壓在日常生活中的應用</p>
-        <p class="lead">透過粒子動畫與動手模擬，看懂真空儲物袋、食物包裝與海綿密實袋背後的氣壓原理。</p>
-        <div class="hero-ctas">
-          <a class="btn btn-primary" href="#module1">開始互動體驗</a>
-          <a class="btn btn-ghost" href="#quiz">挑戰知識問答</a>
-        </div>
-      </div>
+    <header class="topbar">
+      <h1>氣壓實驗室</h1>
+      <p class="formula">袋內氣壓 &lt; 袋外大氣壓力，袋子就被壓凹</p>
+      <nav class="tabs" aria-label="關卡">
+        <button type="button" data-screen="module1" aria-selected="true">儲物袋</button>
+        <button type="button" data-screen="module2" aria-selected="false">食物包裝</button>
+        <button type="button" data-screen="module3" aria-selected="false">海綿實驗</button>
+        <button type="button" data-screen="quiz" aria-selected="false">問答</button>
+      </nav>
     </header>
 
-    <nav class="nav-pills" aria-label="章節導覽">
-      <a href="#concept">核心觀念</a>
-      <a href="#module1">儲物袋</a>
-      <a href="#module2">食物包裝</a>
-      <a href="#module3">海綿實驗</a>
-      <a href="#quiz">問答挑戰</a>
-    </nav>
-
-    <main>
+    <main class="board">
       <section class="section" id="concept">
         <div class="section-head">
           <div class="badge">核心觀念</div>
@@ -986,7 +1067,7 @@
       </section>
 
       <!-- Module 1 -->
-      <section class="section" id="module1">
+      <section class="section is-on" id="module1">
         <div class="section-head">
           <div class="badge">模組一</div>
           <h2>真空儲物袋體驗</h2>
@@ -1225,15 +1306,6 @@
         </div>
       </section>
     </main>
-
-    <div class="key-formula">
-      <h2>記住這句話</h2>
-      <p>袋內氣壓 &lt; 袋外大氣壓力 → 袋子被大氣壓力壓凹／壓縮</p>
-    </div>
-
-    <footer>
-      氣壓實驗室 · 適合課堂互動與自學複習 · 以瀏覽器直接開啟即可使用
-    </footer>
   </div>
 
   <canvas id="fireworks"></canvas>
@@ -1261,14 +1333,38 @@
         const parent = canvas.parentElement;
         const style = getComputedStyle(parent);
         const padX = (parseFloat(style.paddingLeft) || 0) + (parseFloat(style.paddingRight) || 0);
-        let w = Math.max(220, parent.clientWidth - padX);
+        const padY = (parseFloat(style.paddingTop) || 0) + (parseFloat(style.paddingBottom) || 0);
+        const extras = Array.from(parent.children)
+          .filter((el) => el !== canvas)
+          .reduce((sum, el) => sum + el.offsetHeight, 0);
+        const gap = 8 * Math.max(0, parent.children.length - 1);
+        let availW = Math.max(180, parent.clientWidth - padX);
+        let availH = Math.max(160, parent.clientHeight - padY - extras - gap);
+        if (parent.clientHeight < 80) {
+          availH = Math.round(Math.min(360, window.innerHeight * 0.46));
+        }
+        let w = availW;
         let h = Math.round(w / aspect);
-        const maxH = Math.round(Math.min(380, window.innerHeight * 0.52));
-        if (h > maxH) {
-          h = maxH;
+        if (h > availH) {
+          h = availH;
           w = Math.round(h * aspect);
         }
-        return { ctx: fitCanvas(canvas, w, h), w, h };
+        if (w > availW) {
+          w = availW;
+          h = Math.round(w / aspect);
+        }
+        return { ctx: fitCanvas(canvas, w, Math.max(140, h)), w, h: Math.max(140, h) };
+      }
+
+      function showScreen(id) {
+        ["concept", "module1", "module2", "module3", "quiz"].forEach((sid) => {
+          const el = document.getElementById(sid);
+          if (el) el.classList.toggle("is-on", sid === id);
+        });
+        document.querySelectorAll(".tabs button").forEach((btn) => {
+          btn.setAttribute("aria-selected", btn.dataset.screen === id ? "true" : "false");
+        });
+        requestAnimationFrame(() => resizeAll());
       }
 
       class Particle {
@@ -2459,7 +2555,7 @@
         if (moduleEl) {
           const card = moduleEl.querySelector(".module");
           if (card) card.classList.add("demoing");
-          moduleEl.scrollIntoView({ behavior: "smooth", block: "center" });
+          showScreen(item.moduleId);
         }
         await wait(600);
         try {
@@ -2471,9 +2567,8 @@
           demoBtn.textContent = "觀看模組示範後重答";
           demoBtn.hidden = true;
           quizState.demoRunning = false;
-          // return to quiz and unlock retry
           delete quizState.results[quizState.index];
-          document.getElementById("quiz").scrollIntoView({ behavior: "smooth", block: "center" });
+          showScreen("quiz");
           await wait(350);
           renderQuiz();
           const fb = document.getElementById("quiz-feedback");
@@ -2734,6 +2829,10 @@
           renderQuiz();
         });
 
+        document.querySelectorAll(".tabs button").forEach((btn) => {
+          btn.addEventListener("click", () => showScreen(btn.dataset.screen));
+        });
+
         window.addEventListener("resize", () => {
           resizeAll();
           if (fw.canvas) {
@@ -2745,6 +2844,7 @@
 
       // boot
       bindUI();
+      showScreen("module1");
       resizeAll();
       initStorageParticles();
       initFoodParticles();
