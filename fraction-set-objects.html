@@ -1,0 +1,2430 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="description" content="小三分數：分數作為一組物件（整體）的部分——水果禮盒分數工坊" />
+  <title>水果禮盒分數工坊｜一組物件的分數</title>
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700;900&family=ZCOOL+KuaiLe&family=ZCOOL+XiaoWei&display=swap");
+
+    :root {
+      --ink: #1c2f28;
+      --muted: #5a6f66;
+      --panel: rgba(255, 252, 247, 0.92);
+      --panel-solid: #fffdf8;
+      --accent: #2f8f6b;
+      --accent-dark: #1f6b50;
+      --accent-soft: #e4f5ec;
+      --citrus: #ef9f27;
+      --citrus-deep: #c2780c;
+      --citrus-soft: #fff4df;
+      --berry: #e4574d;
+      --danger: #c2410c;
+      --ok: #1b7a45;
+      --ok-soft: #e8f8ef;
+      --line: #d5e4db;
+      --wood: #c4a574;
+      --wood-deep: #8b6914;
+      --shadow: 0 18px 40px rgba(28, 47, 40, 0.12);
+      --radius: 22px;
+      --fruit-apple: #e4574d;
+      --fruit-orange: #ef9f27;
+      --fruit-banana: #e4c04a;
+      --fruit-kiwi: #7cb342;
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+      color: var(--ink);
+      background-color: #dfeee6;
+      background-image:
+        radial-gradient(circle at 12% 18%, rgba(239, 159, 39, 0.18), transparent 28%),
+        radial-gradient(circle at 88% 8%, rgba(47, 143, 107, 0.2), transparent 32%),
+        radial-gradient(circle at 70% 90%, rgba(228, 87, 77, 0.1), transparent 30%),
+        linear-gradient(165deg, #eaf6ef 0%, #e7f1f6 48%, #f7f0e4 100%);
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 18px 14px 40px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.35;
+      background-image:
+        radial-gradient(circle at 20px 20px, rgba(47, 143, 107, 0.12) 2px, transparent 3px),
+        radial-gradient(circle at 60px 48px, rgba(239, 159, 39, 0.14) 2px, transparent 3px);
+      background-size: 84px 72px;
+      z-index: 0;
+    }
+
+    .float-fruit {
+      position: fixed;
+      font-size: clamp(1.4rem, 3vw, 2rem);
+      opacity: 0.18;
+      pointer-events: none;
+      z-index: 0;
+      animation: drift 9s ease-in-out infinite;
+      filter: blur(0.2px);
+    }
+    .float-fruit.f1 { top: 12%; left: 4%; animation-delay: 0s; }
+    .float-fruit.f2 { top: 28%; right: 5%; animation-delay: -2s; }
+    .float-fruit.f3 { bottom: 18%; left: 7%; animation-delay: -4s; }
+    .float-fruit.f4 { bottom: 10%; right: 8%; animation-delay: -6s; }
+
+    .hero-cta, .shell, .footer-note { position: relative; z-index: 1; }
+
+    .hero-cta {
+      text-align: center;
+      padding: 10px 8px 6px;
+      width: min(980px, 100%);
+    }
+
+    .brand-mark {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: rgba(255, 253, 248, 0.75);
+      border: 1px solid rgba(47, 143, 107, 0.22);
+      color: var(--accent-dark);
+      font-weight: 800;
+      font-size: 0.82rem;
+      letter-spacing: 0.06em;
+      animation: fadeIn 0.6s ease;
+    }
+
+    .brand {
+      font-family: "ZCOOL KuaiLe", "ZCOOL XiaoWei", "Noto Sans TC", sans-serif;
+      font-size: clamp(2.1rem, 6vw, 3.1rem);
+      font-weight: 400;
+      letter-spacing: 0.06em;
+      margin: 0;
+      line-height: 1.15;
+      background: linear-gradient(120deg, #1f6b50 0%, #2f8f6b 40%, #c2780c 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: 0 10px 30px rgba(47, 143, 107, 0.08);
+      animation: brandIn 0.7s cubic-bezier(.2,.8,.2,1);
+    }
+
+    .subtitle {
+      margin: 10px 0 0;
+      text-align: center;
+      color: var(--muted);
+      font-weight: 700;
+      font-size: clamp(0.95rem, 2.4vw, 1.12rem);
+    }
+
+    .shell {
+      width: min(980px, 100%);
+      margin-top: 16px;
+      background:
+        linear-gradient(180deg, rgba(255,253,248,0.98), rgba(247,251,248,0.96));
+      border-radius: calc(var(--radius) + 4px);
+      box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,0.9);
+      border: 1px solid rgba(47, 143, 107, 0.18);
+      overflow: hidden;
+      backdrop-filter: blur(8px);
+    }
+
+    .shell::before {
+      content: "";
+      display: block;
+      height: 8px;
+      background: linear-gradient(90deg, #2f8f6b 0%, #7cb342 35%, #ef9f27 70%, #e4574d 100%);
+    }
+
+    .nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 14px 14px 10px;
+      background: linear-gradient(180deg, #f4faf6, #eef6f1);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .nav button {
+      border: 1px solid rgba(47, 143, 107, 0.14);
+      background: rgba(255,255,255,0.78);
+      color: var(--ink);
+      font: inherit;
+      font-weight: 800;
+      font-size: 0.86rem;
+      padding: 9px 14px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: transform 0.15s ease, background 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
+    }
+
+    .nav button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 14px rgba(47, 143, 107, 0.12);
+    }
+
+    .nav button[aria-current="true"] {
+      background: linear-gradient(180deg, #3aa57c, var(--accent-dark));
+      color: #fff;
+      border-color: transparent;
+      box-shadow: 0 8px 18px rgba(31, 107, 80, 0.28);
+    }
+
+    .nav button:focus-visible { outline: 3px solid var(--citrus); outline-offset: 2px; }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      border-bottom: 1px dashed rgba(47, 143, 107, 0.25);
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--muted);
+      background: rgba(255,255,255,0.45);
+    }
+
+    .toolbar label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+    }
+
+    .toolbar input[type="checkbox"] {
+      width: 1.1rem;
+      height: 1.1rem;
+      accent-color: var(--accent);
+    }
+
+    .stage {
+      padding: 20px 18px 24px;
+      min-height: 440px;
+    }
+
+    .screen { display: none; animation: riseIn 0.4s cubic-bezier(.2,.8,.2,1); }
+    .screen.active { display: block; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: none; }
+    }
+    @keyframes riseIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: none; }
+    }
+    @keyframes brandIn {
+      from { opacity: 0; transform: translateY(10px) scale(0.98); }
+      to { opacity: 1; transform: none; }
+    }
+    @keyframes pulseRing {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(47, 143, 107, 0.35); }
+      50% { box-shadow: 0 0 0 12px rgba(47, 143, 107, 0); }
+    }
+    @keyframes popIn {
+      0% { transform: scale(0.72); opacity: 0; }
+      70% { transform: scale(1.06); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    @keyframes drift {
+      0%, 100% { transform: translateY(0) rotate(-4deg); }
+      50% { transform: translateY(-12px) rotate(5deg); }
+    }
+    @keyframes softBounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-3px); }
+    }
+
+    h2 {
+      margin: 0 0 8px;
+      font-family: "ZCOOL XiaoWei", "Noto Sans TC", serif;
+      font-size: clamp(1.35rem, 3.2vw, 1.7rem);
+      font-weight: 400;
+      letter-spacing: 0.03em;
+    }
+
+    .lead {
+      margin: 0 0 14px;
+      color: var(--muted);
+      font-weight: 700;
+      line-height: 1.55;
+    }
+
+    .narration {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      background:
+        linear-gradient(135deg, rgba(228, 245, 236, 0.95), rgba(255, 244, 223, 0.75));
+      border: 1px solid rgba(47, 143, 107, 0.28);
+      border-radius: 18px;
+      padding: 14px 16px;
+      margin-bottom: 16px;
+      min-height: 68px;
+      box-shadow: 0 8px 20px rgba(47, 143, 107, 0.06);
+      position: relative;
+    }
+
+    .narration::after {
+      content: "";
+      position: absolute;
+      left: 28px;
+      bottom: -8px;
+      width: 14px;
+      height: 14px;
+      background: #eaf7ef;
+      border-right: 1px solid rgba(47, 143, 107, 0.28);
+      border-bottom: 1px solid rgba(47, 143, 107, 0.28);
+      transform: rotate(45deg);
+    }
+
+    .narration .badge {
+      flex: 0 0 auto;
+      background: linear-gradient(180deg, #3aa57c, var(--accent-dark));
+      color: #fff;
+      font-weight: 900;
+      font-size: 0.78rem;
+      padding: 7px 12px;
+      border-radius: 999px;
+      letter-spacing: 0.04em;
+      box-shadow: 0 4px 10px rgba(31, 107, 80, 0.25);
+    }
+
+    .narration p {
+      margin: 0;
+      font-weight: 700;
+      line-height: 1.6;
+      font-size: 1.05rem;
+    }
+
+    .compare {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin: 16px 0;
+    }
+
+    @media (max-width: 640px) {
+      .compare { grid-template-columns: 1fr; }
+    }
+
+    .compare-card {
+      border: 2px solid rgba(47, 143, 107, 0.14);
+      border-radius: 18px;
+      padding: 16px;
+      text-align: center;
+      background: linear-gradient(180deg, #fff, #f7fbf8);
+      transition: border-color 0.3s, transform 0.3s, background 0.3s, box-shadow 0.3s;
+    }
+
+    .compare-card.active {
+      border-color: var(--accent);
+      background: linear-gradient(180deg, #f3fff8, #e8f8ef);
+      transform: scale(1.02);
+      animation: pulseRing 1.5s ease infinite;
+      box-shadow: 0 12px 24px rgba(47, 143, 107, 0.12);
+    }
+
+    .compare-card.dim { opacity: 0.42; filter: grayscale(0.35); }
+
+    .compare-visual {
+      height: 118px;
+      display: grid;
+      place-items: center;
+      margin-bottom: 10px;
+      font-size: 2.8rem;
+      border-radius: 16px;
+      background:
+        radial-gradient(circle at 30% 30%, rgba(239,159,39,0.12), transparent 45%),
+        #f4faf6;
+    }
+
+    .cake {
+      width: 92px;
+      height: 92px;
+      border-radius: 50%;
+      background: conic-gradient(#ef9f27 0 90deg, #ffe8c8 90deg 360deg);
+      border: 5px solid #e4574d;
+      box-shadow: inset 0 0 0 3px rgba(255,255,255,0.35);
+    }
+
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    button.primary, button.secondary, button.ghost {
+      font: inherit;
+      font-weight: 800;
+      border-radius: 14px;
+      padding: 12px 18px;
+      cursor: pointer;
+      border: 2px solid transparent;
+      min-height: 48px;
+      transition: transform 0.12s ease, box-shadow 0.15s ease, filter 0.15s ease;
+    }
+
+    button.primary {
+      background: linear-gradient(180deg, #3aa57c, var(--accent-dark));
+      color: #fff;
+      border-color: transparent;
+      box-shadow: 0 8px 18px rgba(31, 107, 80, 0.25);
+    }
+
+    button.primary:hover { filter: brightness(1.05); transform: translateY(-1px); }
+    button.primary:active { transform: translateY(1px); }
+
+    button.secondary {
+      background: linear-gradient(180deg, #fff8ea, var(--citrus-soft));
+      color: #8a4b08;
+      border-color: rgba(239, 159, 39, 0.55);
+      box-shadow: 0 4px 0 rgba(194, 120, 12, 0.15);
+    }
+
+    button.ghost {
+      background: rgba(255,255,255,0.9);
+      color: var(--ink);
+      border-color: rgba(47, 143, 107, 0.22);
+    }
+
+    button.primary:disabled,
+    button.secondary:disabled,
+    button.ghost:disabled,
+    button:disabled {
+      opacity: 0.42;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+      filter: none;
+    }
+
+    .layout-split {
+      display: grid;
+      grid-template-columns: 1.35fr 1fr;
+      gap: 16px;
+      align-items: start;
+    }
+
+    @media (max-width: 760px) {
+      .layout-split { grid-template-columns: 1fr; }
+    }
+
+    .box {
+      border: 2px dashed rgba(47, 143, 107, 0.35);
+      border-radius: 18px;
+      padding: 14px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.9), rgba(244,250,246,0.95));
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .box.pulse {
+      border-style: solid;
+      border-color: var(--accent);
+      animation: pulseRing 1.2s ease infinite;
+    }
+
+    .fruit-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+    }
+
+    .fruit {
+      appearance: none;
+      border: 2px solid rgba(47, 143, 107, 0.12);
+      background: linear-gradient(180deg, #fff, #f7fbf8);
+      border-radius: 16px;
+      min-height: 60px;
+      font-size: 1.75rem;
+      cursor: pointer;
+      transition: transform 0.15s, border-color 0.2s, background 0.2s, box-shadow 0.2s;
+      box-shadow: 0 3px 0 rgba(28, 47, 40, 0.06);
+    }
+
+    .fruit:hover { transform: translateY(-2px); }
+    .fruit.part {
+      border-color: var(--berry);
+      background: linear-gradient(180deg, #fff5f3, #ffe8e5);
+      transform: scale(1.05);
+      box-shadow: 0 6px 14px rgba(228, 87, 77, 0.18);
+    }
+    .fruit.whole {
+      border-color: var(--accent);
+      background: linear-gradient(180deg, #f3fff8, #e4f5ec);
+    }
+    .fruit.wrong-dim {
+      opacity: 0.32;
+      filter: grayscale(0.45);
+    }
+
+    .fraction-card {
+      border: 1px solid rgba(47, 143, 107, 0.2);
+      border-radius: 20px;
+      padding: 16px;
+      background:
+        radial-gradient(circle at 20% 0%, rgba(239,159,39,0.12), transparent 40%),
+        linear-gradient(180deg, #fffdf8, #f1faf5);
+      text-align: center;
+      box-shadow: 0 10px 24px rgba(28, 47, 40, 0.06);
+    }
+
+    .fraction-stack {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      min-width: 84px;
+      margin: 10px 0;
+      padding: 10px 16px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.75);
+      border: 1px dashed rgba(47, 143, 107, 0.28);
+      animation: popIn 0.35s ease;
+    }
+
+    .fraction-stack .num,
+    .fraction-stack .den {
+      font-family: "ZCOOL KuaiLe", "Noto Sans TC", sans-serif;
+      font-size: 2.35rem;
+      font-weight: 400;
+      line-height: 1;
+      min-height: 1.1em;
+    }
+
+    .fraction-stack .bar {
+      width: 64px;
+      height: 5px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--accent), var(--citrus));
+    }
+
+    .fraction-stack .num.hl { color: var(--berry); }
+    .fraction-stack .den.hl { color: var(--accent-dark); }
+
+    .readout {
+      font-weight: 800;
+      font-size: 1.02rem;
+      margin: 6px 0 0;
+      line-height: 1.45;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--muted);
+    }
+
+    .chip {
+      background: rgba(255,255,255,0.9);
+      border: 1px solid rgba(47, 143, 107, 0.2);
+      border-radius: 999px;
+      padding: 5px 12px;
+      font-weight: 800;
+    }
+
+    .quiz-panel { margin-top: 12px; }
+
+    .choice-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .choice {
+      font: inherit;
+      font-weight: 800;
+      padding: 14px;
+      border-radius: 14px;
+      border: 2px solid rgba(47, 143, 107, 0.18);
+      background: linear-gradient(180deg, #fff, #f7fbf8);
+      cursor: pointer;
+      min-height: 54px;
+      transition: transform 0.12s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .choice:hover { transform: translateY(-1px); box-shadow: 0 6px 14px rgba(28,47,40,0.08); }
+
+    .choice.correct {
+      border-color: var(--ok);
+      background: var(--ok-soft);
+      color: var(--ok);
+    }
+
+    .choice.incorrect {
+      border-color: var(--danger);
+      background: #fff4ec;
+      color: var(--danger);
+    }
+
+    .feedback {
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      font-weight: 700;
+      line-height: 1.55;
+      display: none;
+    }
+
+    .feedback.show { display: block; animation: riseIn 0.3s ease; }
+    .feedback.ok { background: var(--ok-soft); color: var(--ok); border: 1px solid #86efac; }
+    .feedback.bad { background: #fff4ec; color: #9a3412; border: 1px solid #fdba74; }
+
+    .toy-grid {
+      display: grid;
+      gap: 8px;
+      margin: 8px 0;
+    }
+
+    .toy-grid.cols-5 { grid-template-columns: repeat(5, 1fr); }
+    .toy-grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
+
+    .toy {
+      appearance: none;
+      border: 1px solid rgba(47, 143, 107, 0.16);
+      background: linear-gradient(180deg, #fff, #f4faf6);
+      border-radius: 14px;
+      min-height: 54px;
+      font-size: 1.45rem;
+      cursor: default;
+      position: relative;
+      box-shadow: 0 2px 0 rgba(28,47,40,0.05);
+    }
+
+    .group-wrap { display: grid; gap: 10px; }
+
+    .group {
+      border: 2px solid rgba(139, 105, 20, 0.28);
+      border-radius: 16px;
+      padding: 10px;
+      background:
+        linear-gradient(180deg, rgba(255,248,230,0.9), rgba(247,236,210,0.75));
+      transition: border-color 0.25s, background 0.25s, transform 0.25s;
+    }
+
+    .group.selected {
+      border-color: var(--citrus-deep);
+      background: linear-gradient(180deg, #fff8ea, #ffe8c2);
+      transform: scale(1.02);
+      box-shadow: 0 8px 18px rgba(194, 120, 12, 0.15);
+    }
+
+    .group .count-tag {
+      font-size: 0.78rem;
+      font-weight: 900;
+      color: var(--wood-deep);
+      margin-bottom: 6px;
+    }
+
+    .group-inner {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      justify-content: center;
+    }
+
+    .group-inner .toy { min-width: 48px; flex: 1 1 48px; max-width: 64px; }
+
+    .q-progress {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 900;
+      font-size: 0.9rem;
+      color: #fff;
+      background: linear-gradient(180deg, #3aa57c, var(--accent-dark));
+      border: none;
+      border-radius: 999px;
+      padding: 6px 14px;
+      margin-bottom: 12px;
+      box-shadow: 0 6px 14px rgba(31, 107, 80, 0.22);
+    }
+
+    .sort-board { display: grid; gap: 14px; }
+
+    .pool-zone, .tray-zone {
+      border-radius: 20px;
+      padding: 14px;
+      border: 2px dashed rgba(47, 143, 107, 0.28);
+      background: rgba(255,255,255,0.72);
+      min-height: 92px;
+      transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+    }
+
+    .pool-zone {
+      border-color: rgba(47, 143, 107, 0.35);
+      background:
+        radial-gradient(circle at 10% 20%, rgba(47,143,107,0.08), transparent 40%),
+        linear-gradient(180deg, #f7fcf9, #eef8f4);
+    }
+
+    .tray-zone {
+      border-style: solid;
+      border-color: rgba(139, 105, 20, 0.22);
+      background:
+        linear-gradient(180deg, rgba(255,250,240,0.95), rgba(245,233,208,0.55));
+    }
+
+    .pool-zone.drag-over,
+    .tray.drag-over {
+      border-color: var(--citrus);
+      background: #fff8ea;
+      box-shadow: 0 0 0 5px rgba(239, 159, 39, 0.16);
+    }
+
+    .zone-title {
+      font-weight: 900;
+      font-size: 0.92rem;
+      margin: 0 0 10px;
+      color: var(--accent-dark);
+    }
+
+    .item-pool {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      min-height: 60px;
+    }
+
+    .manip-item {
+      appearance: none;
+      border: 2px solid rgba(47, 143, 107, 0.16);
+      background: linear-gradient(180deg, #fff, #f3faf6);
+      border-radius: 16px;
+      width: 58px;
+      height: 58px;
+      font-size: 1.6rem;
+      cursor: grab;
+      touch-action: none;
+      box-shadow: 0 4px 0 rgba(28, 47, 40, 0.08);
+      transition: transform 0.12s, border-color 0.15s, box-shadow 0.15s;
+      user-select: none;
+    }
+
+    .manip-item:hover { animation: softBounce 0.8s ease infinite; }
+    .manip-item:active { cursor: grabbing; }
+    .manip-item.picked {
+      border-color: var(--citrus);
+      transform: scale(1.1);
+      box-shadow: 0 0 0 5px rgba(239, 159, 39, 0.22);
+    }
+    .manip-item.flying {
+      opacity: 0.35;
+      transform: scale(0.9);
+    }
+
+    .tray-grid {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(auto-fit, minmax(148px, 1fr));
+    }
+
+    .tray {
+      border: 2px solid rgba(139, 105, 20, 0.35);
+      border-radius: 18px;
+      padding: 12px;
+      background:
+        linear-gradient(180deg, #fffaf0, #f3e2c0);
+      min-height: 128px;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s, transform 0.15s, box-shadow 0.15s;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.65), 0 6px 14px rgba(139, 105, 20, 0.1);
+    }
+
+    .tray.target-active {
+      border-color: var(--accent);
+      background: linear-gradient(180deg, #f3fff8, #dff5ea);
+      animation: pulseRing 1.2s ease infinite;
+    }
+
+    .tray.selected {
+      border-color: var(--citrus-deep);
+      background: linear-gradient(180deg, #fff6e4, #ffe0a8);
+      transform: scale(1.02);
+      box-shadow: 0 10px 22px rgba(194, 120, 12, 0.18);
+    }
+
+    .tray.unequal {
+      border-color: var(--danger);
+      background: #fff1e8;
+    }
+
+    .tray.equal-ok {
+      border-color: var(--ok);
+    }
+
+    .tray-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 900;
+      font-size: 0.86rem;
+      color: var(--wood-deep);
+      margin-bottom: 8px;
+    }
+
+    .tray-items {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      min-height: 58px;
+    }
+
+    .phase-chip {
+      display: inline-block;
+      font-weight: 900;
+      font-size: 0.8rem;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, #fff4df, #ffe8c2);
+      color: #8a4b08;
+      margin-bottom: 10px;
+      border: 1px solid rgba(239, 159, 39, 0.35);
+    }
+
+    .count-meter {
+      font-family: "ZCOOL KuaiLe", "Noto Sans TC", sans-serif;
+      font-size: 2.6rem;
+      font-weight: 400;
+      margin: 10px 0;
+      color: var(--accent-dark);
+      animation: popIn 0.3s ease;
+    }
+
+    .step-dots {
+      display: flex;
+      gap: 8px;
+      margin: 12px 0 0;
+    }
+
+    .step-dots span {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: #c9ddd2;
+      transition: transform 0.2s ease, background 0.2s ease;
+    }
+
+    .step-dots span.on {
+      background: linear-gradient(180deg, #3aa57c, var(--accent-dark));
+      transform: scale(1.25);
+    }
+
+    .summary-list {
+      display: grid;
+      gap: 12px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .summary-list li {
+      border: 1px solid rgba(47, 143, 107, 0.18);
+      border-radius: 16px;
+      padding: 14px 16px;
+      font-weight: 700;
+      background: linear-gradient(180deg, #fff, #f5faf7);
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+      box-shadow: 0 6px 16px rgba(28,47,40,0.05);
+    }
+
+    .contrast-note {
+      text-align: center;
+      font-weight: 800;
+      color: var(--accent-dark);
+      margin: 10px 0 0;
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: rgba(47, 143, 107, 0.08);
+    }
+
+    .err-compare {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .err-compare .side {
+      border-radius: 12px;
+      padding: 10px;
+      text-align: center;
+      font-weight: 800;
+      font-size: 0.9rem;
+    }
+
+    .err-compare .good {
+      background: var(--ok-soft);
+      border: 1px solid #86efac;
+      color: var(--ok);
+    }
+
+    .err-compare .bad-side {
+      background: #fff4ec;
+      border: 1px solid #fdba74;
+      color: var(--danger);
+      opacity: 0.9;
+    }
+
+    .footer-note {
+      width: min(980px, 100%);
+      margin-top: 14px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+
+    .app-bar {
+      background: linear-gradient(180deg, #fffdf8, #f4faf6);
+      border-bottom: 1px solid var(--line);
+    }
+    .app-bar-top {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 12px 16px 8px;
+    }
+    .brand-block { min-width: 0; }
+    .app-bar .brand {
+      font-size: clamp(1.35rem, 3.5vw, 1.85rem);
+      text-align: left;
+      background: none;
+      -webkit-background-clip: unset;
+      background-clip: unset;
+      color: var(--accent-dark);
+      text-shadow: none;
+      animation: none;
+    }
+    .app-bar .brand-mark {
+      margin: 0 0 4px;
+      font-size: 0.72rem;
+      padding: 3px 10px;
+    }
+    .app-bar .subtitle {
+      text-align: left;
+      margin: 2px 0 0;
+      font-size: 0.85rem;
+    }
+    .app-bar .nav {
+      background: transparent;
+      border: 0;
+      padding: 0 16px 10px;
+      gap: 6px;
+    }
+    .app-bar .toolbar {
+      padding: 8px 16px;
+      background: rgba(255,255,255,0.55);
+    }
+    .shell {
+      margin-top: 10px;
+      width: min(1040px, 100%);
+    }
+    .play-layout {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-height: 520px;
+    }
+    .ask-strip h2 { margin-bottom: 4px; }
+    .ask-strip .lead { margin-bottom: 8px; }
+    .ask-strip .narration { margin-bottom: 0; }
+    .ask-strip .narration::after { display: none; }
+    .workspace-b {
+      display: grid;
+      grid-template-columns: minmax(0, 1.55fr) minmax(200px, 0.75fr);
+      gap: 12px;
+      align-items: stretch;
+      flex: 1;
+    }
+    @media (max-width: 820px) {
+      .workspace-b { grid-template-columns: 1fr; }
+    }
+    .play-stage {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      background: linear-gradient(180deg, #f3faf6, #eef6f1);
+      border: 1px solid rgba(47, 143, 107, 0.2);
+      border-radius: 18px;
+      padding: 12px;
+      min-height: 340px;
+    }
+    .play-stage .pool-zone,
+    .play-stage .tray-zone {
+      margin: 0;
+      flex: 1;
+    }
+    .play-stage .tray-zone {
+      display: flex;
+      flex-direction: column;
+    }
+    .play-stage .tray-grid { flex: 1; }
+    .side-rail {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .side-rail .fraction-card { margin: 0; }
+    .action-dock {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      padding: 12px 0 0;
+      margin-top: auto;
+      border-top: 1px solid rgba(47, 143, 107, 0.18);
+      position: sticky;
+      bottom: 0;
+      background: linear-gradient(180deg, rgba(255,253,248,0.92), #fffdf8);
+      z-index: 2;
+    }
+    .action-dock .spacer { flex: 1 1 8px; }
+    #screen-practiceB.stage { padding-bottom: 12px; }
+    body { padding-top: 10px; }
+    .hero-cta { display: none; }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation: none !important;
+        transition: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="float-fruit f1" aria-hidden="true">🍎</div>
+  <div class="float-fruit f2" aria-hidden="true">🍊</div>
+  <div class="float-fruit f3" aria-hidden="true">🍌</div>
+  <div class="float-fruit f4" aria-hidden="true">🍇</div>
+
+  <main class="shell" id="app">
+    <header class="app-bar">
+      <div class="app-bar-top">
+        <div class="brand-block">
+          <div class="brand-mark">果園數學 · 分數工坊</div>
+          <h1 class="brand">水果禮盒分數工坊</h1>
+          <p class="subtitle">小三｜分數作為一組物件（整體）的部分</p>
+        </div>
+      </div>
+      <nav class="nav" aria-label="學習進度">
+        <button type="button" data-go="intro" aria-current="true">開場</button>
+        <button type="button" data-go="demoA">解說 A</button>
+        <button type="button" data-go="practiceA">練習 A</button>
+        <button type="button" data-go="demoB">解說 B</button>
+        <button type="button" data-go="practiceB">練習 B</button>
+        <button type="button" data-go="challenge">挑戰</button>
+        <button type="button" data-go="summary">回顧</button>
+      </nav>
+      <div class="toolbar">
+        <label>
+          <input type="checkbox" id="teachMode" checked />
+          解說模式（逐步按「下一步」）
+        </label>
+        <button type="button" class="ghost" id="replayExplain" style="padding:6px 12px;min-height:36px;font-size:0.85rem">重播本段解說</button>
+      </div>
+    </header>
+
+    <!-- INTRO -->
+    <section class="stage screen active" id="screen-intro" data-screen="intro">
+      <h2>一組物件，也可以是整體</h2>
+      <p class="lead">這一課用「個數」來看分數，不是用一塊圖形的面積。</p>
+      <div class="narration" aria-live="polite">
+        <span class="badge">解說</span>
+        <p id="introNarration">上一課我們用一塊蛋糕（面積）看分數。</p>
+      </div>
+      <div class="compare">
+        <div class="compare-card" id="cardContinuous">
+          <div class="compare-visual"><div class="cake" aria-hidden="true"></div></div>
+          <strong>一個物件（面積）</strong>
+          <div style="color:var(--muted);font-weight:700;margin-top:4px">連續模型</div>
+        </div>
+        <div class="compare-card" id="cardDiscrete">
+          <div class="compare-visual" aria-hidden="true">🍎🍊🍌🥝🍇</div>
+          <strong>一組物件（個數）</strong>
+          <div style="color:var(--muted);font-weight:700;margin-top:4px">離散模型 ← 本課</div>
+        </div>
+      </div>
+      <p class="contrast-note" id="introHint">分母看全部有多少個，分子看這一部分有多少個。</p>
+      <div class="btn-row">
+        <button type="button" class="primary" id="introNext">下一步</button>
+        <button type="button" class="secondary" id="introStart" hidden>開始解說 A</button>
+      </div>
+      <div class="step-dots" id="introDots" aria-hidden="true"><span></span><span></span><span></span></div>
+    </section>
+
+    <!-- DEMO A -->
+    <section class="stage screen" id="screen-demoA" data-screen="demoA">
+      <h2>解說 A：怎樣寫出分數？</h2>
+      <p class="lead">例：水果禮盒共 10 個，其中蘋果 7 個。</p>
+      <div class="narration"><span class="badge">解說</span><p id="demoANarration"></p></div>
+      <div class="layout-split">
+        <div>
+          <div class="box" id="demoABox">
+            <div class="fruit-grid" id="demoAGrid" aria-label="示範水果禮盒"></div>
+          </div>
+          <div class="legend">
+            <span class="chip">🍎 蘋果</span>
+            <span class="chip">🍊 橙</span>
+            <span class="chip">🍌 香蕉</span>
+          </div>
+        </div>
+        <div class="fraction-card">
+          <div style="font-weight:800;color:var(--muted)">分數卡</div>
+          <div class="fraction-stack">
+            <div class="num" id="demoANum">？</div>
+            <div class="bar" title="分線"></div>
+            <div class="den" id="demoADen">？</div>
+          </div>
+          <p class="readout" id="demoARead">先找出分母和分子</p>
+          <div style="margin-top:8px;font-size:0.85rem;font-weight:700;color:var(--muted)">
+            分子 · 分線 · 分母
+          </div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button type="button" class="primary" id="demoANext">下一步</button>
+        <button type="button" class="secondary" id="demoAToPractice" hidden>去練習 A</button>
+      </div>
+      <div class="step-dots" id="demoADots"><span></span><span></span><span></span><span></span><span></span></div>
+    </section>
+
+    <!-- PRACTICE A -->
+    <section class="stage screen" id="screen-practiceA" data-screen="practiceA">
+      <h2>練習 A：寫出分數</h2>
+      <div class="q-progress" id="practiceAProgress">第 1 / 10 題</div>
+      <p class="lead">先數全部（分母），再數指定部分（分子）。</p>
+      <div class="narration"><span class="badge">提示</span><p id="practiceAPrompt">蘋果佔全部水果的幾分之幾？</p></div>
+      <div class="layout-split">
+        <div class="box" id="practiceABox">
+          <div class="fruit-grid" id="practiceAGrid"></div>
+        </div>
+        <div>
+          <div class="fraction-card">
+            <div class="fraction-stack">
+              <div class="num" id="practiceANum">?</div>
+              <div class="bar"></div>
+              <div class="den" id="practiceADen">?</div>
+            </div>
+            <p class="readout" id="practiceARead">點選答案</p>
+          </div>
+          <div class="choice-grid" id="practiceAChoices"></div>
+          <div class="feedback" id="practiceAFeedback"></div>
+          <div class="btn-row">
+            <button type="button" class="ghost" id="practiceAReplay">重播解說 A</button>
+            <button type="button" class="secondary" id="practiceAPrevQ">上一題</button>
+            <button type="button" class="primary" id="practiceANextQ">下一題</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DEMO B -->
+    <section class="stage screen" id="screen-demoB" data-screen="demoB">
+      <h2>解說 B：一組物件的幾分之幾是多少？</h2>
+      <p class="lead">用圖示等分來找，不要先用乘除計算。</p>
+      <div class="narration"><span class="badge">解說</span><p id="demoBNarration"></p></div>
+      <div class="layout-split">
+        <div>
+          <div class="group-wrap" id="demoBGroups" aria-label="等分示範"></div>
+        </div>
+        <div class="fraction-card">
+          <div style="font-weight:800">10 的 <span style="color:var(--warm)">3/5</span></div>
+          <p class="readout" id="demoBRead">先看分母，把全部等分</p>
+          <div style="font-size:2.4rem;font-weight:900;margin-top:12px" id="demoBAnswer">？</div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button type="button" class="primary" id="demoBNext">下一步</button>
+        <button type="button" class="secondary" id="demoBToPractice" hidden>去練習 B</button>
+      </div>
+      <div class="step-dots" id="demoBDots"><span></span><span></span><span></span><span></span><span></span></div>
+    </section>
+
+    <!-- PRACTICE B -->
+    <section class="stage screen" id="screen-practiceB" data-screen="practiceB">
+      <div class="play-layout">
+        <div class="ask-strip">
+          <div class="q-progress" id="practiceBProgress">第 1 / 12 題</div>
+          <h2 id="practiceBTitle">練習 B：自己決定要分幾份</h2>
+          <p class="lead" id="practiceBLead">看分數想一想：要等分成幾份？再自己加份盤、把物件放進去。</p>
+          <div class="narration"><span class="badge">題目</span><p id="practiceBPrompt"></p></div>
+        </div>
+
+        <div class="workspace-b">
+          <section class="play-stage" aria-label="操作區">
+            <div class="phase-chip" id="practiceBPhaseChip">步驟 1：決定份數並分物</div>
+            <div class="pool-zone" id="practiceBPoolZone">
+              <p class="zone-title">物資區</p>
+              <div class="item-pool" id="practiceBPool" aria-label="物資區"></div>
+            </div>
+            <div class="tray-zone">
+              <p class="zone-title">份盤區 <span class="chip" id="practiceBTrayCount">現有 0 個份盤</span></p>
+              <div class="tray-grid" id="practiceBTrays" aria-label="份盤"></div>
+              <p id="practiceBEmptyTrays" class="readout" style="margin-top:8px">還沒有份盤。按下方「加一份盤」開始。</p>
+            </div>
+          </section>
+
+          <aside class="side-rail" aria-label="分數提示">
+            <div class="fraction-card">
+              <div style="font-weight:800;color:var(--muted)">題目裏的分數</div>
+              <div class="fraction-stack">
+                <div class="num" id="practiceBFracNum">?</div>
+                <div class="bar" title="分線"></div>
+                <div class="den" id="practiceBFracDen">?</div>
+              </div>
+              <p class="readout" id="practiceBFracAsk">哪個數告訴我們「要等分成幾份」？</p>
+            </div>
+            <p class="readout" id="practiceBSideHint">先自己決定份盤數量，再把全部物件放入，每盤一樣多。</p>
+            <p class="readout" id="practiceBSelected">物資區尚餘 — 個</p>
+            <div class="count-meter" id="practiceBCountMeter">？</div>
+            <p class="readout" id="practiceBCountLabel">取份後這裏會顯示總個數</p>
+            <div class="feedback" id="practiceBFeedback"></div>
+          </aside>
+        </div>
+
+        <div class="action-dock">
+          <button type="button" class="ghost" id="practiceBAddTray">加一份盤</button>
+          <button type="button" class="ghost" id="practiceBRemoveTray">拿走一份盤</button>
+          <button type="button" class="secondary" id="practiceBThinkHint">想一想提示</button>
+          <button type="button" class="primary" id="practiceBCheckEqual">檢查我的分法</button>
+          <span class="spacer"></span>
+          <button type="button" class="ghost" id="practiceBResetSort">重新開始</button>
+          <button type="button" class="ghost" id="practiceBReplay">重播解說 B</button>
+          <button type="button" class="secondary" id="practiceBPrevQ">上一題</button>
+          <button type="button" class="primary" id="practiceBConfirm" disabled>確認取份答案</button>
+          <button type="button" class="secondary" id="practiceBNextQ">下一題</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- CHALLENGE -->
+    <section class="stage screen" id="screen-challenge" data-screen="challenge">
+      <h2>挑戰：小心分母陷阱</h2>
+      <p class="lead">想清楚：整體是甚麼？</p>
+      <div class="narration"><span class="badge">挑戰</span><p id="challengePrompt"></p></div>
+      <div id="challengeVisual" class="box" style="margin-bottom:12px"></div>
+      <div class="choice-grid" id="challengeChoices"></div>
+      <div class="feedback" id="challengeFeedback"></div>
+      <div id="challengeWhy" hidden></div>
+      <div class="btn-row">
+        <button type="button" class="primary" id="challengeNext">下一題</button>
+        <button type="button" class="secondary" id="challengeToSummary" hidden>看重點回顧</button>
+      </div>
+    </section>
+
+    <!-- SUMMARY -->
+    <section class="stage screen" id="screen-summary" data-screen="summary">
+      <h2>重點回顧</h2>
+      <p class="lead">可以重播迷你解說，溫習核心概念。</p>
+      <ul class="summary-list">
+        <li>
+          <span>一組物件可看作一個整體</span>
+          <button type="button" class="ghost" data-replay="intro" style="min-height:40px;padding:8px 12px">重播</button>
+        </li>
+        <li>
+          <span>分母＝全部數量；分子＝部分數量</span>
+          <button type="button" class="ghost" data-replay="demoA" style="min-height:40px;padding:8px 12px">重播</button>
+        </li>
+        <li>
+          <span>求整體的 a/b：先等分成 b 份，再取 a 份</span>
+          <button type="button" class="ghost" data-replay="demoB" style="min-height:40px;padding:8px 12px">重播</button>
+        </li>
+        <li>
+          <span>分子是 0（分母≠0）等於 0；先問清楚整體是甚麼</span>
+          <button type="button" class="ghost" data-replay="challenge" style="min-height:40px;padding:8px 12px">去挑戰</button>
+        </li>
+      </ul>
+      <div class="btn-row">
+        <button type="button" class="primary" data-go="intro">再玩一次</button>
+      </div>
+    </section>
+  </main>
+
+  <p class="footer-note">對齊 3N5 分數(一) 第 12 課｜離散數量模型｜不涉及擴分約分</p>
+
+  <script>
+    (function () {
+      "use strict";
+
+      const SCREENS = ["intro", "demoA", "practiceA", "demoB", "practiceB", "challenge", "summary"];
+      const teachModeEl = document.getElementById("teachMode");
+
+      const DEMO_A_FRUITS = [
+        "🍎", "🍎", "🍎", "🍎", "🍎",
+        "🍎", "🍎", "🍊", "🍊", "🍌"
+      ];
+
+      const state = {
+        screen: "intro",
+        introStep: 0,
+        demoAStep: 0,
+        demoBStep: 0,
+        practiceAIndex: 0,
+        practiceBIndex: 0,
+        challengeIndex: 0,
+        practiceBPhase: "sort",
+        practiceBItems: [],
+        practiceBPool: [],
+        practiceBTrays: [],
+        practiceBPickedId: null,
+        practiceBSelectedTrays: new Set(),
+        practiceBEqualOk: false,
+        practiceBHintLevel: 0,
+        practiceBPickHintLevel: 0,
+        autoTimer: null,
+        dragItemId: null
+      };
+
+      function chineseFraction(n, d) {
+        const map = {
+          0: "零", 1: "一", 2: "二", 3: "三", 4: "四", 5: "五",
+          6: "六", 7: "七", 8: "八", 9: "九", 10: "十", 11: "十一",
+          12: "十二", 13: "十三", 14: "十四", 15: "十五", 16: "十六",
+          18: "十八", 20: "二十"
+        };
+        const dn = map[d] || String(d);
+        const nn = map[n] || String(n);
+        if (n === 0) return "零（等於 0）";
+        return dn + "分之" + nn;
+      }
+
+      function clearAuto() {
+        if (state.autoTimer) {
+          clearTimeout(state.autoTimer);
+          state.autoTimer = null;
+        }
+      }
+
+      function setScreen(name) {
+        clearAuto();
+        state.screen = name;
+        document.querySelectorAll(".screen").forEach(function (el) {
+          el.classList.toggle("active", el.dataset.screen === name);
+        });
+        document.querySelectorAll(".nav [data-go]").forEach(function (btn) {
+          btn.setAttribute("aria-current", btn.getAttribute("data-go") === name ? "true" : "false");
+        });
+        if (name === "intro") startIntro(true);
+        if (name === "demoA") startDemoA(true);
+        if (name === "practiceA") renderPracticeA();
+        if (name === "demoB") startDemoB(true);
+        if (name === "practiceB") renderPracticeB();
+        if (name === "challenge") renderChallenge();
+      }
+
+      function updateDots(id, step) {
+        const dots = document.querySelectorAll("#" + id + " span");
+        dots.forEach(function (d, i) { d.classList.toggle("on", i === step); });
+      }
+
+      function scheduleAuto(fn, ms) {
+        clearAuto();
+        if (!teachModeEl.checked) {
+          state.autoTimer = setTimeout(fn, ms || 2200);
+        }
+      }
+
+      /* ---------- INTRO ---------- */
+      const introSteps = [
+        {
+          text: "上一課我們用一塊蛋糕（面積）看分數。",
+          apply: function () {
+            document.getElementById("cardContinuous").className = "compare-card active";
+            document.getElementById("cardDiscrete").className = "compare-card dim";
+            document.getElementById("introHint").textContent = "那是「一個物件（整體）的部分」。";
+          }
+        },
+        {
+          text: "這一課改用一盒水果（個數）看分數。",
+          apply: function () {
+            document.getElementById("cardContinuous").className = "compare-card dim";
+            document.getElementById("cardDiscrete").className = "compare-card active";
+            document.getElementById("introHint").textContent = "這是「一組物件（整體）的部分」——本課重點。";
+          }
+        },
+        {
+          text: "一組物件也可以是一個「整體」。分母看全部有多少個，分子看這一部分有多少個；等分時每份個數要一樣多。",
+          apply: function () {
+            document.getElementById("cardContinuous").className = "compare-card";
+            document.getElementById("cardDiscrete").className = "compare-card active";
+            document.getElementById("introHint").textContent = "準備好了？我們用水果禮盒一步步寫出分數。";
+            document.getElementById("introNext").hidden = true;
+            document.getElementById("introStart").hidden = false;
+          }
+        }
+      ];
+
+      function startIntro(reset) {
+        if (reset) state.introStep = 0;
+        document.getElementById("introNext").hidden = false;
+        document.getElementById("introStart").hidden = true;
+        showIntroStep();
+      }
+
+      function showIntroStep() {
+        const step = introSteps[state.introStep];
+        document.getElementById("introNarration").textContent = step.text;
+        step.apply();
+        updateDots("introDots", state.introStep);
+        if (state.introStep < introSteps.length - 1) {
+          scheduleAuto(function () {
+            state.introStep += 1;
+            showIntroStep();
+          });
+        }
+      }
+
+      document.getElementById("introNext").addEventListener("click", function () {
+        clearAuto();
+        if (state.introStep < introSteps.length - 1) {
+          state.introStep += 1;
+          showIntroStep();
+        }
+      });
+      document.getElementById("introStart").addEventListener("click", function () {
+        setScreen("demoA");
+      });
+
+      /* ---------- DEMO A ---------- */
+      function renderFruitGrid(el, fruits, mode) {
+        el.innerHTML = "";
+        fruits.forEach(function (f, i) {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "fruit";
+          btn.textContent = f;
+          btn.setAttribute("aria-label", "水果 " + (i + 1));
+          if (mode === "whole") btn.classList.add("whole");
+          if (mode === "part" && f === "🍎") btn.classList.add("part");
+          if (mode === "part" && f !== "🍎") btn.classList.add("wrong-dim");
+          if (mode === "both") {
+            btn.classList.add("whole");
+            if (f === "🍎") btn.classList.add("part");
+          }
+          el.appendChild(btn);
+        });
+      }
+
+      const demoASteps = [
+        {
+          text: "水果禮盒是一組物件，我們把它看作一個整體。",
+          apply: function () {
+            document.getElementById("demoABox").classList.add("pulse");
+            renderFruitGrid(document.getElementById("demoAGrid"), DEMO_A_FRUITS, "none");
+            document.getElementById("demoANum").textContent = "？";
+            document.getElementById("demoADen").textContent = "？";
+            document.getElementById("demoANum").className = "num";
+            document.getElementById("demoADen").className = "den";
+            document.getElementById("demoARead").textContent = "先認清：整體是這盒水果";
+          }
+        },
+        {
+          text: "先數全部水果：一共有 10 個。這個 10 就是分母。",
+          apply: function () {
+            document.getElementById("demoABox").classList.remove("pulse");
+            renderFruitGrid(document.getElementById("demoAGrid"), DEMO_A_FRUITS, "whole");
+            document.getElementById("demoADen").textContent = "10";
+            document.getElementById("demoADen").className = "den hl";
+            document.getElementById("demoANum").textContent = "？";
+            document.getElementById("demoARead").textContent = "分母 = 全部數量 = 10";
+          }
+        },
+        {
+          text: "再數蘋果：有 7 個。這個 7 就是分子。",
+          apply: function () {
+            renderFruitGrid(document.getElementById("demoAGrid"), DEMO_A_FRUITS, "part");
+            document.getElementById("demoANum").textContent = "7";
+            document.getElementById("demoANum").className = "num hl";
+            document.getElementById("demoARead").textContent = "分子 = 蘋果數量 = 7";
+          }
+        },
+        {
+          text: "中間這條是分線。蘋果佔全部水果的十分之七。",
+          apply: function () {
+            renderFruitGrid(document.getElementById("demoAGrid"), DEMO_A_FRUITS, "both");
+            document.getElementById("demoANum").textContent = "7";
+            document.getElementById("demoADen").textContent = "10";
+            document.getElementById("demoANum").className = "num hl";
+            document.getElementById("demoADen").className = "den hl";
+            document.getElementById("demoARead").textContent = "讀作：十分之七";
+          }
+        },
+        {
+          text: "記住：分母問「整體是甚麼」——這裏的整體是全部水果，不是其他水果的數量。",
+          apply: function () {
+            renderFruitGrid(document.getElementById("demoAGrid"), DEMO_A_FRUITS, "both");
+            document.getElementById("demoARead").textContent = "7/10＝蘋果佔全部水果";
+            document.getElementById("demoANext").hidden = true;
+            document.getElementById("demoAToPractice").hidden = false;
+          }
+        }
+      ];
+
+      function startDemoA(reset) {
+        if (reset) state.demoAStep = 0;
+        document.getElementById("demoANext").hidden = false;
+        document.getElementById("demoAToPractice").hidden = true;
+        showDemoAStep();
+      }
+
+      function showDemoAStep() {
+        const step = demoASteps[state.demoAStep];
+        document.getElementById("demoANarration").textContent = step.text;
+        step.apply();
+        updateDots("demoADots", state.demoAStep);
+        if (state.demoAStep < demoASteps.length - 1) {
+          scheduleAuto(function () {
+            state.demoAStep += 1;
+            showDemoAStep();
+          });
+        }
+      }
+
+      document.getElementById("demoANext").addEventListener("click", function () {
+        clearAuto();
+        if (state.demoAStep < demoASteps.length - 1) {
+          state.demoAStep += 1;
+          showDemoAStep();
+        }
+      });
+      document.getElementById("demoAToPractice").addEventListener("click", function () {
+        setScreen("practiceA");
+      });
+
+      /* ---------- PRACTICE A ---------- */
+      function makeA(prompt, fruits, highlight, answer, choices, whyOk, whyBad, wholeFilter) {
+        return {
+          prompt: prompt,
+          fruits: fruits,
+          highlight: highlight,
+          answer: answer,
+          choices: choices,
+          whyOk: whyOk,
+          whyBad: whyBad || {},
+          wholeFilter: wholeFilter || null
+        };
+      }
+
+      const practiceAQuestions = [
+        makeA("蘋果佔全部水果的幾分之幾？",
+          ["🍎", "🍎", "🍎", "🍎", "🍎", "🍎", "🍎", "🍊", "🍊", "🍌"], "🍎", "7/10",
+          ["7/10", "7/3", "3/10", "10/7"],
+          "全部 10 個是分母，蘋果 7 個是分子 → 7/10。",
+          { "7/3": "分母要用全部 10 個，不是其他水果。", "3/10": "那是非蘋果的份額。", "10/7": "分子、分母放反了。" }),
+        makeA("橙佔全部水果的幾分之幾？",
+          ["🍎", "🍎", "🍊", "🍊", "🍊", "🍌", "🍌", "🥝"], "🍊", "3/8",
+          ["3/8", "3/5", "5/8", "0/8"],
+          "全部 8 個 → 分母 8；橙 3 個 → 分子 3。",
+          { "3/5": "分母錯了：整體是全部 8 個。", "5/8": "那是非橙。", "0/8": "橙有 3 個。" }),
+        makeA("香蕉佔全部水果的幾分之幾？",
+          ["🍎", "🍊", "🍊", "🍌", "🍌", "🍌", "🍌", "🥝", "🥝"], "🍌", "4/9",
+          ["4/9", "4/5", "5/9", "2/9"],
+          "全部 9 個，香蕉 4 個 → 4/9。",
+          { "4/5": "分母不能用其他水果數量。", "5/9": "那是非香蕉。", "2/9": "奇異果才是 2 個。" }),
+        makeA("奇異果佔全部水果的幾分之幾？（禮盒裏有沒有奇異果？）",
+          ["🍎", "🍎", "🍊", "🍊", "🍌", "🍌", "🍇", "🍇", "🍇"], "🥝", "0/9",
+          ["0/9", "9/0", "1/9", "0/0"],
+          "沒有奇異果 → 分子 0；全部 9 個 → 分母 9。0/9＝0。",
+          { "9/0": "分母不可以是 0。", "1/9": "禮盒裏沒有奇異果。", "0/0": "分母不可以是 0。" }),
+        makeA("葡萄佔全部水果的幾分之幾？",
+          ["🍇", "🍇", "🍇", "🍇", "🍎", "🍊", "🍌"], "🍇", "4/7",
+          ["4/7", "4/3", "3/7", "7/4"],
+          "全部 7 個，葡萄 4 個 → 4/7。",
+          { "4/3": "分母要用全部。", "3/7": "那是非葡萄。", "7/4": "分子分母反了。" }),
+        makeA("紅蘋果佔「全部蘋果」的幾分之幾？（整體＝全部蘋果）",
+          ["🍎", "🍎", "🍎", "🍏", "🍏", "🍊", "🍊"], "🍎", "3/5",
+          ["3/5", "3/7", "2/5", "5/7"],
+          "全部蘋果 5 個（分母），紅蘋果 3 個（分子）→ 3/5。",
+          { "3/7": "整體不是全部水果。", "2/5": "那是青蘋果。", "5/7": "那是蘋果佔全部水果。" },
+          function (f) { return f === "🍎" || f === "🍏"; }),
+        makeA("青蘋果佔全部水果的幾分之幾？",
+          ["🍎", "🍎", "🍏", "🍏", "🍏", "🍊", "🍌", "🍌"], "🍏", "3/8",
+          ["3/8", "3/5", "5/8", "2/8"],
+          "全部 8 個，青蘋果 3 個 → 3/8。",
+          { "3/5": "分母要用全部水果。", "5/8": "那是紅蘋果＋橙＋香蕉？再數清楚。", "2/8": "紅蘋果才是 2 個。" }),
+        makeA("草莓佔全部水果的幾分之幾？",
+          ["🍓", "🍓", "🍎", "🍊", "🍊", "🍌"], "🍓", "2/6",
+          ["2/6", "2/4", "4/6", "2/2"],
+          "全部 6 個，草莓 2 個 → 2/6。（不必約分）",
+          { "2/4": "分母不能用非草莓。", "4/6": "那是非草莓。", "2/2": "整體不是只有草莓。" }),
+        makeA("梨佔全部水果的幾分之幾？",
+          ["🍐", "🍐", "🍐", "🍎", "🍎", "🍊", "🍊", "🍊", "🍌", "🥝"], "🍐", "3/10",
+          ["3/10", "3/7", "7/10", "3/3"],
+          "全部 10 個，梨 3 個 → 3/10。",
+          { "3/7": "分母錯用其他水果。", "7/10": "那是非梨。", "3/3": "整體不是只有梨。" }),
+        makeA("芒果佔全部水果的幾分之幾？（這盒沒有芒果）",
+          ["🍎", "🍎", "🍎", "🍊", "🍌", "🍌"], "🥭", "0/6",
+          ["0/6", "1/6", "6/6", "0/0"],
+          "沒有芒果 → 0/6＝0。",
+          { "1/6": "圖中沒有芒果。", "6/6": "那是全部水果＝1，不是芒果。", "0/0": "分母不可以是 0。" }),
+        makeA("橙和香蕉一共佔全部水果的幾分之幾？",
+          ["🍎", "🍎", "🍊", "🍊", "🍌", "🍌", "🍌", "🥝"], "🍊🍌", "5/8",
+          ["5/8", "5/3", "3/8", "2/8"],
+          "橙 2＋香蕉 3＝5；全部 8 → 5/8。",
+          { "5/3": "分母要用全部。", "3/8": "只數了香蕉。", "2/8": "只數了橙。" }),
+        makeA("紅色水果（蘋果＋草莓）佔全部的幾分之幾？",
+          ["🍎", "🍎", "🍓", "🍊", "🍌", "🥝"], "🍎🍓", "3/6",
+          ["3/6", "3/3", "2/6", "1/6"],
+          "蘋果 2＋草莓 1＝3；全部 6 → 3/6。",
+          { "3/3": "分母不是只有紅色水果。", "2/6": "漏了草莓。", "1/6": "只數了草莓。" })
+      ];
+
+      // multi-highlight support for combined parts
+      function isPartFruit(f, highlight) {
+        if (!highlight) return false;
+        if (highlight.length <= 2) return f === highlight;
+        // e.g. "🍊🍌" or "🍎🍓"
+        for (let i = 0; i < highlight.length; ) {
+          const cp = highlight.codePointAt(i);
+          const ch = String.fromCodePoint(cp);
+          if (f === ch) return true;
+          i += ch.length;
+        }
+        return false;
+      }
+
+      function renderPracticeA() {
+        const q = practiceAQuestions[state.practiceAIndex];
+        document.getElementById("practiceAProgress").textContent =
+          "第 " + (state.practiceAIndex + 1) + " / " + practiceAQuestions.length + " 題";
+        document.getElementById("practiceAPrompt").textContent = q.prompt;
+        const grid = document.getElementById("practiceAGrid");
+        grid.innerHTML = "";
+        q.fruits.forEach(function (f) {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "fruit";
+          btn.textContent = f;
+          const isPart = isPartFruit(f, q.highlight);
+          const isWhole = q.wholeFilter ? q.wholeFilter(f) : true;
+          if (isWhole) btn.classList.add("whole");
+          if (isPart) btn.classList.add("part");
+          if (!isWhole) btn.classList.add("wrong-dim");
+          grid.appendChild(btn);
+        });
+        document.getElementById("practiceANum").textContent = "?";
+        document.getElementById("practiceADen").textContent = "?";
+        document.getElementById("practiceANum").className = "num";
+        document.getElementById("practiceADen").className = "den";
+        document.getElementById("practiceARead").textContent = "選擇正確分數";
+        const feedback = document.getElementById("practiceAFeedback");
+        feedback.className = "feedback";
+        feedback.textContent = "";
+        const box = document.getElementById("practiceAChoices");
+        box.innerHTML = "";
+        q.choices.forEach(function (c) {
+          const b = document.createElement("button");
+          b.type = "button";
+          b.className = "choice";
+          b.textContent = c;
+          b.addEventListener("click", function () { answerPracticeA(c, b); });
+          box.appendChild(b);
+        });
+      }
+
+      function answerPracticeA(choice, btn) {
+        const q = practiceAQuestions[state.practiceAIndex];
+        const feedback = document.getElementById("practiceAFeedback");
+        document.querySelectorAll("#practiceAChoices .choice").forEach(function (el) {
+          el.disabled = true;
+          if (el.textContent === q.answer) el.classList.add("correct");
+        });
+        const parts = q.answer.split("/");
+        document.getElementById("practiceANum").textContent = parts[0];
+        document.getElementById("practiceADen").textContent = parts[1];
+        document.getElementById("practiceANum").className = "num hl";
+        document.getElementById("practiceADen").className = "den hl";
+        if (choice === q.answer) {
+          btn.classList.add("correct");
+          document.getElementById("practiceARead").textContent = chineseFraction(+parts[0], +parts[1]);
+          feedback.className = "feedback show ok";
+          feedback.textContent = "正確！" + q.whyOk;
+        } else {
+          btn.classList.add("incorrect");
+          feedback.className = "feedback show bad";
+          feedback.innerHTML = "未正確。" + (q.whyBad[choice] || "再想想整體是甚麼。") +
+            '<div class="err-compare"><div class="side good">正解分母：看全部（整體）</div><div class="side bad-side">常見錯：用餘下／其他種類當分母 ✕</div></div>';
+        }
+      }
+
+      document.getElementById("practiceANextQ").addEventListener("click", function () {
+        state.practiceAIndex = (state.practiceAIndex + 1) % practiceAQuestions.length;
+        renderPracticeA();
+      });
+      document.getElementById("practiceAPrevQ").addEventListener("click", function () {
+        state.practiceAIndex = (state.practiceAIndex - 1 + practiceAQuestions.length) % practiceAQuestions.length;
+        renderPracticeA();
+      });
+      document.getElementById("practiceAReplay").addEventListener("click", function () {
+        setScreen("demoA");
+      });
+
+      /* ---------- DEMO B ---------- */
+      function buildGroups(total, parts, orientation) {
+        const size = total / parts;
+        const groups = [];
+        let idx = 0;
+        for (let g = 0; g < parts; g++) {
+          const items = [];
+          for (let i = 0; i < size; i++) items.push(idx++);
+          groups.push(items);
+        }
+        return { groups: groups, orientation: orientation, perGroup: size };
+      }
+
+      function renderGroups(container, total, parts, selectedCount, showCounts, icon) {
+        icon = icon || "🧸";
+        const data = buildGroups(total, parts, "row");
+        container.innerHTML = "";
+        container.style.gridTemplateColumns = "1fr";
+        data.groups.forEach(function (items, gi) {
+          const g = document.createElement("div");
+          g.className = "group" + (gi < selectedCount ? " selected" : "");
+          if (showCounts) {
+            const tag = document.createElement("div");
+            tag.className = "count-tag";
+            tag.textContent = "第 " + (gi + 1) + " 份・" + items.length + " 個";
+            g.appendChild(tag);
+          }
+          const inner = document.createElement("div");
+          inner.className = "group-inner";
+          items.forEach(function () {
+            const t = document.createElement("div");
+            t.className = "toy";
+            t.textContent = icon;
+            inner.appendChild(t);
+          });
+          g.appendChild(inner);
+          container.appendChild(g);
+        });
+      }
+
+      const demoBSteps = [
+        {
+          text: "題目：10 個布娃娃的五分之三是多少？",
+          apply: function () {
+            const c = document.getElementById("demoBGroups");
+            c.innerHTML = "";
+            const grid = document.createElement("div");
+            grid.className = "toy-grid cols-5";
+            for (let i = 0; i < 10; i++) {
+              const t = document.createElement("div");
+              t.className = "toy";
+              t.textContent = "🧸";
+              grid.appendChild(t);
+            }
+            c.appendChild(grid);
+            document.getElementById("demoBAnswer").textContent = "？";
+            document.getElementById("demoBRead").textContent = "先看分母，把全部等分";
+          }
+        },
+        {
+          text: "看分母 5：把 10 個等分成 5 份。",
+          apply: function () {
+            renderGroups(document.getElementById("demoBGroups"), 10, 5, 0, false);
+            document.getElementById("demoBRead").textContent = "等分成 5 份（分母）";
+          }
+        },
+        {
+          text: "檢查：每份都是 2 個，才算等分。",
+          apply: function () {
+            renderGroups(document.getElementById("demoBGroups"), 10, 5, 0, true);
+            document.getElementById("demoBRead").textContent = "每份數量相同 → 等分成功";
+          }
+        },
+        {
+          text: "看分子 3：取其中 3 份。",
+          apply: function () {
+            renderGroups(document.getElementById("demoBGroups"), 10, 5, 3, true);
+            document.getElementById("demoBRead").textContent = "取 3 份（分子）";
+          }
+        },
+        {
+          text: "數一數高亮的：一共 6 個。所以答案是 6。",
+          apply: function () {
+            renderGroups(document.getElementById("demoBGroups"), 10, 5, 3, true);
+            document.getElementById("demoBAnswer").textContent = "6";
+            document.getElementById("demoBAnswer").style.animation = "popIn 0.4s ease";
+            document.getElementById("demoBRead").textContent = "10 的 3/5 ＝ 6 個";
+            document.getElementById("demoBNext").hidden = true;
+            document.getElementById("demoBToPractice").hidden = false;
+          }
+        }
+      ];
+
+      function startDemoB(reset) {
+        if (reset) state.demoBStep = 0;
+        document.getElementById("demoBNext").hidden = false;
+        document.getElementById("demoBToPractice").hidden = true;
+        showDemoBStep();
+      }
+
+      function showDemoBStep() {
+        const step = demoBSteps[state.demoBStep];
+        document.getElementById("demoBNarration").textContent = step.text;
+        step.apply();
+        updateDots("demoBDots", state.demoBStep);
+        if (state.demoBStep < demoBSteps.length - 1) {
+          scheduleAuto(function () {
+            state.demoBStep += 1;
+            showDemoBStep();
+          });
+        }
+      }
+
+      document.getElementById("demoBNext").addEventListener("click", function () {
+        clearAuto();
+        if (state.demoBStep < demoBSteps.length - 1) {
+          state.demoBStep += 1;
+          showDemoBStep();
+        }
+      });
+      document.getElementById("demoBToPractice").addEventListener("click", function () {
+        setScreen("practiceB");
+      });
+
+      /* ---------- PRACTICE B：拖／點分物 ---------- */
+      const practiceBQuestions = [
+        { total: 10, num: 3, den: 5, icon: "🧸", answer: 6, label: "布娃娃" },
+        { total: 16, num: 3, den: 4, icon: "🌀", answer: 12, label: "陀螺" },
+        { total: 18, num: 5, den: 6, icon: "⭐", answer: 15, label: "貼紙" },
+        { total: 12, num: 2, den: 3, icon: "🍪", answer: 8, label: "餅乾" },
+        { total: 8, num: 3, den: 4, icon: "🎈", answer: 6, label: "氣球" },
+        { total: 15, num: 2, den: 5, icon: "🧁", answer: 6, label: "杯子蛋糕" },
+        { total: 14, num: 3, den: 7, icon: "🍫", answer: 6, label: "朱古力豆" },
+        { total: 9, num: 2, den: 3, icon: "🐰", answer: 6, label: "小兔子" },
+        { total: 20, num: 3, den: 5, icon: "🔵", answer: 12, label: "圓點貼紙" },
+        { total: 12, num: 1, den: 4, icon: "✏️", answer: 3, label: "鉛筆" },
+        { total: 16, num: 1, den: 2, icon: "🍬", answer: 8, label: "糖果" },
+        { total: 18, num: 2, den: 3, icon: "🐸", answer: 12, label: "小青蛙" }
+      ];
+
+      function initPracticeBModel() {
+        const q = practiceBQuestions[state.practiceBIndex];
+        state.practiceBPhase = "sort";
+        state.practiceBEqualOk = false;
+        state.practiceBPickedId = null;
+        state.practiceBSelectedTrays = new Set();
+        state.practiceBHintLevel = 0;
+        state.practiceBPickHintLevel = 0;
+        state.practiceBItems = [];
+        state.practiceBPool = [];
+        // 不預先給定份盤數：由學生自行加減發現「分母＝要分幾份」
+        state.practiceBTrays = [];
+        for (let i = 0; i < q.total; i++) {
+          state.practiceBItems.push({ id: "b" + i, icon: q.icon });
+          state.practiceBPool.push("b" + i);
+        }
+      }
+
+      function addPracticeBTray() {
+        if (state.practiceBPhase !== "sort" && state.practiceBPhase !== "done") {
+          enterSortPhase();
+        }
+        if (state.practiceBTrays.length >= 12) return;
+        state.practiceBTrays.push([]);
+        state.practiceBEqualOk = false;
+        state.practiceBSelectedTrays = new Set();
+        paintPracticeB();
+      }
+
+      function removePracticeBTray() {
+        if (state.practiceBPhase !== "sort") enterSortPhase();
+        if (!state.practiceBTrays.length) return;
+        const last = state.practiceBTrays.pop();
+        // 盤內物件放回物資區
+        last.forEach(function (id) { state.practiceBPool.push(id); });
+        state.practiceBEqualOk = false;
+        state.practiceBSelectedTrays = new Set();
+        state.practiceBPickedId = null;
+        paintPracticeB();
+      }
+
+      function findItemLocation(id) {
+        if (state.practiceBPool.indexOf(id) !== -1) return { place: "pool", index: -1 };
+        for (let t = 0; t < state.practiceBTrays.length; t++) {
+          if (state.practiceBTrays[t].indexOf(id) !== -1) return { place: "tray", index: t };
+        }
+        return null;
+      }
+
+      function removeItemFromAll(id) {
+        state.practiceBPool = state.practiceBPool.filter(function (x) { return x !== id; });
+        state.practiceBTrays = state.practiceBTrays.map(function (tray) {
+          return tray.filter(function (x) { return x !== id; });
+        });
+      }
+
+      function moveItemToPool(id) {
+        removeItemFromAll(id);
+        state.practiceBPool.push(id);
+        state.practiceBEqualOk = false;
+        if (state.practiceBPhase !== "sort") enterSortPhase();
+      }
+
+      function moveItemToTray(id, trayIndex) {
+        removeItemFromAll(id);
+        state.practiceBTrays[trayIndex].push(id);
+        state.practiceBEqualOk = false;
+        if (state.practiceBPhase !== "sort") enterSortPhase();
+      }
+
+      function enterSortPhase() {
+        state.practiceBPhase = "sort";
+        state.practiceBSelectedTrays = new Set();
+        state.practiceBEqualOk = false;
+        document.getElementById("practiceBConfirm").disabled = true;
+      }
+
+      function enterPickPhase() {
+        state.practiceBPhase = "pick";
+        state.practiceBPickedId = null;
+        state.practiceBSelectedTrays = new Set();
+        document.getElementById("practiceBConfirm").disabled = false;
+      }
+
+      function selectedCount() {
+        var n = 0;
+        state.practiceBSelectedTrays.forEach(function (ti) {
+          n += state.practiceBTrays[ti].length;
+        });
+        return n;
+      }
+
+      function updatePracticeBSide() {
+        const q = practiceBQuestions[state.practiceBIndex];
+        const poolLeft = state.practiceBPool.length;
+        const chip = document.getElementById("practiceBPhaseChip");
+        const hint = document.getElementById("practiceBSideHint");
+        const selectedEl = document.getElementById("practiceBSelected");
+        const meter = document.getElementById("practiceBCountMeter");
+        const label = document.getElementById("practiceBCountLabel");
+        const trayCountEl = document.getElementById("practiceBTrayCount");
+        const emptyEl = document.getElementById("practiceBEmptyTrays");
+        const fracAsk = document.getElementById("practiceBFracAsk");
+
+        document.getElementById("practiceBFracNum").textContent = String(q.num);
+        document.getElementById("practiceBFracDen").textContent = String(q.den);
+        trayCountEl.textContent = "現有 " + state.practiceBTrays.length + " 個份盤";
+        emptyEl.hidden = state.practiceBTrays.length > 0;
+
+        if (state.practiceBPhase === "sort") {
+          chip.textContent = "步驟 1：自己決定要分幾份，再分物";
+          hint.textContent = "先加份盤，再拖／點放物件。全部放完且每盤一樣多，才算等分。";
+          selectedEl.textContent = "物資區尚餘 " + poolLeft + " 個 · 已放入 " + (q.total - poolLeft) +
+            " 個 · 份盤 " + state.practiceBTrays.length + " 個";
+          meter.textContent = "？";
+          label.textContent = "等分成功後，再想想要取幾份。";
+          fracAsk.textContent = "哪個數告訴我們「要等分成幾份」？用＋/− 準備份盤試試。";
+          document.getElementById("practiceBFracNum").className = "num";
+          document.getElementById("practiceBFracDen").className = "den hl";
+        } else if (state.practiceBPhase === "pick" || state.practiceBPhase === "done") {
+          chip.textContent = state.practiceBPhase === "done" ? "完成！" : "步驟 2：自己決定取幾份";
+          hint.textContent = "分子告訴我們取幾份。點選份盤後按確認。";
+          selectedEl.textContent = "已取 " + state.practiceBSelectedTrays.size + " 份";
+          const count = selectedCount();
+          meter.textContent = String(count);
+          label.textContent = "高亮份盤裏共有 " + count + " 個" + q.label;
+          fracAsk.textContent = "哪個數告訴我們「要取幾份」？";
+          document.getElementById("practiceBFracNum").className = "num hl";
+          document.getElementById("practiceBFracDen").className = "den";
+        }
+      }
+
+      function bindItemInteractions(btn, id, trayIndex) {
+        btn.draggable = state.practiceBPhase === "sort";
+        if (state.practiceBPhase !== "sort") {
+          btn.style.cursor = "pointer";
+          btn.draggable = false;
+        }
+        btn.addEventListener("dragstart", function (e) {
+          if (state.practiceBPhase !== "sort") {
+            e.preventDefault();
+            return;
+          }
+          state.dragItemId = id;
+          btn.classList.add("flying");
+          e.dataTransfer.setData("text/plain", id);
+          e.dataTransfer.effectAllowed = "move";
+        });
+        btn.addEventListener("dragend", function () {
+          state.dragItemId = null;
+          btn.classList.remove("flying");
+          document.querySelectorAll(".drag-over").forEach(function (el) {
+            el.classList.remove("drag-over");
+          });
+        });
+        btn.addEventListener("click", function (e) {
+          e.stopPropagation();
+          if (state.practiceBPhase === "pick" && typeof trayIndex === "number") {
+            if (state.practiceBSelectedTrays.has(trayIndex)) state.practiceBSelectedTrays.delete(trayIndex);
+            else state.practiceBSelectedTrays.add(trayIndex);
+            paintPracticeB();
+            return;
+          }
+          if (state.practiceBPhase !== "sort") return;
+          if (state.practiceBPickedId === id) {
+            state.practiceBPickedId = null;
+          } else {
+            state.practiceBPickedId = id;
+          }
+          paintPracticeB();
+        });
+      }
+
+      function paintPracticeB() {
+        const q = practiceBQuestions[state.practiceBIndex];
+        const poolEl = document.getElementById("practiceBPool");
+        const traysEl = document.getElementById("practiceBTrays");
+        poolEl.innerHTML = "";
+        traysEl.innerHTML = "";
+
+        state.practiceBPool.forEach(function (id) {
+          const item = state.practiceBItems.find(function (x) { return x.id === id; });
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "manip-item" + (state.practiceBPickedId === id ? " picked" : "");
+          btn.textContent = item.icon;
+          btn.setAttribute("aria-label", q.label);
+          bindItemInteractions(btn, id);
+          poolEl.appendChild(btn);
+        });
+
+        state.practiceBTrays.forEach(function (tray, ti) {
+          const trayEl = document.createElement("div");
+          trayEl.className = "tray";
+          trayEl.dataset.tray = String(ti);
+          if (state.practiceBPhase === "sort" && state.practiceBPickedId) {
+            trayEl.classList.add("target-active");
+          }
+          if (state.practiceBSelectedTrays.has(ti)) trayEl.classList.add("selected");
+          if (state.practiceBEqualOk && state.practiceBPhase !== "sort") trayEl.classList.add("equal-ok");
+
+          const head = document.createElement("div");
+          head.className = "tray-head";
+          const pickHint = state.practiceBPhase === "pick" ? " · 點此取份" : "";
+          head.innerHTML = "<span>第 " + (ti + 1) + " 份" + pickHint + "</span><span>" + tray.length + " 個</span>";
+          trayEl.appendChild(head);
+
+          const inner = document.createElement("div");
+          inner.className = "tray-items";
+          tray.forEach(function (id) {
+            const item = state.practiceBItems.find(function (x) { return x.id === id; });
+            const btn = document.createElement("button");
+            btn.type = "button";
+            btn.className = "manip-item" + (state.practiceBPickedId === id ? " picked" : "");
+            btn.textContent = item.icon;
+            btn.setAttribute("aria-label", state.practiceBPhase === "pick" ? "取這一份" : "物件");
+            bindItemInteractions(btn, id, ti);
+            btn.addEventListener("dblclick", function (e) {
+              e.stopPropagation();
+              if (state.practiceBPhase === "sort") {
+                moveItemToPool(id);
+                state.practiceBPickedId = null;
+                paintPracticeB();
+              }
+            });
+            inner.appendChild(btn);
+          });
+          trayEl.appendChild(inner);
+
+          trayEl.addEventListener("dragover", function (e) {
+            if (state.practiceBPhase !== "sort") return;
+            e.preventDefault();
+            trayEl.classList.add("drag-over");
+          });
+          trayEl.addEventListener("dragleave", function () {
+            trayEl.classList.remove("drag-over");
+          });
+          trayEl.addEventListener("drop", function (e) {
+            e.preventDefault();
+            trayEl.classList.remove("drag-over");
+            const id = e.dataTransfer.getData("text/plain") || state.dragItemId;
+            if (!id) return;
+            moveItemToTray(id, ti);
+            state.practiceBPickedId = null;
+            paintPracticeB();
+          });
+          trayEl.addEventListener("click", function () {
+            if (state.practiceBPhase === "sort") {
+              if (state.practiceBPickedId) {
+                moveItemToTray(state.practiceBPickedId, ti);
+                state.practiceBPickedId = null;
+                paintPracticeB();
+              }
+              return;
+            }
+            if (state.practiceBPhase === "pick") {
+              if (state.practiceBSelectedTrays.has(ti)) state.practiceBSelectedTrays.delete(ti);
+              else state.practiceBSelectedTrays.add(ti);
+              paintPracticeB();
+            }
+          });
+
+          traysEl.appendChild(trayEl);
+        });
+
+        // pool as drop target to return items
+        const poolZone = document.getElementById("practiceBPoolZone");
+        poolZone.ondragover = function (e) {
+          if (state.practiceBPhase !== "sort") return;
+          e.preventDefault();
+          poolZone.classList.add("drag-over");
+        };
+        poolZone.ondragleave = function () { poolZone.classList.remove("drag-over"); };
+        poolZone.ondrop = function (e) {
+          e.preventDefault();
+          poolZone.classList.remove("drag-over");
+          const id = e.dataTransfer.getData("text/plain") || state.dragItemId;
+          if (!id) return;
+          moveItemToPool(id);
+          state.practiceBPickedId = null;
+          paintPracticeB();
+        };
+
+        // empty state drop: ignore
+        updatePracticeBSide();
+      }
+
+      function renderPracticeB() {
+        const q = practiceBQuestions[state.practiceBIndex];
+        initPracticeBModel();
+        document.getElementById("practiceBProgress").textContent =
+          "第 " + (state.practiceBIndex + 1) + " / " + practiceBQuestions.length + " 題";
+        document.getElementById("practiceBTitle").textContent =
+          q.total + " 個" + q.label + "的 " + q.num + "/" + q.den + " 是多少？";
+        document.getElementById("practiceBPrompt").textContent =
+          "先看分數，自己決定要準備幾個份盤，把物件等分放好，再取其中幾份。";
+        document.getElementById("practiceBLead").textContent =
+          "不會先告訴你要分幾盤——請從分數裏自己發現。可用下方按鈕加減份盤。";
+        document.getElementById("practiceBFeedback").className = "feedback";
+        document.getElementById("practiceBFeedback").textContent = "";
+        document.getElementById("practiceBConfirm").disabled = true;
+        paintPracticeB();
+      }
+
+      document.getElementById("practiceBAddTray").addEventListener("click", addPracticeBTray);
+      document.getElementById("practiceBRemoveTray").addEventListener("click", removePracticeBTray);
+
+      document.getElementById("practiceBResetSort").addEventListener("click", function () {
+        initPracticeBModel();
+        document.getElementById("practiceBFeedback").className = "feedback";
+        document.getElementById("practiceBFeedback").textContent = "";
+        paintPracticeB();
+      });
+
+      document.getElementById("practiceBThinkHint").addEventListener("click", function () {
+        const q = practiceBQuestions[state.practiceBIndex];
+        const feedback = document.getElementById("practiceBFeedback");
+        const level = state.practiceBPhase === "pick" ? state.practiceBPickHintLevel : state.practiceBHintLevel;
+
+        if (state.practiceBPhase === "pick") {
+          if (level === 0) {
+            feedback.className = "feedback show ok";
+            feedback.textContent = "提示：看分數上面的分子——它告訴我們要取幾份。";
+            state.practiceBPickHintLevel = 1;
+          } else if (level === 1) {
+            feedback.className = "feedback show ok";
+            feedback.textContent = "再想：分子在分線上面。數一數你現在點亮了幾份，要和分子一樣。";
+            state.practiceBPickHintLevel = 2;
+          } else {
+            feedback.className = "feedback show ok";
+            feedback.textContent = "分子是 " + q.num + "，請點選 " + q.num + " 個份盤。";
+          }
+          return;
+        }
+
+        // sort phase discovery hints
+        if (level === 0) {
+          feedback.className = "feedback show ok";
+          feedback.textContent = "提示：分數裏有分子和分母。哪一個表示「把整體等分成幾份」？";
+          state.practiceBHintLevel = 1;
+        } else if (level === 1) {
+          feedback.className = "feedback show ok";
+          feedback.textContent = "再想：分母在分線下面。看看右邊分數卡下面那個數，用＋/− 準備同樣多個份盤。";
+          document.getElementById("practiceBFracDen").className = "den hl";
+          state.practiceBHintLevel = 2;
+        } else {
+          feedback.className = "feedback show ok";
+          feedback.textContent = "分母是 " + q.den + "，所以要準備 " + q.den + " 個份盤，再把物件均分進去。";
+        }
+      });
+
+      document.getElementById("practiceBCheckEqual").addEventListener("click", function () {
+        const q = practiceBQuestions[state.practiceBIndex];
+        const feedback = document.getElementById("practiceBFeedback");
+        const trayN = state.practiceBTrays.length;
+
+        if (trayN === 0) {
+          feedback.className = "feedback show bad";
+          feedback.textContent = "還沒有份盤。先想分數要你等分成幾份，再按「＋ 加一份盤」。";
+          return;
+        }
+        if (state.practiceBPool.length > 0) {
+          feedback.className = "feedback show bad";
+          feedback.textContent = "物資區還有物件未分完，請全部放入份盤。";
+          return;
+        }
+
+        const counts = state.practiceBTrays.map(function (t) { return t.length; });
+        const allEqual = counts.length > 0 && counts.every(function (c) { return c === counts[0] && c > 0; });
+
+        if (trayN !== q.den) {
+          state.practiceBEqualOk = false;
+          feedback.className = "feedback show bad";
+          if (state.practiceBHintLevel < 1) {
+            feedback.textContent = "份盤數量好像不對。再看看分數——哪個數告訴我們要分成幾份？（現有 " + trayN + " 個份盤）";
+            state.practiceBHintLevel = 1;
+          } else if (state.practiceBHintLevel < 2) {
+            feedback.textContent = "看看分母（分數下面）。用＋/− 把份盤調成和分母一樣多，再均分物件。";
+            document.getElementById("practiceBFracDen").className = "den hl";
+            state.practiceBHintLevel = 2;
+          } else {
+            feedback.textContent = "要分成 " + q.den + " 份（分母是 " + q.den + "）。現在有 " + trayN +
+              " 個份盤，請用＋/− 調整後再檢查。";
+          }
+          paintPracticeB();
+          return;
+        }
+
+        if (!allEqual) {
+          state.practiceBEqualOk = false;
+          feedback.className = "feedback show bad";
+          feedback.textContent = "份盤數對了，但每盤個數還不一樣（現在是 " + counts.join("、") +
+            "）。請調成每盤一樣多。";
+          paintPracticeB();
+          document.querySelectorAll("#practiceBTrays .tray").forEach(function (el, i) {
+            if (counts[i] !== counts[0]) el.classList.add("unequal");
+          });
+          return;
+        }
+
+        const per = counts[0];
+        if (per * trayN !== q.total) {
+          // shouldn't happen if pool empty and trays hold all
+          feedback.className = "feedback show bad";
+          feedback.textContent = "請確認全部物件都在份盤裏。";
+          return;
+        }
+
+        state.practiceBEqualOk = true;
+        enterPickPhase();
+        feedback.className = "feedback show ok";
+        feedback.textContent = "你發現了：要等分成 " + q.den + " 份，每份 " + per +
+          " 個。接下來，分子告訴我們取幾份——自己點選再確認。";
+        paintPracticeB();
+      });
+
+      document.getElementById("practiceBConfirm").addEventListener("click", function () {
+        const q = practiceBQuestions[state.practiceBIndex];
+        const feedback = document.getElementById("practiceBFeedback");
+        if (state.practiceBPhase !== "pick" || !state.practiceBEqualOk) {
+          feedback.className = "feedback show bad";
+          feedback.textContent = "請先自己分好份盤，並通過「檢查我的分法」。";
+          return;
+        }
+        const picked = state.practiceBSelectedTrays.size;
+        const count = selectedCount();
+        if (picked !== q.num) {
+          feedback.className = "feedback show bad";
+          if (state.practiceBPickHintLevel < 1) {
+            feedback.textContent = "取的份數還不對。再看分數上面的分子——它表示要取幾份。（現在取了 " + picked + " 份）";
+            state.practiceBPickHintLevel = 1;
+          } else if (state.practiceBPickHintLevel < 2) {
+            feedback.textContent = "分子在分線上面。請點選和分子相同數量的份盤。";
+            document.getElementById("practiceBFracNum").className = "num hl";
+            state.practiceBPickHintLevel = 2;
+          } else {
+            feedback.textContent = "分子是 " + q.num + "，請恰好點選 " + q.num + " 個份盤。（現在選了 " + picked + " 份）";
+          }
+          return;
+        }
+        if (count === q.answer) {
+          state.practiceBPhase = "done";
+          document.getElementById("practiceBConfirm").disabled = true;
+          feedback.className = "feedback show ok";
+          feedback.textContent = "正確！你自己發現要分成 " + q.den + " 份、取 " + q.num +
+            " 份，數得 " + q.answer + " 個" + q.label + "。";
+          updatePracticeBSide();
+        } else {
+          feedback.className = "feedback show bad";
+          feedback.textContent = "取份份數對了，但總個數是 " + count + "。請再數高亮份盤裏的物件。";
+        }
+      });
+
+      document.getElementById("practiceBNextQ").addEventListener("click", function () {
+        state.practiceBIndex = (state.practiceBIndex + 1) % practiceBQuestions.length;
+        renderPracticeB();
+      });
+      document.getElementById("practiceBPrevQ").addEventListener("click", function () {
+        state.practiceBIndex = (state.practiceBIndex - 1 + practiceBQuestions.length) % practiceBQuestions.length;
+        renderPracticeB();
+      });
+      document.getElementById("practiceBReplay").addEventListener("click", function () {
+        setScreen("demoB");
+      });
+
+      /* ---------- CHALLENGE ---------- */
+      const challenges = [
+        {
+          prompt: "下圖有 2 顆紅星、5 顆藍星。紅星佔全部星星的幾分之幾？",
+          visualHTML: '<div class="fruit-grid" style="grid-template-columns:repeat(7,1fr)">' +
+            Array(2).fill('<button type="button" class="fruit part" aria-label="紅星">⭐</button>').join("") +
+            Array(5).fill('<button type="button" class="fruit whole" aria-label="藍星">🔵</button>').join("") +
+            "</div><p style='font-weight:700;color:var(--muted);margin:8px 0 0'>誘答 2/5 把藍星當分母了。</p>",
+          answer: "2/7",
+          choices: ["2/7", "2/5", "5/7", "2/2"],
+          why: "整體是全部 7 顆星星，不是只有藍星 5 顆。正解 2/7。"
+        },
+        {
+          prompt: "8 粒荔枝吃去 2 粒。吃去的佔全部荔枝的幾分之幾？",
+          visualHTML: '<p style="font-size:1.8rem;margin:0">🍇🍇🍇🍇🍇🍇🍇🍇</p><p style="font-weight:700;margin:8px 0 0">吃去 2 粒，餘下 6 粒。分母是 8 還是 6？</p>',
+          answer: "2/8",
+          choices: ["2/8", "2/6", "6/8", "2/2"],
+          why: "分母要用全部 8 粒，不能用餘下 6 粒。吃去佔 2/8。"
+        },
+        {
+          prompt: "禮盒有 9 個水果，沒有奇異果。奇異果佔全部的幾分之幾？",
+          visualHTML: '<div class="fruit-grid">' +
+            Array(4).fill('<button type="button" class="fruit whole">🍎</button>').join("") +
+            Array(3).fill('<button type="button" class="fruit whole">🍊</button>').join("") +
+            Array(2).fill('<button type="button" class="fruit whole">🍌</button>').join("") +
+            "</div>",
+          answer: "0/9",
+          choices: ["0/9", "1/9", "9/9", "0/0"],
+          why: "分子是 0、分母 9（≠0）→ 0/9＝0。"
+        },
+        {
+          prompt: "16 個陀螺的 3/4 是多少個？（先在腦中等分成 4 份再取 3 份）",
+          visualHTML: '<div class="toy-grid cols-4">' + Array(16).fill('<div class="toy">🌀</div>').join("") + "</div>",
+          answer: "12",
+          choices: ["12", "4", "3", "16"],
+          why: "等分成 4 份，每份 4 個；取 3 份 → 12 個。"
+        }
+      ];
+
+      function renderChallenge() {
+        const q = challenges[state.challengeIndex];
+        document.getElementById("challengePrompt").textContent = q.prompt;
+        document.getElementById("challengeVisual").innerHTML = q.visualHTML;
+        document.getElementById("challengeFeedback").className = "feedback";
+        document.getElementById("challengeFeedback").textContent = "";
+        document.getElementById("challengeWhy").hidden = true;
+        document.getElementById("challengeToSummary").hidden = state.challengeIndex < challenges.length - 1;
+        document.getElementById("challengeNext").hidden = false;
+
+        const box = document.getElementById("challengeChoices");
+        box.innerHTML = "";
+        q.choices.forEach(function (c) {
+          const b = document.createElement("button");
+          b.type = "button";
+          b.className = "choice";
+          b.textContent = c;
+          b.addEventListener("click", function () {
+            document.querySelectorAll("#challengeChoices .choice").forEach(function (el) {
+              el.disabled = true;
+              if (el.textContent === q.answer) el.classList.add("correct");
+            });
+            const fb = document.getElementById("challengeFeedback");
+            const why = document.getElementById("challengeWhy");
+            why.hidden = false;
+            why.innerHTML = '<div class="err-compare" style="margin-top:0">' +
+              '<div class="side good">正解：' + q.answer + "</div>" +
+              '<div class="side bad-side">常見錯：用餘下／其他種類當分母 ✕</div></div>' +
+              '<p style="font-weight:700;margin:8px 0 0">' + q.why + "</p>";
+            if (c === q.answer) {
+              b.classList.add("correct");
+              fb.className = "feedback show ok";
+              fb.textContent = "正確！";
+            } else {
+              b.classList.add("incorrect");
+              fb.className = "feedback show bad";
+              fb.textContent = "未正確——看看下面的對照。";
+            }
+          });
+          box.appendChild(b);
+        });
+      }
+
+      document.getElementById("challengeNext").addEventListener("click", function () {
+        if (state.challengeIndex < challenges.length - 1) {
+          state.challengeIndex += 1;
+          renderChallenge();
+        } else {
+          setScreen("summary");
+        }
+      });
+      document.getElementById("challengeToSummary").addEventListener("click", function () {
+        setScreen("summary");
+      });
+
+      /* ---------- NAV / REPLAY ---------- */
+      document.querySelectorAll("[data-go]").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          setScreen(btn.getAttribute("data-go"));
+        });
+      });
+
+      document.querySelectorAll("[data-replay]").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          setScreen(btn.getAttribute("data-replay"));
+        });
+      });
+
+      document.getElementById("replayExplain").addEventListener("click", function () {
+        const map = {
+          intro: "intro",
+          demoA: "demoA",
+          practiceA: "demoA",
+          demoB: "demoB",
+          practiceB: "demoB",
+          challenge: "demoA",
+          summary: "intro"
+        };
+        setScreen(map[state.screen] || "intro");
+      });
+
+      teachModeEl.addEventListener("change", function () {
+        // restart current explain screen pacing
+        if (state.screen === "intro") startIntro(false);
+        if (state.screen === "demoA") startDemoA(false);
+        if (state.screen === "demoB") startDemoB(false);
+      });
+
+      // boot
+      startIntro(true);
+    })();
+  </script>
+</body>
+</html>
