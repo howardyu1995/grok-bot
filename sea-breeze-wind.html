@@ -202,33 +202,89 @@
       border-right: 2px solid var(--line-soft);
       background: transparent;
       color: var(--muted);
-      padding: 0.75rem 0.35rem;
+      padding: 0.55rem 0.3rem 0.65rem;
       text-align: center;
       font-family: var(--font-display);
-      font-size: clamp(0.78rem, 1.7vw, 0.95rem);
+      font-size: clamp(0.72rem, 1.55vw, 0.88rem);
       font-weight: 700;
-      line-height: 1.25;
-      min-height: 56px;
+      line-height: 1.2;
+      min-height: 64px;
       cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.28rem;
       transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
     }
     .step-chip:last-child { border-right: none; }
     .step-chip:hover { background: #E0F2FE; color: var(--primary-deep); }
     .step-chip:focus-visible { outline: none; box-shadow: inset 0 0 0 3px var(--primary); }
+    .step-badge {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      font-weight: 800;
+      background: #E2E8F0;
+      color: #475569;
+      border: 3px solid #CBD5E1;
+      box-shadow: 0 2px 0 rgba(71, 85, 105, 0.15);
+      transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+    }
+    .step-label { max-width: 100%; }
     .step-chip.done {
       background: #D1FAE5;
       color: #065F46;
+    }
+    .step-chip.done .step-badge {
+      background: linear-gradient(180deg, #4ADE80, #16A34A);
+      color: #fff;
+      border-color: #15803D;
+      box-shadow: 0 2px 0 rgba(21, 128, 61, 0.35);
     }
     .step-chip.active {
       background: linear-gradient(180deg, #FEF3C7, #FDE68A);
       color: #92400E;
       box-shadow: inset 0 -4px 0 var(--sun);
     }
+    .step-chip.active .step-badge {
+      background: linear-gradient(180deg, #FCD34D, #F59E0B);
+      color: #78350F;
+      border-color: #D97706;
+      transform: scale(1.08);
+      box-shadow: 0 3px 0 rgba(217, 119, 6, 0.35);
+    }
 
     .canvas-wrap {
       position: relative;
       background: #BAE6FD;
       padding: 0;
+      transition: box-shadow 0.25s ease, background 0.28s ease;
+    }
+    .canvas-wrap.quest-on {
+      box-shadow: inset 0 0 0 5px rgba(245, 158, 11, 0.85), inset 0 0 0 10px rgba(253, 224, 71, 0.35);
+      background: #7DD3FC;
+    }
+    .canvas-wrap.quest-on::after {
+      content: attr(data-quest);
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 2;
+      font-family: var(--font-display);
+      font-size: 0.92rem;
+      font-weight: 800;
+      color: #78350F;
+      background: linear-gradient(180deg, #FEF3C7, #FCD34D);
+      border: 3px solid #F59E0B;
+      border-radius: 999px;
+      padding: 0.3rem 0.75rem;
+      box-shadow: 0 4px 0 rgba(217, 119, 6, 0.3);
+      pointer-events: none;
     }
     #sim-canvas {
       display: block;
@@ -237,6 +293,7 @@
       cursor: pointer;
       touch-action: manipulation;
       background: linear-gradient(#7DD3FC, #E0F2FE);
+      transition: filter 0.28s ease;
     }
 
     .stage-nav {
@@ -293,25 +350,110 @@
       margin-top: 0.35rem;
     }
 
-    .temp-readout {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem 1rem;
-      align-items: center;
-      font-family: var(--font-display);
-      font-size: clamp(1.05rem, 2.3vw, 1.2rem);
-      font-weight: 700;
-      margin-top: 0.65rem;
-      padding: 0.65rem 0.85rem;
+    .temp-chart {
+      margin-top: 0.7rem;
+      padding: 0.7rem 0.85rem 0.8rem;
       background: linear-gradient(180deg, #ECFDF5, #D1FAE5);
       border-radius: 16px;
       border: 3px solid #6EE7B7;
       box-shadow: 0 4px 0 rgba(5, 150, 105, 0.2), var(--shadow-inner);
     }
-    .temp-readout .land { color: #B91C1C; }
-    .temp-readout .sea { color: var(--primary-deep); }
-    .temp-readout .delta { color: #0F766E; }
-    .temp-readout .vs { color: var(--ink); }
+    .temp-chart-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      margin-bottom: 0.55rem;
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 1rem;
+      color: var(--ink);
+    }
+    .temp-delta-pill {
+      background: #fff;
+      border: 2px solid #34D399;
+      border-radius: 999px;
+      padding: 0.15rem 0.65rem;
+      color: #0F766E;
+      font-size: 0.95rem;
+    }
+    .temp-bar-row {
+      display: grid;
+      grid-template-columns: 3rem 1fr auto;
+      align-items: center;
+      gap: 0.45rem 0.55rem;
+      margin-top: 0.4rem;
+    }
+    .temp-bar-name {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 0.95rem;
+    }
+    .temp-bar-name.land { color: #B91C1C; }
+    .temp-bar-name.sea { color: var(--primary-deep); }
+    .temp-bar-track {
+      height: 22px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.75);
+      border: 2px solid #A7F3D0;
+      overflow: hidden;
+      box-shadow: inset 0 1px 3px rgba(15, 23, 42, 0.08);
+    }
+    .temp-bar-fill {
+      height: 100%;
+      width: 40%;
+      border-radius: 999px;
+      transition: width 0.28s ease-out;
+      min-width: 8%;
+    }
+    .temp-bar-fill.land {
+      background: linear-gradient(90deg, #FCA5A5, #EF4444);
+      box-shadow: inset 0 -2px 0 rgba(127, 29, 29, 0.25);
+    }
+    .temp-bar-fill.sea {
+      background: linear-gradient(90deg, #7DD3FC, #0284C7);
+      box-shadow: inset 0 -2px 0 rgba(3, 105, 161, 0.3);
+    }
+    .temp-bar-val {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 1.05rem;
+      min-width: 2.6rem;
+      text-align: right;
+    }
+    .temp-bar-val.land { color: #B91C1C; }
+    .temp-bar-val.sea { color: var(--primary-deep); }
+
+    /* 日夜場景轉場（僅一拍，約 280ms） */
+    .stage,
+    .guide-bar,
+    body {
+      transition: background 0.28s ease, border-color 0.28s ease, filter 0.28s ease;
+    }
+    body.scene-night {
+      background:
+        radial-gradient(ellipse 70% 45% at 12% -8%, rgba(96, 165, 250, 0.22), transparent 55%),
+        radial-gradient(ellipse 60% 40% at 92% 4%, rgba(30, 58, 95, 0.28), transparent 50%),
+        linear-gradient(165deg, #1E3A5F 0%, #334155 48%, #0F172A 100%);
+    }
+    body.scene-night .brand-title { color: #E0F2FE; text-shadow: 0 2px 0 rgba(15, 23, 42, 0.45); }
+    body.scene-night .subtitle { color: #CBD5E1; }
+    body.scene-night .site-footer { color: #94A3B8; }
+    body.scene-night .stage {
+      border-color: #60A5FA;
+      box-shadow: 0 8px 0 rgba(30, 58, 95, 0.35), 0 14px 28px rgba(15, 23, 42, 0.35);
+    }
+    body.scene-night .step-rail { background: #1E293B; border-bottom-color: #334155; }
+    body.scene-night .step-chip { color: #CBD5E1; border-right-color: #334155; }
+    body.scene-night .step-chip:hover { background: #334155; color: #F8FAFC; }
+    body.scene-night .dock,
+    body.scene-night .stage-nav,
+    body.scene-night #canvas-hint { background: #0F172A; border-top-color: #334155; color: #E2E8F0; }
+    body.scene-night .dock-label { color: #E0F2FE; }
+    body.scene-night .quiz-section {
+      border-color: #60A5FA;
+      background: #F8FAFC;
+    }
 
     .legend {
       display: flex;
@@ -633,14 +775,29 @@
       </div>
 
       <div class="step-rail" id="step-strip" role="tablist" aria-label="海風形成步驟">
-        <button type="button" class="step-chip" data-step="0" role="tab">1 太陽加熱</button>
-        <button type="button" class="step-chip" data-step="1" role="tab">2 陸地變熱</button>
-        <button type="button" class="step-chip" data-step="2" role="tab">3 熱空氣上升</button>
-        <button type="button" class="step-chip" data-step="3" role="tab">4 冷空氣補充</button>
-        <button type="button" class="step-chip" data-step="4" role="tab">5 形成海風</button>
+        <button type="button" class="step-chip" data-step="0" role="tab" aria-label="關卡 1 太陽加熱">
+          <span class="step-badge" aria-hidden="true">1</span>
+          <span class="step-label">太陽加熱</span>
+        </button>
+        <button type="button" class="step-chip" data-step="1" role="tab" aria-label="關卡 2 陸地變熱">
+          <span class="step-badge" aria-hidden="true">2</span>
+          <span class="step-label">陸地變熱</span>
+        </button>
+        <button type="button" class="step-chip" data-step="2" role="tab" aria-label="關卡 3 熱空氣上升">
+          <span class="step-badge" aria-hidden="true">3</span>
+          <span class="step-label">熱空氣上升</span>
+        </button>
+        <button type="button" class="step-chip" data-step="3" role="tab" aria-label="關卡 4 冷空氣補充">
+          <span class="step-badge" aria-hidden="true">4</span>
+          <span class="step-label">冷空氣補充</span>
+        </button>
+        <button type="button" class="step-chip" data-step="4" role="tab" aria-label="關卡 5 形成海風">
+          <span class="step-badge" aria-hidden="true">5</span>
+          <span class="step-label">形成海風</span>
+        </button>
       </div>
 
-      <div class="canvas-wrap">
+      <div class="canvas-wrap" id="canvas-wrap">
         <canvas id="sim-canvas" width="940" height="520" role="img" aria-label="海風與陸風形成動畫"></canvas>
       </div>
 
@@ -665,11 +822,21 @@
             <span>弱（清晨）</span>
             <span>強（正午）</span>
           </div>
-          <div class="temp-readout" aria-live="polite">
-            <span class="land">陸地 <span id="temp-land">35</span>°C</span>
-            <span class="vs">/</span>
-            <span class="sea">海洋 <span id="temp-sea">28</span>°C</span>
-            <span class="delta">溫差 <span id="temp-delta">7</span>°C</span>
+          <div class="temp-chart" aria-live="polite">
+            <div class="temp-chart-head">
+              <span>溫差比較（陸 vs 海）</span>
+              <span class="temp-delta-pill">溫差 <span id="temp-delta">7</span>°C</span>
+            </div>
+            <div class="temp-bar-row">
+              <span class="temp-bar-name land">陸地</span>
+              <div class="temp-bar-track" aria-hidden="true"><div id="bar-land" class="temp-bar-fill land"></div></div>
+              <span class="temp-bar-val land"><span id="temp-land">35</span>°</span>
+            </div>
+            <div class="temp-bar-row">
+              <span class="temp-bar-name sea">海洋</span>
+              <div class="temp-bar-track" aria-hidden="true"><div id="bar-sea" class="temp-bar-fill sea"></div></div>
+              <span class="temp-bar-val sea"><span id="temp-sea">28</span>°</span>
+            </div>
           </div>
         </div>
 
@@ -807,14 +974,23 @@
       return points[points.length - 1];
     }
 
-    function mixColor(a, b, t) {
-      const pa = hexToRgb(a), pb = hexToRgb(b);
-      return `rgb(${Math.round(lerp(pa.r, pb.r, t))},${Math.round(lerp(pa.g, pb.g, t))},${Math.round(lerp(pa.b, pb.b, t))})`;
-    }
-
     function hexToRgb(hex) {
       const h = hex.replace('#', '');
       return { r: parseInt(h.slice(0, 2), 16), g: parseInt(h.slice(2, 4), 16), b: parseInt(h.slice(4, 6), 16) };
+    }
+
+    function mixToHex(a, b, t) {
+      const pa = hexToRgb(a), pb = hexToRgb(b);
+      const r = Math.round(lerp(pa.r, pb.r, t));
+      const g = Math.round(lerp(pa.g, pb.g, t));
+      const bl = Math.round(lerp(pa.b, pb.b, t));
+      return '#' + [r, g, bl].map((x) => x.toString(16).padStart(2, '0')).join('');
+    }
+
+    function mixColor(a, b, t) {
+      const hex = mixToHex(a, b, t);
+      const p = hexToRgb(hex);
+      return `rgb(${p.r},${p.g},${p.b})`;
     }
 
     // ---------- 氣流粒子（支援日／夜路徑） ----------
@@ -994,6 +1170,8 @@
 
         this.heat = 0.7;
         this.isNight = false;
+        this.nightBlend = 0;       // 0=日間畫面, 1=夜間畫面（平滑轉場）
+        this.nightBlendTarget = 0;
         this.mode = 'particles';
         this.showPressure = false;
         this.speedBoost = 1;
@@ -1093,7 +1271,9 @@
 
       setNight(on) {
         this.isNight = !!on;
+        this.nightBlendTarget = on ? 1 : 0;
         this.spawnParticles();
+        document.body.classList.toggle('scene-night', !!on);
       }
 
       setMode(mode) { this.mode = mode; }
@@ -1145,6 +1325,15 @@
 
       update(dt) {
         this.time += dt;
+        // 日夜畫面約 280ms 完成轉場
+        if (this.nightBlend !== this.nightBlendTarget) {
+          const speed = 1 / 0.28;
+          const dir = this.nightBlendTarget > this.nightBlend ? 1 : -1;
+          this.nightBlend = clamp(this.nightBlend + dir * speed * dt, 0, 1);
+          if (Math.abs(this.nightBlend - this.nightBlendTarget) < 0.02) {
+            this.nightBlend = this.nightBlendTarget;
+          }
+        }
         if (this.boostTimer > 0) {
           this.boostTimer -= dt;
           if (this.boostTimer <= 0) { this.boostTimer = 0; this.speedBoost = 1; }
@@ -1204,7 +1393,7 @@
           this.drawArrows(ctx, L);
         }
 
-        this.drawThermometers(ctx, L);
+        this.drawTempCompareBars(ctx, L);
         if (this.showPressure) this.drawPressure(ctx, L);
         this.drawFocusRing(ctx, L);
         this.drawLabels(ctx, L);
@@ -1212,24 +1401,32 @@
       }
 
       drawSky(ctx, L) {
-        let top, bot;
-        if (this.isNight) {
-          top = '#0b1d36';
-          bot = '#1a3358';
-        } else {
-          const heat = this.heat;
-          top = mixColor('#5dade2', '#7ec8f5', heat);
-          bot = mixColor('#aed6f1', '#d6eaf8', heat);
-        }
+        const b = this.nightBlend;
+        const heat = this.heat;
+        const dayTop = mixToHex('#5dade2', '#7ec8f5', heat);
+        const dayBot = mixToHex('#aed6f1', '#d6eaf8', heat);
+        const top = mixToHex(dayTop, '#0b1d36', b);
+        const bot = mixToHex(dayBot, '#1a3358', b);
+        const end = mixToHex('#b3e0ff', '#243b55', b);
         const g = ctx.createLinearGradient(0, 0, 0, L.h);
         g.addColorStop(0, top);
         g.addColorStop(0.55, bot);
-        g.addColorStop(1, this.isNight ? '#243b55' : '#b3e0ff');
+        g.addColorStop(1, end);
         ctx.fillStyle = g;
         ctx.fillRect(0, 0, L.w, L.h);
 
-        if (this.isNight) {
-          ctx.fillStyle = 'rgba(255,255,255,0.85)';
+        // 雲與星星交叉淡入淡出
+        if (b < 0.95) {
+          ctx.save();
+          ctx.globalAlpha = 0.45 * (1 - b);
+          this.drawCloud(ctx, L.w * 0.55, L.h * 0.12, 1.1);
+          this.drawCloud(ctx, L.w * 0.82, L.h * 0.2, 0.8);
+          ctx.restore();
+        }
+        if (b > 0.05) {
+          ctx.save();
+          ctx.globalAlpha = 0.85 * b;
+          ctx.fillStyle = '#ffffff';
           for (let i = 0; i < 18; i++) {
             const sx = (i * 97 + 40) % L.w;
             const sy = 20 + (i * 37) % (L.h * 0.35);
@@ -1237,11 +1434,6 @@
             ctx.arc(sx, sy, 1.2 + (i % 3) * 0.4, 0, Math.PI * 2);
             ctx.fill();
           }
-        } else {
-          ctx.save();
-          ctx.globalAlpha = 0.45;
-          this.drawCloud(ctx, L.w * 0.55, L.h * 0.12, 1.1);
-          this.drawCloud(ctx, L.w * 0.82, L.h * 0.2, 0.8);
           ctx.restore();
         }
       }
@@ -1258,25 +1450,14 @@
 
       drawSunOrMoon(ctx, L) {
         const dim = this.isDimmed('sun');
+        const b = this.nightBlend;
         ctx.save();
-        ctx.globalAlpha = dim ? 0.25 : 1;
         ctx.translate(L.sunX, L.sunY);
 
-        if (this.isNight) {
-          ctx.fillStyle = '#f5f3ce';
-          ctx.beginPath();
-          ctx.arc(0, 0, 26, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.globalCompositeOperation = 'destination-out';
-          ctx.beginPath();
-          ctx.arc(10, -4, 22, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.globalCompositeOperation = 'source-over';
-          ctx.fillStyle = 'rgba(245,243,206,0.25)';
-          ctx.beginPath();
-          ctx.arc(0, 0, 40, 0, Math.PI * 2);
-          ctx.fill();
-        } else {
+        // 太陽淡出
+        if (b < 0.98) {
+          ctx.save();
+          ctx.globalAlpha = (dim ? 0.25 : 1) * (1 - b);
           const heat = this.heat;
           const pulse = 1 + Math.sin(this.time * (1.5 + heat * 2)) * 0.06 * heat;
           const r = (28 + heat * 14) * pulse;
@@ -1305,16 +1486,38 @@
           ctx.beginPath();
           ctx.arc(0, 0, r, 0, Math.PI * 2);
           ctx.fill();
+          ctx.restore();
+        }
+
+        // 月亮淡入
+        if (b > 0.02) {
+          ctx.save();
+          ctx.globalAlpha = (dim ? 0.25 : 1) * b;
+          ctx.fillStyle = '#f5f3ce';
+          ctx.beginPath();
+          ctx.arc(0, 0, 26, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.globalCompositeOperation = 'destination-out';
+          ctx.beginPath();
+          ctx.arc(10, -4, 22, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.globalCompositeOperation = 'source-over';
+          ctx.fillStyle = 'rgba(245,243,206,0.25)';
+          ctx.beginPath();
+          ctx.arc(0, 0, 40, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
         }
         ctx.restore();
       }
 
       drawLand(ctx, L) {
         const dim = this.isDimmed('land');
+        const b = this.nightBlend;
         ctx.save();
         ctx.globalAlpha = dim ? 0.35 : 1;
         const shore = L.shoreX, horizon = L.horizon;
-        ctx.fillStyle = this.isNight ? '#3d6b3d' : '#6fcf6f';
+        ctx.fillStyle = mixToHex('#6fcf6f', '#3d6b3d', b);
         ctx.beginPath();
         ctx.moveTo(0, L.h);
         ctx.lineTo(0, horizon + 20);
@@ -1323,7 +1526,7 @@
         ctx.lineTo(shore, L.h);
         ctx.closePath();
         ctx.fill();
-        ctx.fillStyle = this.isNight ? '#2f5530' : '#4caf50';
+        ctx.fillStyle = mixToHex('#4caf50', '#2f5530', b);
         ctx.beginPath();
         ctx.moveTo(0, L.h);
         ctx.lineTo(0, horizon + 55);
@@ -1332,7 +1535,7 @@
         ctx.lineTo(shore, L.h);
         ctx.closePath();
         ctx.fill();
-        ctx.fillStyle = '#f6d7a7';
+        ctx.fillStyle = mixToHex('#f6d7a7', '#c4a574', b);
         ctx.beginPath();
         ctx.moveTo(shore - 28, horizon + 5);
         ctx.quadraticCurveTo(shore - 5, horizon + 18, shore + 8, horizon + 12);
@@ -1345,13 +1548,14 @@
 
       drawSea(ctx, L) {
         const dim = this.isDimmed('sea');
+        const b = this.nightBlend;
         ctx.save();
         ctx.globalAlpha = dim ? 0.35 : 1;
         const shore = L.shoreX, horizon = L.horizon, t = this.time;
         const seaGrad = ctx.createLinearGradient(0, horizon, 0, L.h);
-        seaGrad.addColorStop(0, this.isNight ? '#1a3a5c' : '#5dade2');
-        seaGrad.addColorStop(0.45, this.isNight ? '#12253d' : '#2980b9');
-        seaGrad.addColorStop(1, this.isNight ? '#0a1624' : '#1a5276');
+        seaGrad.addColorStop(0, mixToHex('#5dade2', '#1a3a5c', b));
+        seaGrad.addColorStop(0.45, mixToHex('#2980b9', '#12253d', b));
+        seaGrad.addColorStop(1, mixToHex('#1a5276', '#0a1624', b));
         ctx.fillStyle = seaGrad;
         ctx.beginPath();
         ctx.moveTo(shore - 4, horizon + 10);
@@ -1498,35 +1702,45 @@
         ctx.restore();
       }
 
-      drawThermometers(ctx, L) {
+      /** Canvas 上的並排粗長條：陸 vs 海（給後排看） */
+      drawTempCompareBars(ctx, L) {
         const temps = this.getTemps();
-        this.drawThermo(ctx, L.landCenterX - 70, L.horizon - 10, temps.land, 18, 40, '#e74c3c', '陸');
-        this.drawThermo(ctx, L.seaCenterX + 55, L.horizon - 10, temps.sea, 18, 40, '#2980b9', '海');
-      }
-
-      drawThermo(ctx, x, y, temp, minT, maxT, color, tag) {
-        const h = 70, ratio = clamp((temp - minT) / (maxT - minT), 0.08, 1);
+        const minT = 16, maxT = 42;
+        const boxW = Math.min(210, L.w * 0.28);
+        const boxH = 78;
+        const x = L.w / 2 - boxW / 2;
+        const y = 44;
         ctx.save();
-        ctx.fillStyle = 'rgba(255,255,255,0.9)';
-        roundRect(ctx, x - 12, y - h - 8, 24, h + 28, 10);
+        ctx.fillStyle = 'rgba(255,255,255,0.92)';
+        ctx.strokeStyle = '#34D399';
+        ctx.lineWidth = 3;
+        roundRect(ctx, x, y, boxW, boxH, 14);
         ctx.fill();
-        ctx.strokeStyle = '#94a3b8';
-        ctx.lineWidth = 2;
         ctx.stroke();
-        ctx.fillStyle = '#e2e8f0';
-        roundRect(ctx, x - 5, y - h, 10, h, 5);
-        ctx.fill();
-        ctx.fillStyle = color;
-        const fillH = h * ratio;
-        roundRect(ctx, x - 5, y - fillH, 10, fillH, 5);
-        ctx.fill();
-        ctx.beginPath();
-        ctx.arc(x, y + 2, 9, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.fillStyle = '#1e293b';
-        ctx.font = 'bold 12px "Noto Sans TC", sans-serif';
+        ctx.fillStyle = '#0F766E';
+        ctx.font = 'bold 13px "Baloo 2", "Noto Sans TC", sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText(tag + temp + '°', x, y - h - 14);
+        ctx.fillText(`溫差 ${temps.delta}°C`, x + boxW / 2, y + 18);
+
+        const drawRow = (label, temp, color, rowY) => {
+          const ratio = clamp((temp - minT) / (maxT - minT), 0.08, 1);
+          ctx.fillStyle = '#0C4A6E';
+          ctx.font = 'bold 12px "Noto Sans TC", sans-serif';
+          ctx.textAlign = 'left';
+          ctx.fillText(label, x + 10, rowY + 11);
+          const trackX = x + 42, trackW = boxW - 88, trackH = 14;
+          ctx.fillStyle = '#E2E8F0';
+          roundRect(ctx, trackX, rowY, trackW, trackH, 8);
+          ctx.fill();
+          ctx.fillStyle = color;
+          roundRect(ctx, trackX, rowY, trackW * ratio, trackH, 8);
+          ctx.fill();
+          ctx.fillStyle = '#0C4A6E';
+          ctx.textAlign = 'right';
+          ctx.fillText(`${temp}°`, x + boxW - 10, rowY + 11);
+        };
+        drawRow('陸', temps.land, '#EF4444', y + 30);
+        drawRow('海', temps.sea, '#0284C7', y + 52);
         ctx.restore();
       }
 
@@ -1666,19 +1880,35 @@
         this.guideBox.classList.remove('night-guide');
         this.guideText.textContent = s.guide;
         this.chips.forEach((c, i) => {
-          c.classList.toggle('active', i === this.step);
-          c.classList.toggle('done', i < this.step);
+          const active = i === this.step;
+          const done = i < this.step;
+          c.classList.toggle('active', active);
+          c.classList.toggle('done', done);
+          const badge = c.querySelector('.step-badge');
+          if (badge) badge.textContent = done ? '✓' : String(i + 1);
+          c.setAttribute('aria-selected', active ? 'true' : 'false');
         });
+        const wrap = document.getElementById('canvas-wrap');
+        wrap.classList.add('quest-on');
+        wrap.dataset.quest = `關卡 ${this.step + 1}/5・${s.title}`;
         this.btnPrev.disabled = this.step <= 0;
         this.btnNext.disabled = false;
         this.btnNext.textContent = this.step >= STEPS.length - 1 ? '完成' : '下一步';
-        document.getElementById('canvas-hint').textContent = `步驟 ${this.step + 1}/5：${s.title}`;
+        document.getElementById('canvas-hint').textContent = `關卡 ${this.step + 1}/5：${s.title}`;
       }
 
       free() {
         this.step = -1;
         this.sim.setFocus(null);
-        this.chips.forEach((c) => c.classList.remove('active', 'done'));
+        this.chips.forEach((c, i) => {
+          c.classList.remove('active', 'done');
+          const badge = c.querySelector('.step-badge');
+          if (badge) badge.textContent = String(i + 1);
+          c.setAttribute('aria-selected', 'false');
+        });
+        const wrap = document.getElementById('canvas-wrap');
+        wrap.classList.remove('quest-on');
+        wrap.removeAttribute('data-quest');
         this.btnPrev.disabled = true;
         this.btnNext.disabled = true;
         this.btnNext.textContent = '下一步';
@@ -1888,9 +2118,15 @@
 
     function updateTempUI(sim) {
       const t = sim.getTemps();
+      const minT = 16, maxT = 42;
+      const pct = (v) => `${clamp(((v - minT) / (maxT - minT)) * 100, 8, 100)}%`;
       document.getElementById('temp-land').textContent = t.land;
       document.getElementById('temp-sea').textContent = t.sea;
       document.getElementById('temp-delta').textContent = t.delta;
+      const barLand = document.getElementById('bar-land');
+      const barSea = document.getElementById('bar-sea');
+      if (barLand) barLand.style.width = pct(t.land);
+      if (barSea) barSea.style.width = pct(t.sea);
     }
 
     function setupControls(sim, guide) {
