@@ -8,6 +8,7 @@
 |------|------|------|
 | 氣壓原理互動模型 | [`air-pressure-drink-box.html`](./air-pressure-drink-box.html) | 香港小五常識：飲品盒為何會凹陷（p5.js） |
 | 五位數密碼鎖 | [`index.html`](./index.html) | 解密挑戰小遊戲 |
+| 水果禮盒分數工坊 | [`fraction-set-objects.html`](./fraction-set-objects.html) | 小三第 12 課：分數作為一組物件（整體）的部分 |
 | 教學遊戲目錄 | [`game-index/index.html`](./game-index/index.html) | 按年級、課次進入教學遊戲 |
 
 ## Cursor Prompt（Vibe Coding）
