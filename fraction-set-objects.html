@@ -902,6 +902,118 @@
       font-weight: 600;
     }
 
+
+    .app-bar {
+      background: linear-gradient(180deg, #fffdf8, #f4faf6);
+      border-bottom: 1px solid var(--line);
+    }
+    .app-bar-top {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 12px 16px 8px;
+    }
+    .brand-block { min-width: 0; }
+    .app-bar .brand {
+      font-size: clamp(1.35rem, 3.5vw, 1.85rem);
+      text-align: left;
+      background: none;
+      -webkit-background-clip: unset;
+      background-clip: unset;
+      color: var(--accent-dark);
+      text-shadow: none;
+      animation: none;
+    }
+    .app-bar .brand-mark {
+      margin: 0 0 4px;
+      font-size: 0.72rem;
+      padding: 3px 10px;
+    }
+    .app-bar .subtitle {
+      text-align: left;
+      margin: 2px 0 0;
+      font-size: 0.85rem;
+    }
+    .app-bar .nav {
+      background: transparent;
+      border: 0;
+      padding: 0 16px 10px;
+      gap: 6px;
+    }
+    .app-bar .toolbar {
+      padding: 8px 16px;
+      background: rgba(255,255,255,0.55);
+    }
+    .shell {
+      margin-top: 10px;
+      width: min(1040px, 100%);
+    }
+    .play-layout {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-height: 520px;
+    }
+    .ask-strip h2 { margin-bottom: 4px; }
+    .ask-strip .lead { margin-bottom: 8px; }
+    .ask-strip .narration { margin-bottom: 0; }
+    .ask-strip .narration::after { display: none; }
+    .workspace-b {
+      display: grid;
+      grid-template-columns: minmax(0, 1.55fr) minmax(200px, 0.75fr);
+      gap: 12px;
+      align-items: stretch;
+      flex: 1;
+    }
+    @media (max-width: 820px) {
+      .workspace-b { grid-template-columns: 1fr; }
+    }
+    .play-stage {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      background: linear-gradient(180deg, #f3faf6, #eef6f1);
+      border: 1px solid rgba(47, 143, 107, 0.2);
+      border-radius: 18px;
+      padding: 12px;
+      min-height: 340px;
+    }
+    .play-stage .pool-zone,
+    .play-stage .tray-zone {
+      margin: 0;
+      flex: 1;
+    }
+    .play-stage .tray-zone {
+      display: flex;
+      flex-direction: column;
+    }
+    .play-stage .tray-grid { flex: 1; }
+    .side-rail {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .side-rail .fraction-card { margin: 0; }
+    .action-dock {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      padding: 12px 0 0;
+      margin-top: auto;
+      border-top: 1px solid rgba(47, 143, 107, 0.18);
+      position: sticky;
+      bottom: 0;
+      background: linear-gradient(180deg, rgba(255,253,248,0.92), #fffdf8);
+      z-index: 2;
+    }
+    .action-dock .spacer { flex: 1 1 8px; }
+    #screen-practiceB.stage { padding-bottom: 12px; }
+    body { padding-top: 10px; }
+    .hero-cta { display: none; }
+
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after {
         animation: none !important;
@@ -915,30 +1027,33 @@
   <div class="float-fruit f2" aria-hidden="true">🍊</div>
   <div class="float-fruit f3" aria-hidden="true">🍌</div>
   <div class="float-fruit f4" aria-hidden="true">🍇</div>
-  <header class="hero-cta">
-    <div class="brand-mark">果園數學 · 分數工坊</div>
-    <h1 class="brand">水果禮盒分數工坊</h1>
-    <p class="subtitle">小三｜分數作為一組物件（整體）的部分</p>
-  </header>
 
   <main class="shell" id="app">
-    <nav class="nav" aria-label="學習進度">
-      <button type="button" data-go="intro" aria-current="true">開場</button>
-      <button type="button" data-go="demoA">解說 A</button>
-      <button type="button" data-go="practiceA">練習 A</button>
-      <button type="button" data-go="demoB">解說 B</button>
-      <button type="button" data-go="practiceB">練習 B</button>
-      <button type="button" data-go="challenge">挑戰</button>
-      <button type="button" data-go="summary">回顧</button>
-    </nav>
-
-    <div class="toolbar">
-      <label>
-        <input type="checkbox" id="teachMode" checked />
-        解說模式（逐步按「下一步」）
-      </label>
-      <button type="button" class="ghost" id="replayExplain" style="padding:6px 12px;min-height:36px;font-size:0.85rem">重播本段解說</button>
-    </div>
+    <header class="app-bar">
+      <div class="app-bar-top">
+        <div class="brand-block">
+          <div class="brand-mark">果園數學 · 分數工坊</div>
+          <h1 class="brand">水果禮盒分數工坊</h1>
+          <p class="subtitle">小三｜分數作為一組物件（整體）的部分</p>
+        </div>
+      </div>
+      <nav class="nav" aria-label="學習進度">
+        <button type="button" data-go="intro" aria-current="true">開場</button>
+        <button type="button" data-go="demoA">解說 A</button>
+        <button type="button" data-go="practiceA">練習 A</button>
+        <button type="button" data-go="demoB">解說 B</button>
+        <button type="button" data-go="practiceB">練習 B</button>
+        <button type="button" data-go="challenge">挑戰</button>
+        <button type="button" data-go="summary">回顧</button>
+      </nav>
+      <div class="toolbar">
+        <label>
+          <input type="checkbox" id="teachMode" checked />
+          解說模式（逐步按「下一步」）
+        </label>
+        <button type="button" class="ghost" id="replayExplain" style="padding:6px 12px;min-height:36px;font-size:0.85rem">重播本段解說</button>
+      </div>
+    </header>
 
     <!-- INTRO -->
     <section class="stage screen active" id="screen-intro" data-screen="intro">
@@ -1058,54 +1173,57 @@
 
     <!-- PRACTICE B -->
     <section class="stage screen" id="screen-practiceB" data-screen="practiceB">
-      <h2>練習 B：自己決定要分幾份</h2>
-      <div class="q-progress" id="practiceBProgress">第 1 / 10 題</div>
-      <p class="lead" id="practiceBLead">看分數想一想：要等分成幾份？再自己加份盤、把物件放進去。</p>
-      <div class="narration"><span class="badge">題目</span><p id="practiceBPrompt"></p></div>
-      <div class="layout-split">
-        <div class="sort-board">
-          <div class="phase-chip" id="practiceBPhaseChip">步驟 1：決定份數並分物</div>
-          <div class="pool-zone" id="practiceBPoolZone">
-            <p class="zone-title">物資區（還沒分出去的）</p>
-            <div class="item-pool" id="practiceBPool" aria-label="物資區"></div>
-          </div>
-          <div class="tray-zone">
-            <p class="zone-title">份盤區 · 先想好要幾個份盤，再分物（每盤要一樣多）</p>
-            <div class="btn-row" style="margin:0 0 10px">
-              <button type="button" class="secondary" id="practiceBAddTray">＋ 加一份盤</button>
-              <button type="button" class="ghost" id="practiceBRemoveTray">− 拿走一份盤</button>
-              <span class="chip" id="practiceBTrayCount">現有 0 個份盤</span>
-            </div>
-            <div class="tray-grid" id="practiceBTrays" aria-label="份盤"></div>
-            <p id="practiceBEmptyTrays" class="readout" style="margin-top:8px">還沒有份盤。按「＋ 加一份盤」開始。</p>
-          </div>
-          <div class="btn-row" style="margin-top:0">
-            <button type="button" class="ghost" id="practiceBResetSort">重新開始</button>
-            <button type="button" class="secondary" id="practiceBThinkHint">想一想提示</button>
-            <button type="button" class="primary" id="practiceBCheckEqual">檢查我的分法</button>
-          </div>
+      <div class="play-layout">
+        <div class="ask-strip">
+          <div class="q-progress" id="practiceBProgress">第 1 / 12 題</div>
+          <h2 id="practiceBTitle">練習 B：自己決定要分幾份</h2>
+          <p class="lead" id="practiceBLead">看分數想一想：要等分成幾份？再自己加份盤、把物件放進去。</p>
+          <div class="narration"><span class="badge">題目</span><p id="practiceBPrompt"></p></div>
         </div>
-        <div>
-          <div class="fraction-card" style="margin-bottom:12px">
-            <div style="font-weight:800;color:var(--muted)">題目裏的分數</div>
-            <div class="fraction-stack">
-              <div class="num" id="practiceBFracNum">?</div>
-              <div class="bar" title="分線"></div>
-              <div class="den" id="practiceBFracDen">?</div>
+
+        <div class="workspace-b">
+          <section class="play-stage" aria-label="操作區">
+            <div class="phase-chip" id="practiceBPhaseChip">步驟 1：決定份數並分物</div>
+            <div class="pool-zone" id="practiceBPoolZone">
+              <p class="zone-title">物資區</p>
+              <div class="item-pool" id="practiceBPool" aria-label="物資區"></div>
             </div>
-            <p class="readout" id="practiceBFracAsk">哪個數告訴我們「要等分成幾份」？</p>
-          </div>
-          <p style="font-weight:800;margin:0 0 8px" id="practiceBSideHint">先自己決定份盤數量，再把全部物件放入，每盤一樣多。</p>
-          <p class="readout" id="practiceBSelected">物資區尚餘 — 個</p>
-          <div class="count-meter" id="practiceBCountMeter">？</div>
-          <p class="readout" id="practiceBCountLabel">取份後這裏會顯示總個數</p>
-          <div class="feedback" id="practiceBFeedback"></div>
-          <div class="btn-row">
-            <button type="button" class="ghost" id="practiceBReplay">重播解說 B</button>
-            <button type="button" class="secondary" id="practiceBPrevQ">上一題</button>
-            <button type="button" class="primary" id="practiceBConfirm" disabled>確認取份答案</button>
-            <button type="button" class="secondary" id="practiceBNextQ">下一題</button>
-          </div>
+            <div class="tray-zone">
+              <p class="zone-title">份盤區 <span class="chip" id="practiceBTrayCount">現有 0 個份盤</span></p>
+              <div class="tray-grid" id="practiceBTrays" aria-label="份盤"></div>
+              <p id="practiceBEmptyTrays" class="readout" style="margin-top:8px">還沒有份盤。按下方「加一份盤」開始。</p>
+            </div>
+          </section>
+
+          <aside class="side-rail" aria-label="分數提示">
+            <div class="fraction-card">
+              <div style="font-weight:800;color:var(--muted)">題目裏的分數</div>
+              <div class="fraction-stack">
+                <div class="num" id="practiceBFracNum">?</div>
+                <div class="bar" title="分線"></div>
+                <div class="den" id="practiceBFracDen">?</div>
+              </div>
+              <p class="readout" id="practiceBFracAsk">哪個數告訴我們「要等分成幾份」？</p>
+            </div>
+            <p class="readout" id="practiceBSideHint">先自己決定份盤數量，再把全部物件放入，每盤一樣多。</p>
+            <p class="readout" id="practiceBSelected">物資區尚餘 — 個</p>
+            <div class="count-meter" id="practiceBCountMeter">？</div>
+            <p class="readout" id="practiceBCountLabel">取份後這裏會顯示總個數</p>
+            <div class="feedback" id="practiceBFeedback"></div>
+          </aside>
+        </div>
+
+        <div class="action-dock">
+          <button type="button" class="ghost" id="practiceBAddTray">加一份盤</button>
+          <button type="button" class="ghost" id="practiceBRemoveTray">拿走一份盤</button>
+          <button type="button" class="secondary" id="practiceBThinkHint">想一想提示</button>
+          <button type="button" class="primary" id="practiceBCheckEqual">檢查我的分法</button>
+          <span class="spacer"></span>
+          <button type="button" class="ghost" id="practiceBResetSort">重新開始</button>
+          <button type="button" class="ghost" id="practiceBReplay">重播解說 B</button>
+          <button type="button" class="secondary" id="practiceBPrevQ">上一題</button>
+          <button type="button" class="primary" id="practiceBConfirm" disabled>確認取份答案</button>
+          <button type="button" class="secondary" id="practiceBNextQ">下一題</button>
         </div>
       </div>
     </section>
@@ -2004,11 +2122,12 @@
         initPracticeBModel();
         document.getElementById("practiceBProgress").textContent =
           "第 " + (state.practiceBIndex + 1) + " / " + practiceBQuestions.length + " 題";
+        document.getElementById("practiceBTitle").textContent =
+          q.total + " 個" + q.label + "的 " + q.num + "/" + q.den + " 是多少？";
         document.getElementById("practiceBPrompt").textContent =
-          q.total + " 個" + q.label + "的 " + q.num + "/" + q.den +
-          " 是多少？先看分數，自己決定要準備幾個份盤，把物件等分放好，再取其中幾份。";
+          "先看分數，自己決定要準備幾個份盤，把物件等分放好，再取其中幾份。";
         document.getElementById("practiceBLead").textContent =
-          "不會先告訴你要分幾盤——請從分數裏自己發現。可用＋/− 加減份盤。";
+          "不會先告訴你要分幾盤——請從分數裏自己發現。可用下方按鈕加減份盤。";
         document.getElementById("practiceBFeedback").className = "feedback";
         document.getElementById("practiceBFeedback").textContent = "";
         document.getElementById("practiceBConfirm").disabled = true;
