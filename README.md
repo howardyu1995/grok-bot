@@ -81,3 +81,15 @@ https://howardyu1995.github.io/grok-bot/game-index/
 python3 -m http.server 8765
 # 瀏覽器開啟 http://127.0.0.1:8765/air-pressure-drink-box.html
 ```
+
+---
+
+## Cursor UI/UX Skill
+
+本倉庫已安裝 [UI UX Pro Max](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill)（Cursor skill），檔案位於 `.cursor/skills/`。
+
+在 Cursor 中描述 UI/UX 需求（例如「改善遊戲目錄首頁版面」）即可自動啟用。進階設計系統查詢：
+
+```bash
+python3 .cursor/skills/ui-ux-pro-max/scripts/search.py "education interactive learning" --design-system -p "grok-bot"
+```
