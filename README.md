@@ -6,6 +6,7 @@
 
 | 網頁 | 檔案 | 說明 |
 |------|------|------|
+| 人體呼吸系統 | [`respiratory-system.html`](./respiratory-system.html) | 吸氣／呼氣機制互動教室（Canvas + 挑戰賽） |
 | 氣壓原理互動模型 | [`air-pressure-drink-box.html`](./air-pressure-drink-box.html) | 香港小五常識：飲品盒為何會凹陷（p5.js） |
 | 五位數密碼鎖 | [`index.html`](./index.html) | 解密挑戰小遊戲 |
 | 教學遊戲目錄 | [`game-index/index.html`](./game-index/index.html) | 按年級、課次進入教學遊戲 |
@@ -25,6 +26,12 @@ Google Sites **不能直接執行** 含 JavaScript 的 HTML，請先用 GitHub P
    - 若沒有自動跑，可點該 workflow → **Run workflow**（選 `main`）手動執行。
 
 ### 二、公開網址（合併並部署成功後）
+
+人體呼吸系統：
+
+```text
+https://howardyu1995.github.io/grok-bot/respiratory-system.html
+```
 
 氣壓模型：
 
