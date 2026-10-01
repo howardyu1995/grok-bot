@@ -10,6 +10,14 @@
 | 五位數密碼鎖 | [`index.html`](./index.html) | 解密挑戰小遊戲 |
 | 教學遊戲目錄 | [`game-index/index.html`](./game-index/index.html) | 按年級、課次進入教學遊戲 |
 
+## Cursor Prompt（Vibe Coding）
+
+| Prompt | 檔案 | 說明 |
+|--------|------|------|
+| 分數作為一組物件 | [`prompts/p3-l12-fraction-set-objects.md`](./prompts/p3-l12-fraction-set-objects.md) | 小三第 12 課離散分數模型；貼到 Cursor 可生成 `fraction-set-objects.html` |
+
+用法：打開該 md，複製「PROMPT 本體」整段到 Cursor Agent，產出單檔 HTML 後用瀏覽器開啟。
+
 ---
 
 ## 用 GitHub Pages 公開網頁（給 Google Sites 嵌入）
