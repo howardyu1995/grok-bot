@@ -597,17 +597,20 @@ def load_all() -> tuple[list[Trade], list[NavPoint], dict]:
     csv_paths = [
         ROOT / "statements" / "firstrade-export.csv",
         UPLOADS / "export_fb8c.csv",
-        *UPLOADS.glob("export*.csv"),
-        *UPLOADS.glob("*.csv"),
+        *sorted(UPLOADS.glob("export*.csv")),
+        *sorted(UPLOADS.glob("*.csv")),
     ]
-    seen_csv = set()
+    seen_csv_hash: set[str] = set()
     for path in csv_paths:
         if not path.exists():
             continue
-        resolved = path.resolve()
-        if resolved in seen_csv:
+        digest = path.read_bytes()
+        import hashlib
+
+        h = hashlib.sha1(digest).hexdigest()
+        if h in seen_csv_hash:
             continue
-        seen_csv.add(resolved)
+        seen_csv_hash.add(h)
         t = parse_firstrade_csv(path)
         trades.extend(t)
         meta["sources"].append({"file": path.name, "broker": "firstrade-csv", "trades": len(t)})

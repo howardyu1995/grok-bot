@@ -2,24 +2,31 @@
 
 在 Cursor 裡直接跑，不上傳網站。支援：
 
-- **富途牛牛／moomoo**：成交／交易流水 CSV，或含「交易流水」工作表的 XLSX（含年度帳單）
-- **Firstrade**：Tax Center → Download Account Information → Excel CSV
+- **富途牛牛／moomoo**：月結 PDF、成交／交易流水 CSV／XLSX
+- **Firstrade**：月結 PDF、Tax Center／帳戶匯出 CSV
+
+**固定規則：每次分析必須合併目前已提供的全部月結與匯出檔，不得只看最新一份。**
 
 資料只在本機解析，不會送到外部服務。
 
 ## 每月怎麼用
 
-1. 從兩家券商匯出該月成交（CSV／XLSX）。
-2. 把檔案放到 [`statements/`](./statements/)（檔名建議含 `futu` 或 `firstrade` 方便辨識）。
-3. 在 Cursor 終端執行：
+1. 把新的月結 PDF／CSV 上傳到對話，或放到 [`statements/`](./statements/)（PDF 可放 `statements/raw/`）。
+2. 在 Cursor 終端執行**全量合併**分析：
 
 ```bash
 cd trade-monthly-review
-pip3 install -r requirements.txt   # 首次需要（讀 XLSX）
-python3 analyze.py
+pip3 install -r requirements.txt   # 首次需要（PDF/XLSX）
+python3 analyze_all.py
 ```
 
-4. 終端會印出完整報告，並寫入 `reports/YYYY-MM.md`。
+3. 報告寫入 `reports/combined_all.md` 與 `reports/combined_all.json`。
+
+單檔／示範資料仍可用：
+
+```bash
+python3 analyze.py
+```
 
 ### 常用參數
 
