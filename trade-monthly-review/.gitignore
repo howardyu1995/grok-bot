@@ -1,4 +1,4 @@
-reports/*.md
+reports/*
 !reports/.gitkeep
 statements/*
 !statements/.gitkeep
