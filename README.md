@@ -9,6 +9,7 @@
 | 氣壓原理互動模型 | [`air-pressure-drink-box.html`](./air-pressure-drink-box.html) | 香港小五常識：飲品盒為何會凹陷（p5.js） |
 | 五位數密碼鎖 | [`index.html`](./index.html) | 解密挑戰小遊戲 |
 | 教學遊戲目錄 | [`game-index/index.html`](./game-index/index.html) | 按年級、課次進入教學遊戲 |
+| 月結交易傾向分析（CLI） | [`trade-monthly-review/`](./trade-monthly-review/) | 在 Cursor 分析富途／Firstrade 月結，非網頁 |
 
 ---
 
