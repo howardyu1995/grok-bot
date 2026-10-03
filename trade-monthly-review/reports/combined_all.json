@@ -1,0 +1,2407 @@
+{
+  "meta": {
+    "sources": [
+      {
+        "file": "1001237056219527-6-20260529-1791033443878_2945.txt",
+        "broker": "futu",
+        "trades": 18
+      },
+      {
+        "file": "1001237056219527-6-20260630-1791033440546_66d3.txt",
+        "broker": "futu",
+        "trades": 42
+      },
+      {
+        "file": "1001237056219527-6-20260731-1791033432872_fab9.txt",
+        "broker": "futu",
+        "trades": 54
+      },
+      {
+        "file": "1001237056219527-6-20260831-1791033430349_c064.txt",
+        "broker": "futu",
+        "trades": 24
+      },
+      {
+        "file": "1001237056219527-6-20260930-1791033415970_90c7.txt",
+        "broker": "futu",
+        "trades": 23
+      },
+      {
+        "file": "24f3f75e-96d1-4c1d-82cb-dd1d7abfdec7_7d86.txt",
+        "broker": "firstrade",
+        "trades": 39
+      },
+      {
+        "file": "8827f3cc-2ade-4297-a9f0-24744fc71e55_ba31.txt",
+        "broker": "firstrade",
+        "trades": 20
+      },
+      {
+        "file": "8bcccea9-c235-4620-9c54-beea941a1b82_22fc.txt",
+        "broker": "firstrade",
+        "trades": 21
+      },
+      {
+        "file": "9130444f-a289-4f29-b3e4-b21e5529f6ae_2daa.txt",
+        "broker": "firstrade",
+        "trades": 17
+      },
+      {
+        "file": "a17bc88b-c93d-4de8-b65f-6d7b4a5c6d9d_f1d2.txt",
+        "broker": "firstrade",
+        "trades": 38
+      },
+      {
+        "file": "afd66d0d-0b2c-4de7-9e47-9a591690a649_fea4.txt",
+        "broker": "firstrade",
+        "trades": 41
+      },
+      {
+        "file": "e0512ae0-33c0-4406-a334-159b03de73f1_4f08.txt",
+        "broker": "firstrade",
+        "trades": 21
+      },
+      {
+        "file": "e92f0b3c-fae0-4c0f-88e9-b8b104917c90_05f9.txt",
+        "broker": "firstrade",
+        "trades": 17
+      },
+      {
+        "file": "firstrade-export.csv",
+        "broker": "firstrade-csv",
+        "trades": 33
+      },
+      {
+        "file": "export_fb8c.csv",
+        "broker": "firstrade-csv",
+        "trades": 33
+      }
+    ],
+    "raw_trades": 441,
+    "deduped_trades": 407
+  },
+  "overall": {
+    "label": "ALL",
+    "trade_count": 407,
+    "buy_count": 271,
+    "sell_count": 136,
+    "symbol_count": 77,
+    "date_start": "2025-10-02",
+    "date_end": "2026-10-01",
+    "turnover_hkd": 5650092.8344,
+    "fees_hkd": 2216.174,
+    "fee_drag": 0.00039223674105088257,
+    "active_days": 142,
+    "avg_trades_per_day": 2.8661971830985915,
+    "max_day_trades": 10,
+    "round_trips": 171,
+    "realized_pnl_hkd": 11394.651568219104,
+    "win_rate": 0.42105263157894735,
+    "avg_win": 1340.9428123473024,
+    "avg_loss": -860.1336456645117,
+    "payoff": 1.5589935576945522,
+    "max_win": 12638.08,
+    "max_loss": -7048.640000000001,
+    "day_trade_pct": 0.1286549707602339,
+    "short_pct": 0.23976608187134502,
+    "swing_pct": 0.631578947368421,
+    "avg_hold": 39.824561403508774,
+    "avg_hold_win": 57.708333333333336,
+    "avg_hold_loss": 26.818181818181817,
+    "top_symbol": [
+      [
+        "MRVL",
+        875368.928
+      ],
+      [
+        "BOXX",
+        452928.6384
+      ],
+      [
+        "QQQM",
+        286220.76
+      ],
+      [
+        "PANW",
+        263322.472
+      ],
+      [
+        "BRK.B",
+        258742.50079999998
+      ],
+      [
+        "00189",
+        241630.0
+      ],
+      [
+        "SHP",
+        205550.68799999997
+      ],
+      [
+        "AVAV",
+        186624.22239999997
+      ],
+      [
+        "GOOGL",
+        174436.864
+      ],
+      [
+        "NVDA",
+        166640.2976
+      ]
+    ],
+    "top_share": 0.15493000799392315,
+    "loss_streak_n": 8,
+    "loss_streak_amt": -12444.771600000002,
+    "revenge_symbols": {
+      "RKLB": -330.456000000001,
+      "AVAV": -1578.7407998432013,
+      "CRWD": -1646.3999999999999,
+      "BRK.B": -420.3602185574418,
+      "NVDA": -3372.1690103584,
+      "SATS": -3501.544899999999,
+      "CRDO": -453.93599999999935,
+      "INTC": -2656.0195200000007,
+      "07709": -17963.700000000004,
+      "IBM": -2899.819999999999,
+      "60925": -2400.9500000000003,
+      "IWM": -4800.125048320003,
+      "0000": -140.33599999999996
+    },
+    "option_trades": 5,
+    "warrant_trades": 34,
+    "best_trips": [
+      {
+        "broker": "firstrade",
+        "symbol": "MRVL",
+        "buy_date": "2026-04-01",
+        "sell_date": "2026-06-10",
+        "qty": 10.0,
+        "buy_price": 98.8,
+        "sell_price": 260.0,
+        "pnl_native": 1612.0,
+        "pnl_hkd": 12638.08,
+        "fees": 0.0,
+        "hold_days": 70,
+        "currency": "USD",
+        "is_option": false,
+        "is_warrant": false,
+        "month": "2026-06"
+      },
+      {
+        "broker": "firstrade",
+        "symbol": "MRVL",
+        "buy_date": "2025-12-31",
+        "sell_date": "2026-04-28",
+        "qty": 22.85716,
+        "buy_price": 87.4999,
+        "sell_price": 157.79,
+        "pnl_native": 1606.6320621159998,
+        "pnl_hkd": 12595.995366989438,
+        "fees": 0.0,
+        "hold_days": 118,
+        "currency": "USD",
+        "is_option": false,
+        "is_warrant": false,
+        "month": "2026-04"
+      },
+      {
+        "broker": "firstrade",
+        "symbol": "PANW",
+        "buy_date": "2026-04-29",
+        "sell_date": "2026-07-29",
+        "qty": 7.0,
+        "buy_price": 182.6,
+        "sell_price": 310.0,
+        "pnl_native": 891.8000000000001,
+        "pnl_hkd": 6991.712,
+        "fees": 0.0,
+        "hold_days": 91,
+        "currency": "USD",
+        "is_option": false,
+        "is_warrant": false,
+        "month": "2026-07"
+      },
+      {
+        "broker": "firstrade",
+        "symbol": "QQQM",
+        "buy_date": "2025-12-19",
+        "sell_date": "2026-06-08",
+        "qty": 18.60656,
+        "buy_price": 250.0,
+        "sell_price": 296.8945,
+        "pnl_native": 872.54532792,
+        "pnl_hkd": 6840.7553708928,
+        "fees": 0.0,
+        "hold_days": 171,
+        "currency": "USD",
+        "is_option": false,
+        "is_warrant": false,
+        "month": "2026-06"
+      },
+      {
+        "broker": "firstrade",
+        "symbol": "PANW",
+        "buy_date": "2026-05-12",
+        "sell_date": "2026-08-20",
+        "qty": 5.0,
+        "buy_price": 213.0,
+        "sell_price": 348.8,
+        "pnl_native": 679.0,
+        "pnl_hkd": 5323.36,
+        "fees": 0.0,
+        "hold_days": 100,
+        "currency": "USD",
+        "is_option": false,
+        "is_warrant": false,
+        "month": "2026-08"
+      },
+      {
+        "broker": "firstrade",
+        "symbol": "PANW",
+        "buy_date": "2025-12-31",
+        "sell_date": "2026-06-05",
+        "qty": 8.0,
+        "buy_price": 187.52,
+        "sell_price": 270.18375,
+        "pnl_native": 661.3099999999997,
+        "pnl_hkd": 5184.670399999997,
+        "fees": 0.0,
+        "hold_days": 156,
+        "currency": "USD",
+        "is_option": false,
+        "is_warrant": false,
+        "month": "2026-06"
+      },
+      {
+        "broker": "futu",
+        "symbol": "00189",
+        "buy_date": "2026-06-15",
+        "sell_date": "2026-06-25",
+        "qty": 2000.0,
+        "buy_price": 18.4,
+        "sell_price": 20.42,
+        "pnl_native": 3982.3200000000065,
+        "pnl_hkd": 3982.3200000000065,
+        "fees": 57.68,
+        "hold_days": 10,
+        "currency": "HKD",
+        "is_option": false,
+        "is_warrant": false,
+        "month": "2026-06"
+      },
+      {
+        "broker": "firstrade",
+        "symbol": "MRVL",
+        "buy_date": "2026-04-14",
+        "sell_date": "2026-09-15",
+        "qty": 5.0,
+        "buy_price": 130.0,
+        "sell_price": 221.81,
+        "pnl_native": 459.05,
+        "pnl_hkd": 3598.952,
+        "fees": 0.0,
+        "hold_days": 154,
+        "currency": "USD",
+        "is_option": false,
+        "is_warrant": false,
+        "month": "2026-09"
+      }
+    ],
+    "worst_trips": [
+      {
+        "broker": "futu",
+        "symbol": "07709",
+        "buy_date": "2026-06-01",
+        "sell_date": "2026-06-05",
+        "qty": 200.0,
+        "buy_price": 143.5,
+        "sell_price": 108.35,
+        "pnl_native": -7048.640000000001,
+        "pnl_hkd": -7048.640000000001,
+        "fees": 18.64,
+        "hold_days": 4,
+        "currency": "HKD",
+        "is_option": false,
+        "is_warrant": false,
+        "month": "2026-06"
+      },
+      {
+        "broker": "futu",
+        "symbol": "07709",
+        "buy_date": "2026-07-06",
+        "sell_date": "2026-07-13",
+        "qty": 200.0,
+        "buy_price": 107.0,
+        "sell_price": 72.3,
+        "pnl_native": -6957.720000000001,
+        "pnl_hkd": -6957.720000000001,
+        "fees": 17.72,
+        "hold_days": 7,
+        "currency": "HKD",
+        "is_option": false,
+        "is_warrant": false,
+        "month": "2026-07"
+      },
+      {
+        "broker": "firstrade",
+        "symbol": "MRVL",
+        "buy_date": "2026-06-10",
+        "sell_date": "2026-09-15",
+        "qty": 8.85716,
+        "buy_price": 288.8,
+        "sell_price": 221.76,
+        "pnl_native": -593.7840064000002,
+        "pnl_hkd": -4655.266610176001,
+        "fees": 0.0,
+        "hold_days": 97,
+        "currency": "USD",
+        "is_option": false,
+        "is_warrant": false,
+        "month": "2026-09"
+      },
+      {
+        "broker": "firstrade",
+        "symbol": "MRVL",
+        "buy_date": "2026-09-15",
+        "sell_date": "2026-09-15",
+        "qty": 187.14284,
+        "buy_price": 224.7899,
+        "sell_price": 221.76,
+        "pnl_native": -567.0240909159996,
+        "pnl_hkd": -4445.468872781437,
+        "fees": 0.0,
+        "hold_days": 0,
+        "currency": "USD",
+        "is_option": false,
+        "is_warrant": false,
+        "month": "2026-09"
+      },
+      {
+        "broker": "firstrade",
+        "symbol": "IBM",
+        "buy_date": "2026-06-10",
+        "sell_date": "2026-06-22",
+        "qty": 15.0,
+        "buy_price": 280.0,
+        "sell_price": 245.375,
+        "pnl_native": -519.375,
+        "pnl_hkd": -4071.9,
+        "fees": 0.0,
+        "hold_days": 12,
+        "currency": "USD",
+        "is_option": false,
+        "is_warrant": false,
+        "month": "2026-06"
+      },
+      {
+        "broker": "futu",
+        "symbol": "07709",
+        "buy_date": "2026-07-10",
+        "sell_date": "2026-07-13",
+        "qty": 200.0,
+        "buy_price": 92.0,
+        "sell_price": 72.3,
+        "pnl_native": -3957.3400000000006,
+        "pnl_hkd": -3957.3400000000006,
+        "fees": 17.34,
+        "hold_days": 3,
+        "currency": "HKD",
+        "is_option": false,
+        "is_warrant": false,
+        "month": "2026-07"
+      },
+      {
+        "broker": "firstrade",
+        "symbol": "IWM",
+        "buy_date": "2026-06-23",
+        "sell_date": "2026-07-28",
+        "qty": 7.4008400000000005,
+        "buy_price": 342.8,
+        "sell_price": 297.2,
+        "pnl_native": -337.4783040000002,
+        "pnl_hkd": -2645.8299033600015,
+        "fees": 0.0,
+        "hold_days": 35,
+        "currency": "USD",
+        "is_option": false,
+        "is_warrant": false,
+        "month": "2026-07"
+      },
+      {
+        "broker": "firstrade",
+        "symbol": "AVAV",
+        "buy_date": "2025-10-15",
+        "sell_date": "2025-10-17",
+        "qty": 10.0,
+        "buy_price": 403.0,
+        "sell_price": 369.33,
+        "pnl_native": -336.70000000000016,
+        "pnl_hkd": -2639.728000000001,
+        "fees": 0.0,
+        "hold_days": 2,
+        "currency": "USD",
+        "is_option": false,
+        "is_warrant": false,
+        "month": "2025-10"
+      }
+    ],
+    "by_month_realized": {
+      "2025-10": -7245.296799843199,
+      "2025-11": -7482.104000000001,
+      "2025-12": 665.015456000013,
+      "2026-04": 11735.799438733438,
+      "2026-05": 1860.9657607680006,
+      "2026-06": 8866.7636228928,
+      "2026-07": -8620.819780723632,
+      "2026-08": 9896.086856320004,
+      "2026-09": 1718.2410140716822
+    },
+    "by_month_trades": {
+      "2025-10": 39,
+      "2025-11": 17,
+      "2025-12": 21,
+      "2026-04": 20,
+      "2026-05": 39,
+      "2026-06": 83,
+      "2026-07": 91,
+      "2026-08": 52,
+      "2026-09": 44,
+      "2026-10": 1
+    },
+    "by_broker_realized": {
+      "firstrade": 31434.71943488577,
+      "futu": -20040.067866666664
+    }
+  },
+  "monthly": {
+    "2025-10": {
+      "label": "2025-10",
+      "trade_count": 39,
+      "buy_count": 21,
+      "sell_count": 18,
+      "symbol_count": 13,
+      "date_start": "2025-10-02",
+      "date_end": "2025-10-31",
+      "turnover_hkd": 634206.608,
+      "fees_hkd": 0.0,
+      "fee_drag": 0.0,
+      "active_days": 15,
+      "avg_trades_per_day": 2.6,
+      "max_day_trades": 7,
+      "round_trips": 14,
+      "realized_pnl_hkd": -7245.296799843199,
+      "win_rate": 0.35714285714285715,
+      "avg_win": 544.1273600156798,
+      "avg_loss": -1107.3259555468442,
+      "payoff": 0.4913886081058822,
+      "max_win": 1473.92,
+      "max_loss": -2639.728000000001,
+      "day_trade_pct": 0.21428571428571427,
+      "short_pct": 0.5,
+      "swing_pct": 0.2857142857142857,
+      "avg_hold": 4.714285714285714,
+      "avg_hold_win": 6.2,
+      "avg_hold_loss": 3.888888888888889,
+      "top_symbol": [
+        [
+          "AVAV",
+          186624.22239999997
+        ],
+        [
+          "RKLB",
+          112913.64
+        ],
+        [
+          "JOBY",
+          52230.08
+        ],
+        [
+          "COIN",
+          46551.568
+        ],
+        [
+          "MSFT",
+          43751.4336
+        ],
+        [
+          "AMZN",
+          43410.3152
+        ],
+        [
+          "CRWD",
+          38980.9504
+        ],
+        [
+          "MP",
+          30778.8992
+        ],
+        [
+          "VOO",
+          24084.479999999996
+        ],
+        [
+          "BOXX",
+          22329.339200000002
+        ]
+      ],
+      "top_share": 0.29426407742506516,
+      "loss_streak_n": 7,
+      "loss_streak_amt": -8374.687999999998,
+      "revenge_symbols": {
+        "RKLB": -1384.9360000000006,
+        "AVAV": -1578.7407998432013
+      },
+      "option_trades": 0,
+      "warrant_trades": 0,
+      "by_month_realized": {
+        "2025-10": -7245.296799843199
+      },
+      "by_month_trades": {
+        "2025-10": 39
+      },
+      "by_broker_realized": {
+        "firstrade": -7245.296799843199
+      },
+      "best_trips": [
+        {
+          "broker": "firstrade",
+          "symbol": "AVAV",
+          "buy_date": "2025-10-02",
+          "sell_date": "2025-10-14",
+          "qty": 4.0,
+          "buy_price": 339.0,
+          "sell_price": 386.0,
+          "pnl_native": 188.0,
+          "pnl_hkd": 1473.92,
+          "fees": 0.0,
+          "hold_days": 12,
+          "currency": "USD",
+          "is_option": false,
+          "is_warrant": false,
+          "month": "2025-10"
+        },
+        {
+          "broker": "firstrade",
+          "symbol": "RKLB",
+          "buy_date": "2025-10-06",
+          "sell_date": "2025-10-08",
+          "qty": 25.0,
+          "buy_price": 54.5,
+          "sell_price": 57.8,
+          "pnl_native": 82.49999999999993,
+          "pnl_hkd": 646.7999999999994,
+          "fees": 0.0,
+          "hold_days": 2,
+          "currency": "USD",
+          "is_option": false,
+          "is_warrant": false,
+          "month": "2025-10"
+        },
+        {
+          "broker": "firstrade",
+          "symbol": "RKLB",
+          "buy_date": "2025-10-06",
+          "sell_date": "2025-10-15",
+          "qty": 5.0,
+          "buy_price": 54.5,
+          "sell_price": 62.945,
+          "pnl_native": 42.225,
+          "pnl_hkd": 331.044,
+          "fees": 0.0,
+          "hold_days": 9,
+          "currency": "USD",
+          "is_option": false,
+          "is_warrant": false,
+          "month": "2025-10"
+        }
+      ],
+      "worst_trips": [
+        {
+          "broker": "firstrade",
+          "symbol": "AVAV",
+          "buy_date": "2025-10-15",
+          "sell_date": "2025-10-17",
+          "qty": 10.0,
+          "buy_price": 403.0,
+          "sell_price": 369.33,
+          "pnl_native": -336.70000000000016,
+          "pnl_hkd": -2639.728000000001,
+          "fees": 0.0,
+          "hold_days": 2,
+          "currency": "USD",
+          "is_option": false,
+          "is_warrant": false,
+          "month": "2025-10"
+        },
+        {
+          "broker": "firstrade",
+          "symbol": "JOBY",
+          "buy_date": "2025-10-15",
+          "sell_date": "2025-10-20",
+          "qty": 100.0,
+          "buy_price": 18.02,
+          "sell_price": 15.8,
+          "pnl_native": -221.9999999999999,
+          "pnl_hkd": -1740.479999999999,
+          "fees": 0.0,
+          "hold_days": 5,
+          "currency": "USD",
+          "is_option": false,
+          "is_warrant": false,
+          "month": "2025-10"
+        },
+        {
+          "broker": "firstrade",
+          "symbol": "MP",
+          "buy_date": "2025-10-21",
+          "sell_date": "2025-10-22",
+          "qty": 25.0,
+          "buy_price": 82.6,
+          "sell_price": 74.435,
+          "pnl_native": -204.1249999999998,
+          "pnl_hkd": -1600.3399999999983,
+          "fees": 0.0,
+          "hold_days": 1,
+          "currency": "USD",
+          "is_option": false,
+          "is_warrant": false,
+          "month": "2025-10"
+        }
+      ]
+    },
+    "2025-11": {
+      "label": "2025-11",
+      "trade_count": 17,
+      "buy_count": 12,
+      "sell_count": 5,
+      "symbol_count": 9,
+      "date_start": "2025-11-03",
+      "date_end": "2025-11-28",
+      "turnover_hkd": 428241.4976,
+      "fees_hkd": 0.0,
+      "fee_drag": 0.0,
+      "active_days": 8,
+      "avg_trades_per_day": 2.125,
+      "max_day_trades": 4,
+      "round_trips": 6,
+      "realized_pnl_hkd": -7482.104000000001,
+      "win_rate": 0.0,
+      "avg_win": 0.0,
+      "avg_loss": -1247.0173333333335,
+      "payoff": 0.0,
+      "max_win": -666.4,
+      "max_loss": -1960.0,
+      "day_trade_pct": 0.5,
+      "short_pct": 0.16666666666666666,
+      "swing_pct": 0.3333333333333333,
+      "avg_hold": 5,
+      "avg_hold_win": null,
+      "avg_hold_loss": 5,
+      "top_symbol": [
+        [
+          "BOXX",
+          179543.84
+        ],
+        [
+          "SHP",
+          81026.3216
+        ],
+        [
+          "COIN",
+          40529.664000000004
+        ],
+        [
+          "PLTR",
+          30505.832
+        ],
+        [
+          "GOOGL",
+          22085.28
+        ],
+        [
+          "RGTI",
+          21011.2
+        ],
+        [
+          "VOO",
+          19678.4
+        ],
+        [
+          "CRWD",
+          17044.16
+        ],
+        [
+          "IONQ",
+          16816.8
+        ]
+      ],
+      "top_share": 0.41925838809695026,
+      "loss_streak_n": 6,
+      "loss_streak_amt": -7482.104000000001,
+      "revenge_symbols": {},
+      "option_trades": 0,
+      "warrant_trades": 0,
+      "by_month_realized": {
+        "2025-11": -7482.104000000001
+      },
+      "by_month_trades": {
+        "2025-11": 17
+      },
+      "by_broker_realized": {
+        "firstrade": -7482.104000000001
+      },
+      "best_trips": [
+        {
+          "broker": "firstrade",
+          "symbol": "IONQ",
+          "buy_date": "2025-11-04",
+          "sell_date": "2025-11-10",
+          "qty": 10.0,
+          "buy_price": 60.0,
+          "sell_price": 51.5,
+          "pnl_native": -85.0,
+          "pnl_hkd": -666.4,
+          "fees": 0.0,
+          "hold_days": 6,
+          "currency": "USD",
+          "is_option": false,
+          "is_warrant": false,
+          "month": "2025-11"
+        },
+        {
+          "broker": "firstrade",
+          "symbol": "RGTI",
+          "buy_date": "2025-10-28",
+          "sell_date": "2025-11-05",
+          "qty": 30.0,
+          "buy_price": 40.0,
+          "sell_price": 36.0,
+          "pnl_native": -120.0,
+          "pnl_hkd": -940.8,
+          "fees": 0.0,
+          "hold_days": 8,
+          "currency": "USD",
+          "is_option": false,
+          "is_warrant": false,
+          "month": "2025-11"
+        },
+        {
+          "broker": "firstrade",
+          "symbol": "PLTR",
+          "buy_date": "2025-11-04",
+          "sell_date": "2025-11-05",
+          "qty": 10.0,
+          "buy_price": 202.0,
+          "sell_price": 187.105,
+          "pnl_native": -148.9500000000001,
+          "pnl_hkd": -1167.7680000000007,
+          "fees": 0.0,
+          "hold_days": 1,
+          "currency": "USD",
+          "is_option": false,
+          "is_warrant": false,
+          "month": "2025-11"
+        }
+      ],
+      "worst_trips": [
+        {
+          "broker": "firstrade",
+          "symbol": "IONQ",
+          "buy_date": "2025-10-28",
+          "sell_date": "2025-11-10",
+          "qty": 20.0,
+          "buy_price": 64.0,
+          "sell_price": 51.5,
+          "pnl_native": -250.0,
+          "pnl_hkd": -1960.0,
+          "fees": 0.0,
+          "hold_days": 13,
+          "currency": "USD",
+          "is_option": false,
+          "is_warrant": false,
+          "month": "2025-11"
+        },
+        {
+          "broker": "firstrade",
+          "symbol": "COIN",
+          "buy_date": "2025-11-04",
+          "sell_date": "2025-11-05",
+          "qty": 8.0,
+          "buy_price": 335.0,
+          "sell_price": 311.2,
+          "pnl_native": -190.4000000000001,
+          "pnl_hkd": -1492.7360000000008,
+          "fees": 0.0,
+          "hold_days": 1,
+          "currency": "USD",
+          "is_option": false,
+          "is_warrant": false,
+          "month": "2025-11"
+        },
+        {
+          "broker": "firstrade",
+          "symbol": "RGTI",
+          "buy_date": "2025-11-04",
+          "sell_date": "2025-11-05",
+          "qty": 20.0,
+          "buy_price": 44.0,
+          "sell_price": 36.0,
+          "pnl_native": -160.0,
+          "pnl_hkd": -1254.4,
+          "fees": 0.0,
+          "hold_days": 1,
+          "currency": "USD",
+          "is_option": false,
+          "is_warrant": false,
+          "month": "2025-11"
+        }
+      ]
+    },
+    "2025-12": {
+      "label": "2025-12",
+      "trade_count": 21,
+      "buy_count": 15,
+      "sell_count": 6,
+      "symbol_count": 12,
+      "date_start": "2025-12-01",
+      "date_end": "2025-12-31",
+      "turnover_hkd": 646479.1087999999,
+      "fees_hkd": 0.0,
+      "fee_drag": 0.0,
+      "active_days": 11,
+      "avg_trades_per_day": 1.9090909090909092,
+      "max_day_trades": 4,
+      "round_trips": 13,
+      "realized_pnl_hkd": 665.015456000013,
+      "win_rate": 0.6153846153846154,
+      "avg_win": 367.16964200000166,
+      "avg_loss": -454.4683360000001,
+      "payoff": 0.8079102831049634,
+      "max_win": 564.4800000000035,
+      "max_loss": -705.6,
+      "day_trade_pct": 0.15384615384615385,
+      "short_pct": 0.07692307692307693,
+      "swing_pct": 0.7692307692307693,
+      "avg_hold": 24.076923076923077,
+      "avg_hold_win": 19.125,
+      "avg_hold_loss": 32,
+      "top_symbol": [
+        [
+          "QQQM",
+          242912.0512
+        ],
+        [
+          "SHP",
+          124524.36639999998
+        ],
+        [
+          "BRK.B",
+          71562.4224
+        ],
+        [
+          "CRWD",
+          62720.0
+        ],
+        [
+          "GOOGL",
+          47189.5872
+        ],
+        [
+          "YMAG",
+          26377.68
+        ],
+        [
+          "IONQ",
+          15680.0
+        ],
+        [
+          "MRVL",
+          15680.0
+        ],
+        [
+          "PANW",
+          15680.0
+        ],
+        [
+          "NVDA",
+          14268.8
+        ]
+      ],
+      "top_share": 0.37574617322266674,
+      "loss_streak_n": 3,
+      "loss_streak_amt": -2022.7199999999998,
+      "revenge_symbols": {
+        "CRWD": -1646.3999999999999
+      },
+      "option_trades": 1,
+      "warrant_trades": 0,
+      "by_month_realized": {
+        "2025-12": 665.015456000013
+      },
+      "by_month_trades": {
+        "2025-12": 21
+      },
+      "by_broker_realized": {
+        "firstrade": 665.015456000013
+      },
+      "best_trips": [
+        {
+          "broker": "firstrade",
+          "symbol": "SHP",
+          "buy_date": "2025-11-25",
+          "sell_date": "2025-12-16",
+          "qty": 80.0,
+          "buy_price": 51.8,
+          "sell_price": 52.7,
+          "pnl_native": 72.00000000000045,
+          "pnl_hkd": 564.4800000000035,
+          "fees": 0.0,
+          "hold_days": 21,
+          "currency": "USD",
+          "is_option": false,
+          "is_warrant": false,
+          "month": "2025-12"
+        },
+        {
+          "broker": "firstrade",
+          "symbol": "SHP",
+          "buy_date": "2025-11-21",
+          "sell_date": "2025-12-16",
+          "qty": 50.0,
+          "buy_price": 51.3,
+          "sell_price": 52.7,
+          "pnl_native": 70.00000000000028,
+          "pnl_hkd": 548.8000000000022,
+          "fees": 0.0,
+          "hold_days": 25,
+          "currency": "USD",
+          "is_option": false,
+          "is_warrant": false,
+          "month": "2025-12"
+        },
+        {
+          "broker": "firstrade",
+          "symbol": "SHP",
+          "buy_date": "2025-11-25",
+          "sell_date": "2025-12-16",
+          "qty": 70.0,
+          "buy_price": 51.7999,
+          "sell_price": 52.7,
+          "pnl_native": 63.00700000000013,
+          "pnl_hkd": 493.974880000001,
+          "fees": 0.0,
+          "hold_days": 21,
+          "currency": "USD",
+          "is_option": false,
+          "is_warrant": false,
+          "month": "2025-12"
+        }
+      ],
+      "worst_trips": [
+        {
+          "broker": "firstrade",
+          "symbol": "CRWD",
+          "buy_date": "2025-11-12",
+          "sell_date": "2025-12-16",
+          "qty": 2.0,
+          "buy_price": 545.0,
+          "sell_price": 500.0,
+          "pnl_native": -90.0,
+          "pnl_hkd": -705.6,
+          "fees": 0.0,
+          "hold_days": 34,
+          "currency": "USD",
+          "is_option": false,
+          "is_warrant": false,
+          "month": "2025-12"
+        },
+        {
+          "broker": "firstrade",
+          "symbol": "CRWD",
+          "buy_date": "2025-10-31",
+          "sell_date": "2025-12-16",
+          "qty": 2.0,
+          "buy_price": 542.0,
+          "sell_price": 500.0,
+          "pnl_native": -84.0,
+          "pnl_hkd": -658.56,
+          "fees": 0.0,
+          "hold_days": 46,
+          "currency": "USD",
+          "is_option": false,
+          "is_warrant": false,
+          "month": "2025-12"
+        },
+        {
+          "broker": "firstrade",
+          "symbol": "CRWD",
+          "buy_date": "2025-11-03",
+          "sell_date": "2025-12-16",
+          "qty": 2.0,
+          "buy_price": 542.0,
+          "sell_price": 500.0,
+          "pnl_native": -84.0,
+          "pnl_hkd": -658.56,
+          "fees": 0.0,
+          "hold_days": 43,
+          "currency": "USD",
+          "is_option": false,
+          "is_warrant": false,
+          "month": "2025-12"
+        }
+      ]
+    },
+    "2026-04": {
+      "label": "2026-04",
+      "trade_count": 20,
+      "buy_count": 16,
+      "sell_count": 4,
+      "symbol_count": 10,
+      "date_start": "2026-04-01",
+      "date_end": "2026-04-30",
+      "turnover_hkd": 232142.792,
+      "fees_hkd": 0.0,
+      "fee_drag": 0.0,
+      "active_days": 12,
+      "avg_trades_per_day": 1.6666666666666667,
+      "max_day_trades": 4,
+      "round_trips": 11,
+      "realized_pnl_hkd": 11735.799438733438,
+      "win_rate": 0.45454545454545453,
+      "avg_win": 2963.5798877466873,
+      "avg_loss": -513.6833333333333,
+      "payoff": 5.7692739776386635,
+      "max_win": 12595.995366989438,
+      "max_loss": -1161.3,
+      "day_trade_pct": 0.09090909090909091,
+      "short_pct": 0.18181818181818182,
+      "swing_pct": 0.7272727272727273,
+      "avg_hold": 66.72727272727273,
+      "avg_hold_win": 35.6,
+      "avg_hold_loss": 92.66666666666667,
+      "top_symbol": [
+        [
+          "MRVL",
+          53658.2144
+        ],
+        [
+          "SATS",
+          40321.6688
+        ],
+        [
+          "TSM",
+          29398.824
+        ],
+        [
+          "BRK.B",
+          22736.0
+        ],
+        [
+          "NVDA",
+          22724.239999999998
+        ],
+        [
+          "RKLB",
+          19478.2448
+        ],
+        [
+          "PANW",
+          14315.84
+        ],
+        [
+          "CRDO",
+          13955.199999999999
+        ],
+        [
+          "MSFT",
+          11634.56
+        ],
+        [
+          "VOO",
+          3920.0
+        ]
+      ],
+      "top_share": 0.23114314227770638,
+      "loss_streak_n": 4,
+      "loss_streak_amt": -1783.6,
+      "revenge_symbols": {
+        "NVDA": -1783.6
+      },
+      "option_trades": 0,
+      "warrant_trades": 0,
+      "by_month_realized": {
+        "2026-04": 11735.799438733438
+      },
+      "by_month_trades": {
+        "2026-04": 20
+      },
+      "by_broker_realized": {
+        "firstrade": 11735.799438733438
+      },
+      "best_trips": [
+        {
+          "broker": "firstrade",
+          "symbol": "MRVL",
+          "buy_date": "2025-12-31",
+          "sell_date": "2026-04-28",
+          "qty": 22.85716,
+          "buy_price": 87.4999,
+          "sell_price": 157.79,
+          "pnl_native": 1606.6320621159998,
+          "pnl_hkd": 12595.995366989438,
+          "fees": 0.0,
+          "hold_days": 118,
+          "currency": "USD",
+          "is_option": false,
+          "is_warrant": false,
+          "month": "2026-04"
+        },
+        {
+          "broker": "firstrade",
+          "symbol": "MRVL",
+          "buy_date": "2026-04-01",
+          "sell_date": "2026-04-28",
+          "qty": 2.1428399999999996,
+          "buy_price": 98.8,
+          "sell_price": 157.79,
+          "pnl_native": 126.40613159999997,
+          "pnl_hkd": 991.0240717439997,
+          "fees": 0.0,
+          "hold_days": 27,
+          "currency": "USD",
+          "is_option": false,
+          "is_warrant": false,
+          "month": "2026-04"
+        },
+        {
+          "broker": "firstrade",
+          "symbol": "RKLB",
+          "buy_date": "2026-04-09",
+          "sell_date": "2026-04-22",
+          "qty": 5.0,
+          "buy_price": 70.0,
+          "sell_price": 87.3,
+          "pnl_native": 86.49999999999999,
+          "pnl_hkd": 678.1599999999999,
+          "fees": 0.0,
+          "hold_days": 13,
+          "currency": "USD",
+          "is_option": false,
+          "is_warrant": false,
+          "month": "2026-04"
+        }
+      ],
+      "worst_trips": [
+        {
+          "broker": "firstrade",
+          "symbol": "SATS",
+          "buy_date": "2026-04-16",
+          "sell_date": "2026-04-22",
+          "qty": 15.0,
+          "buy_price": 134.875,
+          "sell_price": 125.0,
+          "pnl_native": -148.125,
+          "pnl_hkd": -1161.3,
+          "fees": 0.0,
+          "hold_days": 6,
+          "currency": "USD",
+          "is_option": false,
+          "is_warrant": false,
+          "month": "2026-04"
+        },
+        {
+          "broker": "firstrade",
+          "symbol": "NVDA",
+          "buy_date": "2025-10-29",
+          "sell_date": "2026-04-01",
+          "qty": 4.0,
+          "buy_price": 193.0,
+          "sell_price": 170.5,
+          "pnl_native": -90.0,
+          "pnl_hkd": -705.6,
+          "fees": 0.0,
+          "hold_days": 154,
+          "currency": "USD",
+          "is_option": false,
+          "is_warrant": false,
+          "month": "2026-04"
+        },
+        {
+          "broker": "firstrade",
+          "symbol": "NVDA",
+          "buy_date": "2025-12-03",
+          "sell_date": "2026-04-01",
+          "qty": 5.0,
+          "buy_price": 181.0,
+          "sell_price": 170.5,
+          "pnl_native": -52.5,
+          "pnl_hkd": -411.59999999999997,
+          "fees": 0.0,
+          "hold_days": 119,
+          "currency": "USD",
+          "is_option": false,
+          "is_warrant": false,
+          "month": "2026-04"
+        }
+      ]
+    },
+    "2026-05": {
+      "label": "2026-05",
+      "trade_count": 39,
+      "buy_count": 31,
+      "sell_count": 8,
+      "symbol_count": 19,
+      "date_start": "2026-05-01",
+      "date_end": "2026-05-29",
+      "turnover_hkd": 369454.8348,
+      "fees_hkd": 214.62199999999999,
+      "fee_drag": 0.0005809153915015974,
+      "active_days": 16,
+      "avg_trades_per_day": 2.4375,
+      "max_day_trades": 7,
+      "round_trips": 6,
+      "realized_pnl_hkd": 1860.9657607680006,
+      "win_rate": 0.3333333333333333,
+      "avg_win": 1832.6149999999996,
+      "avg_loss": -451.06605980799964,
+      "payoff": 4.062852790963853,
+      "max_win": 2865.55,
+      "max_loss": -1350.3282392319993,
+      "day_trade_pct": 0.16666666666666666,
+      "short_pct": 0.16666666666666666,
+      "swing_pct": 0.6666666666666666,
+      "avg_hold": 11.333333333333334,
+      "avg_hold_win": 4.5,
+      "avg_hold_loss": 14.75,
+      "top_symbol": [
+        [
+          "00189",
+          87560.0
+        ],
+        [
+          "BOXX",
+          54925.0016
+        ],
+        [
+          "CRDO",
+          50072.74719999999
+        ],
+        [
+          "INTC",
+          28286.72
+        ],
+        [
+          "FUTU",
+          27768.966399999998
+        ],
+        [
+          "SATS",
+          23756.6112
+        ],
+        [
+          "OKLO",
+          17465.4032
+        ],
+        [
+          "NVDA",
+          16816.8
+        ],
+        [
+          "IBM",
+          16746.239999999998
+        ],
+        [
+          "TSM",
+          16346.4
+        ]
+      ],
+      "top_share": 0.23699784588662798,
+      "loss_streak_n": 4,
+      "loss_streak_amt": -1804.2642392319985,
+      "revenge_symbols": {
+        "CRDO": -453.93599999999935
+      },
+      "option_trades": 0,
+      "warrant_trades": 0,
+      "by_month_realized": {
+        "2026-05": 1860.9657607680006
+      },
+      "by_month_trades": {
+        "2026-05": 39
+      },
+      "by_broker_realized": {
+        "firstrade": -1004.5842392319996,
+        "futu": 2865.55
+      },
+      "best_trips": [
+        {
+          "broker": "futu",
+          "symbol": "00189",
+          "buy_date": "2026-05-18",
+          "sell_date": "2026-05-27",
+          "qty": 1000.0,
+          "buy_price": 12.1,
+          "sell_price": 15.02,
+          "pnl_native": 2865.55,
+          "pnl_hkd": 2865.55,
+          "fees": 54.45,
+          "hold_days": 9,
+          "currency": "HKD",
+          "is_option": false,
+          "is_warrant": false,
+          "month": "2026-05"
+        },
+        {
+          "broker": "firstrade",
+          "symbol": "FUTU",
+          "buy_date": "2026-05-26",
+          "sell_date": "2026-05-26",
+          "qty": 20.0,
+          "buy_price": 86.0,
+          "sell_price": 91.1,
+          "pnl_native": 101.99999999999989,
+          "pnl_hkd": 799.679999999999,
+          "fees": 0.0,
+          "hold_days": 0,
+          "currency": "USD",
+          "is_option": false,
+          "is_warrant": false,
+          "month": "2026-05"
+        },
+        {
+          "broker": "firstrade",
+          "symbol": "CRDO",
+          "buy_date": "2026-04-30",
+          "sell_date": "2026-05-18",
+          "qty": 2.0,
+          "buy_price": 178.0,
+          "sell_price": 173.33,
+          "pnl_native": -9.339999999999975,
+          "pnl_hkd": -73.2255999999998,
+          "fees": 0.0,
+          "hold_days": 18,
+          "currency": "USD",
+          "is_option": false,
+          "is_warrant": false,
+          "month": "2026-05"
+        }
+      ],
+      "worst_trips": [
+        {
+          "broker": "firstrade",
+          "symbol": "OKLO",
+          "buy_date": "2026-05-12",
+          "sell_date": "2026-05-18",
+          "qty": 16.26016,
+          "buy_price": 73.8,
+          "sell_price": 63.2075,
+          "pnl_native": -172.2357447999999,
+          "pnl_hkd": -1350.3282392319993,
+          "fees": 0.0,
+          "hold_days": 6,
+          "currency": "USD",
+          "is_option": false,
+          "is_warrant": false,
+          "month": "2026-05"
+        },
+        {
+          "broker": "firstrade",
+          "symbol": "CRDO",
+          "buy_date": "2026-05-01",
+          "sell_date": "2026-05-18",
+          "qty": 8.0,
+          "buy_price": 178.0,
+          "sell_price": 173.33,
+          "pnl_native": -37.3599999999999,
+          "pnl_hkd": -292.9023999999992,
+          "fees": 0.0,
+          "hold_days": 17,
+          "currency": "USD",
+          "is_option": false,
+          "is_warrant": false,
+          "month": "2026-05"
+        },
+        {
+          "broker": "firstrade",
+          "symbol": "CRDO",
+          "buy_date": "2026-04-30",
+          "sell_date": "2026-05-18",
+          "qty": 8.0,
+          "buy_price": 178.0,
+          "sell_price": 176.6,
+          "pnl_native": -11.200000000000045,
+          "pnl_hkd": -87.80800000000035,
+          "fees": 0.0,
+          "hold_days": 18,
+          "currency": "USD",
+          "is_option": false,
+          "is_warrant": false,
+          "month": "2026-05"
+        }
+      ]
+    },
+    "2026-06": {
+      "label": "2026-06",
+      "trade_count": 83,
+      "buy_count": 49,
+      "sell_count": 34,
+      "symbol_count": 33,
+      "date_start": "2026-06-01",
+      "date_end": "2026-06-30",
+      "turnover_hkd": 1100942.0708,
+      "fees_hkd": 652.7052,
+      "fee_drag": 0.0005928606212002702,
+      "active_days": 21,
+      "avg_trades_per_day": 3.9523809523809526,
+      "max_day_trades": 8,
+      "round_trips": 28,
+      "realized_pnl_hkd": 8866.7636228928,
+      "win_rate": 0.32142857142857145,
+      "avg_win": 3466.9355300992006,
+      "avg_loss": -1175.560849894737,
+      "payoff": 2.9491757320853615,
+      "max_win": 12638.08,
+      "max_loss": -7048.640000000001,
+      "day_trade_pct": 0.07142857142857142,
+      "short_pct": 0.35714285714285715,
+      "swing_pct": 0.5714285714285714,
+      "avg_hold": 38.035714285714285,
+      "avg_hold_win": 48.666666666666664,
+      "avg_hold_loss": 33,
+      "top_symbol": [
+        [
+          "00189",
+          154070.0
+        ],
+        [
+          "03416",
+          111190.33
+        ],
+        [
+          "IBM",
+          94565.9232
+        ],
+        [
+          "AVUV",
+          73028.032
+        ],
+        [
+          "01088",
+          62305.2
+        ],
+        [
+          "BOXX",
+          59644.76000000001
+        ],
+        [
+          "00883",
+          54334.4
+        ],
+        [
+          "TEMA",
+          51037.8512
+        ],
+        [
+          "07709",
+          50370.0
+        ],
+        [
+          "QQQM",
+          43308.7088
+        ]
+      ],
+      "top_share": 0.13994378458808915,
+      "loss_streak_n": 8,
+      "loss_streak_amt": -7048.640000000001,
+      "revenge_symbols": {
+        "INTC": -2656.0195200000007,
+        "IBM": -2899.819999999999,
+        "SATS": -2379.444899999999
+      },
+      "option_trades": 1,
+      "warrant_trades": 6,
+      "by_month_realized": {
+        "2026-06": 8866.7636228928
+      },
+      "by_month_trades": {
+        "2026-06": 83
+      },
+      "by_broker_realized": {
+        "firstrade": 13497.677222892797,
+        "futu": -4630.913599999997
+      },
+      "best_trips": [
+        {
+          "broker": "firstrade",
+          "symbol": "MRVL",
+          "buy_date": "2026-04-01",
+          "sell_date": "2026-06-10",
+          "qty": 10.0,
+          "buy_price": 98.8,
+          "sell_price": 260.0,
+          "pnl_native": 1612.0,
+          "pnl_hkd": 12638.08,
+          "fees": 0.0,
+          "hold_days": 70,
+          "currency": "USD",
+          "is_option": false,
+          "is_warrant": false,
+          "month": "2026-06"
+        },
+        {
+          "broker": "firstrade",
+          "symbol": "QQQM",
+          "buy_date": "2025-12-19",
+          "sell_date": "2026-06-08",
+          "qty": 18.60656,
+          "buy_price": 250.0,
+          "sell_price": 296.8945,
+          "pnl_native": 872.54532792,
+          "pnl_hkd": 6840.7553708928,
+          "fees": 0.0,
+          "hold_days": 171,
+          "currency": "USD",
+          "is_option": false,
+          "is_warrant": false,
+          "month": "2026-06"
+        },
+        {
+          "broker": "firstrade",
+          "symbol": "PANW",
+          "buy_date": "2025-12-31",
+          "sell_date": "2026-06-05",
+          "qty": 8.0,
+          "buy_price": 187.52,
+          "sell_price": 270.18375,
+          "pnl_native": 661.3099999999997,
+          "pnl_hkd": 5184.670399999997,
+          "fees": 0.0,
+          "hold_days": 156,
+          "currency": "USD",
+          "is_option": false,
+          "is_warrant": false,
+          "month": "2026-06"
+        }
+      ],
+      "worst_trips": [
+        {
+          "broker": "futu",
+          "symbol": "07709",
+          "buy_date": "2026-06-01",
+          "sell_date": "2026-06-05",
+          "qty": 200.0,
+          "buy_price": 143.5,
+          "sell_price": 108.35,
+          "pnl_native": -7048.640000000001,
+          "pnl_hkd": -7048.640000000001,
+          "fees": 18.64,
+          "hold_days": 4,
+          "currency": "HKD",
+          "is_option": false,
+          "is_warrant": false,
+          "month": "2026-06"
+        },
+        {
+          "broker": "firstrade",
+          "symbol": "IBM",
+          "buy_date": "2026-06-10",
+          "sell_date": "2026-06-22",
+          "qty": 15.0,
+          "buy_price": 280.0,
+          "sell_price": 245.375,
+          "pnl_native": -519.375,
+          "pnl_hkd": -4071.9,
+          "fees": 0.0,
+          "hold_days": 12,
+          "currency": "USD",
+          "is_option": false,
+          "is_warrant": false,
+          "month": "2026-06"
+        },
+        {
+          "broker": "futu",
+          "symbol": "00189",
+          "buy_date": "2026-06-22",
+          "sell_date": "2026-06-26",
+          "qty": 1000.0,
+          "buy_price": 22.0,
+          "sell_price": 19.91,
+          "pnl_native": -2167.3100000000004,
+          "pnl_hkd": -2167.3100000000004,
+          "fees": 77.31,
+          "hold_days": 4,
+          "currency": "HKD",
+          "is_option": false,
+          "is_warrant": false,
+          "month": "2026-06"
+        }
+      ]
+    },
+    "2026-07": {
+      "label": "2026-07",
+      "trade_count": 91,
+      "buy_count": 60,
+      "sell_count": 31,
+      "symbol_count": 36,
+      "date_start": "2026-07-01",
+      "date_end": "2026-07-31",
+      "turnover_hkd": 632006.0816,
+      "fees_hkd": 676.3068,
+      "fee_drag": 0.0010700953989047815,
+      "active_days": 23,
+      "avg_trades_per_day": 3.9565217391304346,
+      "max_day_trades": 9,
+      "round_trips": 44,
+      "realized_pnl_hkd": -8620.819780723632,
+      "win_rate": 0.3409090909090909,
+      "avg_win": 1055.8776353962667,
+      "avg_loss": -843.4132521264701,
+      "payoff": 1.2519101789474105,
+      "max_win": 6991.712,
+      "max_loss": -6957.720000000001,
+      "day_trade_pct": 0.20454545454545456,
+      "short_pct": 0.20454545454545456,
+      "swing_pct": 0.5909090909090909,
+      "avg_hold": 50.79545454545455,
+      "avg_hold_win": 102.46666666666667,
+      "avg_hold_loss": 24.06896551724138,
+      "top_symbol": [
+        [
+          "BRK.B",
+          101463.5552
+        ],
+        [
+          "07709",
+          68720.0
+        ],
+        [
+          "AVUV",
+          58731.7136
+        ],
+        [
+          "IWM",
+          48206.6704
+        ],
+        [
+          "PANW",
+          45647.9296
+        ],
+        [
+          "03466",
+          40256.79
+        ],
+        [
+          "GOOGL",
+          38478.0928
+        ],
+        [
+          "03437",
+          38368.72
+        ],
+        [
+          "TSM",
+          33244.5792
+        ],
+        [
+          "NVDA",
+          33170.1776
+        ]
+      ],
+      "top_share": 0.16054205513835043,
+      "loss_streak_n": 8,
+      "loss_streak_amt": -12444.771600000002,
+      "revenge_symbols": {
+        "60925": -2400.9500000000003,
+        "IWM": -4800.125048320003,
+        "NVDA": -1720.2810103584004
+      },
+      "option_trades": 3,
+      "warrant_trades": 22,
+      "by_month_realized": {
+        "2026-07": -8620.819780723632
+      },
+      "by_month_trades": {
+        "2026-07": 91
+      },
+      "by_broker_realized": {
+        "firstrade": 6978.436885943036,
+        "futu": -15599.256666666668
+      },
+      "best_trips": [
+        {
+          "broker": "firstrade",
+          "symbol": "PANW",
+          "buy_date": "2026-04-29",
+          "sell_date": "2026-07-29",
+          "qty": 7.0,
+          "buy_price": 182.6,
+          "sell_price": 310.0,
+          "pnl_native": 891.8000000000001,
+          "pnl_hkd": 6991.712,
+          "fees": 0.0,
+          "hold_days": 91,
+          "currency": "USD",
+          "is_option": false,
+          "is_warrant": false,
+          "month": "2026-07"
+        },
+        {
+          "broker": "firstrade",
+          "symbol": "PANW",
+          "buy_date": "2025-12-31",
+          "sell_date": "2026-07-28",
+          "qty": 2.6655200000000008,
+          "buy_price": 187.52,
+          "sell_price": 324.13,
+          "pnl_native": 364.13668720000004,
+          "pnl_hkd": 2854.8316276480004,
+          "fees": 0.0,
+          "hold_days": 209,
+          "currency": "USD",
+          "is_option": false,
+          "is_warrant": false,
+          "month": "2026-07"
+        },
+        {
+          "broker": "firstrade",
+          "symbol": "PANW",
+          "buy_date": "2026-04-29",
+          "sell_date": "2026-07-28",
+          "qty": 1.3344799999999992,
+          "buy_price": 182.6,
+          "sell_price": 324.13,
+          "pnl_native": 188.8689543999999,
+          "pnl_hkd": 1480.7326024959991,
+          "fees": 0.0,
+          "hold_days": 90,
+          "currency": "USD",
+          "is_option": false,
+          "is_warrant": false,
+          "month": "2026-07"
+        }
+      ],
+      "worst_trips": [
+        {
+          "broker": "futu",
+          "symbol": "07709",
+          "buy_date": "2026-07-06",
+          "sell_date": "2026-07-13",
+          "qty": 200.0,
+          "buy_price": 107.0,
+          "sell_price": 72.3,
+          "pnl_native": -6957.720000000001,
+          "pnl_hkd": -6957.720000000001,
+          "fees": 17.72,
+          "hold_days": 7,
+          "currency": "HKD",
+          "is_option": false,
+          "is_warrant": false,
+          "month": "2026-07"
+        },
+        {
+          "broker": "futu",
+          "symbol": "07709",
+          "buy_date": "2026-07-10",
+          "sell_date": "2026-07-13",
+          "qty": 200.0,
+          "buy_price": 92.0,
+          "sell_price": 72.3,
+          "pnl_native": -3957.3400000000006,
+          "pnl_hkd": -3957.3400000000006,
+          "fees": 17.34,
+          "hold_days": 3,
+          "currency": "HKD",
+          "is_option": false,
+          "is_warrant": false,
+          "month": "2026-07"
+        },
+        {
+          "broker": "firstrade",
+          "symbol": "IWM",
+          "buy_date": "2026-06-23",
+          "sell_date": "2026-07-28",
+          "qty": 7.4008400000000005,
+          "buy_price": 342.8,
+          "sell_price": 297.2,
+          "pnl_native": -337.4783040000002,
+          "pnl_hkd": -2645.8299033600015,
+          "fees": 0.0,
+          "hold_days": 35,
+          "currency": "USD",
+          "is_option": false,
+          "is_warrant": false,
+          "month": "2026-07"
+        }
+      ]
+    },
+    "2026-08": {
+      "label": "2026-08",
+      "trade_count": 52,
+      "buy_count": 41,
+      "sell_count": 11,
+      "symbol_count": 23,
+      "date_start": "2026-08-03",
+      "date_end": "2026-08-28",
+      "turnover_hkd": 439520.0968,
+      "fees_hkd": 380.216,
+      "fee_drag": 0.000865070796007342,
+      "active_days": 18,
+      "avg_trades_per_day": 2.888888888888889,
+      "max_day_trades": 10,
+      "round_trips": 20,
+      "realized_pnl_hkd": 9896.086856320004,
+      "win_rate": 0.6,
+      "avg_win": 1037.2921380266669,
+      "avg_loss": -318.9273499999999,
+      "payoff": 3.2524402125646086,
+      "max_win": 5323.36,
+      "max_loss": -1374.7999999999995,
+      "day_trade_pct": 0.0,
+      "short_pct": 0.15,
+      "swing_pct": 0.85,
+      "avg_hold": 32.35,
+      "avg_hold_win": 46.416666666666664,
+      "avg_hold_loss": 11.25,
+      "top_symbol": [
+        [
+          "PANW",
+          133383.6448
+        ],
+        [
+          "GOOGL",
+          38914.624
+        ],
+        [
+          "BOXX",
+          29839.431999999997
+        ],
+        [
+          "70000",
+          29204.0
+        ],
+        [
+          "NVDA",
+          27847.68
+        ],
+        [
+          "QMOM",
+          24037.831999999995
+        ],
+        [
+          "GOOG",
+          21980.224
+        ],
+        [
+          "50000",
+          16738.4
+        ],
+        [
+          "MSFT",
+          15836.8
+        ],
+        [
+          "2000",
+          15444.8
+        ]
+      ],
+      "top_share": 0.3034756448479195,
+      "loss_streak_n": 7,
+      "loss_streak_amt": -2476.1548,
+      "revenge_symbols": {},
+      "option_trades": 0,
+      "warrant_trades": 4,
+      "by_month_realized": {
+        "2026-08": 9896.086856320004
+      },
+      "by_month_trades": {
+        "2026-08": 52
+      },
+      "by_broker_realized": {
+        "firstrade": 12372.241656320002,
+        "futu": -2476.1547999999993
+      },
+      "best_trips": [
+        {
+          "broker": "firstrade",
+          "symbol": "PANW",
+          "buy_date": "2026-05-12",
+          "sell_date": "2026-08-20",
+          "qty": 5.0,
+          "buy_price": 213.0,
+          "sell_price": 348.8,
+          "pnl_native": 679.0,
+          "pnl_hkd": 5323.36,
+          "fees": 0.0,
+          "hold_days": 100,
+          "currency": "USD",
+          "is_option": false,
+          "is_warrant": false,
+          "month": "2026-08"
+        },
+        {
+          "broker": "firstrade",
+          "symbol": "PANW",
+          "buy_date": "2026-04-29",
+          "sell_date": "2026-08-20",
+          "qty": 1.6655200000000008,
+          "buy_price": 182.6,
+          "sell_price": 348.8,
+          "pnl_native": 276.80942400000015,
+          "pnl_hkd": 2170.185884160001,
+          "fees": 0.0,
+          "hold_days": 113,
+          "currency": "USD",
+          "is_option": false,
+          "is_warrant": false,
+          "month": "2026-08"
+        },
+        {
+          "broker": "firstrade",
+          "symbol": "PANW",
+          "buy_date": "2026-06-22",
+          "sell_date": "2026-08-20",
+          "qty": 3.3344799999999992,
+          "buy_price": 283.87,
+          "sell_price": 348.8,
+          "pnl_native": 216.5077864,
+          "pnl_hkd": 1697.421045376,
+          "fees": 0.0,
+          "hold_days": 59,
+          "currency": "USD",
+          "is_option": false,
+          "is_warrant": false,
+          "month": "2026-08"
+        }
+      ],
+      "worst_trips": [
+        {
+          "broker": "futu",
+          "symbol": "01299",
+          "buy_date": "2026-07-27",
+          "sell_date": "2026-08-06",
+          "qty": 200.0,
+          "buy_price": 78.0,
+          "sell_price": 71.45,
+          "pnl_native": -1374.7999999999995,
+          "pnl_hkd": -1374.7999999999995,
+          "fees": 64.8,
+          "hold_days": 10,
+          "currency": "HKD",
+          "is_option": false,
+          "is_warrant": false,
+          "month": "2026-08"
+        },
+        {
+          "broker": "futu",
+          "symbol": "28025",
+          "buy_date": "2026-08-03",
+          "sell_date": "2026-08-12",
+          "qty": 20000.0,
+          "buy_price": 0.075,
+          "sell_price": 0.047,
+          "pnl_native": -590.2999999999998,
+          "pnl_hkd": -590.2999999999998,
+          "fees": 30.299999999999997,
+          "hold_days": 9,
+          "currency": "HKD",
+          "is_option": false,
+          "is_warrant": false,
+          "month": "2026-08"
+        },
+        {
+          "broker": "futu",
+          "symbol": "68956",
+          "buy_date": "2026-08-03",
+          "sell_date": "2026-08-05",
+          "qty": 30000.0,
+          "buy_price": 0.055,
+          "sell_price": 0.044,
+          "pnl_native": -360.37000000000006,
+          "pnl_hkd": -360.37000000000006,
+          "fees": 30.369999999999997,
+          "hold_days": 2,
+          "currency": "HKD",
+          "is_option": false,
+          "is_warrant": true,
+          "month": "2026-08"
+        }
+      ]
+    },
+    "2026-09": {
+      "label": "2026-09",
+      "trade_count": 44,
+      "buy_count": 25,
+      "sell_count": 19,
+      "symbol_count": 24,
+      "date_start": "2026-09-01",
+      "date_end": "2026-09-29",
+      "turnover_hkd": 1163179.744,
+      "fees_hkd": 292.32399999999996,
+      "fee_drag": 0.000251314555216326,
+      "active_days": 17,
+      "avg_trades_per_day": 2.588235294117647,
+      "max_day_trades": 6,
+      "round_trips": 29,
+      "realized_pnl_hkd": 1718.2410140716822,
+      "win_rate": 0.5517241379310345,
+      "avg_win": 807.4168222523201,
+      "avg_loss": -861.571395535803,
+      "payoff": 0.9371444159310736,
+      "max_win": 3598.952,
+      "max_loss": -4655.266610176001,
+      "day_trade_pct": 0.034482758620689655,
+      "short_pct": 0.2413793103448276,
+      "swing_pct": 0.7241379310344828,
+      "avg_hold": 56.96551724137931,
+      "avg_hold_win": 78.25,
+      "avg_hold_loss": 30.76923076923077,
+      "top_symbol": [
+        [
+          "MRVL",
+          763005.2640000001
+        ],
+        [
+          "BOXX",
+          92747.2
+        ],
+        [
+          "0000",
+          41504.95999999999
+        ],
+        [
+          "BRK.B",
+          39737.7456
+        ],
+        [
+          "NVDA",
+          35568.119999999995
+        ],
+        [
+          "MTUM",
+          24245.6704
+        ],
+        [
+          "MSFT",
+          23440.2672
+        ],
+        [
+          "BE",
+          20893.6
+        ],
+        [
+          "GOOG",
+          20826.4112
+        ],
+        [
+          "70000",
+          19631.36
+        ]
+      ],
+      "top_share": 0.6559650543570678,
+      "loss_streak_n": 5,
+      "loss_streak_amt": -9790.960079501438,
+      "revenge_symbols": {
+        "0000": -140.33599999999996,
+        "MRVL": -668.890746957438
+      },
+      "option_trades": 0,
+      "warrant_trades": 2,
+      "by_month_realized": {
+        "2026-09": 1718.2410140716822
+      },
+      "by_month_trades": {
+        "2026-09": 44
+      },
+      "by_broker_realized": {
+        "firstrade": 1917.5338140716822,
+        "futu": -199.29279999999997
+      },
+      "best_trips": [
+        {
+          "broker": "firstrade",
+          "symbol": "MRVL",
+          "buy_date": "2026-04-14",
+          "sell_date": "2026-09-15",
+          "qty": 5.0,
+          "buy_price": 130.0,
+          "sell_price": 221.81,
+          "pnl_native": 459.05,
+          "pnl_hkd": 3598.952,
+          "fees": 0.0,
+          "hold_days": 154,
+          "currency": "USD",
+          "is_option": false,
+          "is_warrant": false,
+          "month": "2026-09"
+        },
+        {
+          "broker": "firstrade",
+          "symbol": "MRVL",
+          "buy_date": "2026-04-22",
+          "sell_date": "2026-09-15",
+          "qty": 5.0,
+          "buy_price": 153.5,
+          "sell_price": 221.81,
+          "pnl_native": 341.55,
+          "pnl_hkd": 2677.752,
+          "fees": 0.0,
+          "hold_days": 146,
+          "currency": "USD",
+          "is_option": false,
+          "is_warrant": false,
+          "month": "2026-09"
+        },
+        {
+          "broker": "firstrade",
+          "symbol": "MRVL",
+          "buy_date": "2026-04-01",
+          "sell_date": "2026-09-15",
+          "qty": 1.8571600000000004,
+          "buy_price": 98.8,
+          "sell_price": 221.81,
+          "pnl_native": 228.44925160000005,
+          "pnl_hkd": 1791.0421325440004,
+          "fees": 0.0,
+          "hold_days": 167,
+          "currency": "USD",
+          "is_option": false,
+          "is_warrant": false,
+          "month": "2026-09"
+        }
+      ],
+      "worst_trips": [
+        {
+          "broker": "firstrade",
+          "symbol": "MRVL",
+          "buy_date": "2026-06-10",
+          "sell_date": "2026-09-15",
+          "qty": 8.85716,
+          "buy_price": 288.8,
+          "sell_price": 221.76,
+          "pnl_native": -593.7840064000002,
+          "pnl_hkd": -4655.266610176001,
+          "fees": 0.0,
+          "hold_days": 97,
+          "currency": "USD",
+          "is_option": false,
+          "is_warrant": false,
+          "month": "2026-09"
+        },
+        {
+          "broker": "firstrade",
+          "symbol": "MRVL",
+          "buy_date": "2026-09-15",
+          "sell_date": "2026-09-15",
+          "qty": 187.14284,
+          "buy_price": 224.7899,
+          "sell_price": 221.76,
+          "pnl_native": -567.0240909159996,
+          "pnl_hkd": -4445.468872781437,
+          "fees": 0.0,
+          "hold_days": 0,
+          "currency": "USD",
+          "is_option": false,
+          "is_warrant": false,
+          "month": "2026-09"
+        },
+        {
+          "broker": "firstrade",
+          "symbol": "GOOG",
+          "buy_date": "2026-08-07",
+          "sell_date": "2026-09-09",
+          "qty": 4.0,
+          "buy_price": 355.0,
+          "sell_price": 327.9,
+          "pnl_native": -108.40000000000009,
+          "pnl_hkd": -849.8560000000007,
+          "fees": 0.0,
+          "hold_days": 33,
+          "currency": "USD",
+          "is_option": false,
+          "is_warrant": false,
+          "month": "2026-09"
+        }
+      ]
+    },
+    "2026-10": {
+      "label": "2026-10",
+      "trade_count": 1,
+      "buy_count": 1,
+      "sell_count": 0,
+      "symbol_count": 1,
+      "date_start": "2026-10-01",
+      "date_end": "2026-10-01",
+      "turnover_hkd": 3920.0,
+      "fees_hkd": 0.0,
+      "fee_drag": 0.0,
+      "active_days": 1,
+      "avg_trades_per_day": 1.0,
+      "max_day_trades": 1,
+      "round_trips": 0,
+      "realized_pnl_hkd": 0,
+      "win_rate": null,
+      "avg_win": 0.0,
+      "avg_loss": 0.0,
+      "payoff": null,
+      "max_win": 0,
+      "max_loss": 0,
+      "day_trade_pct": 0,
+      "short_pct": 0,
+      "swing_pct": 0,
+      "avg_hold": 0,
+      "avg_hold_win": null,
+      "avg_hold_loss": null,
+      "top_symbol": [
+        [
+          "VOO",
+          3920.0
+        ]
+      ],
+      "top_share": 1.0,
+      "loss_streak_n": 0,
+      "loss_streak_amt": 0.0,
+      "revenge_symbols": {},
+      "option_trades": 0,
+      "warrant_trades": 0,
+      "by_month_realized": {},
+      "by_month_trades": {
+        "2026-10": 1
+      },
+      "by_broker_realized": {},
+      "best_trips": [],
+      "worst_trips": []
+    }
+  },
+  "nav": [
+    {
+      "broker": "firstrade",
+      "month": "2025-10",
+      "open": 124262.23,
+      "close": 126169.14,
+      "currency": "USD",
+      "net_external": 0.0,
+      "adj_pnl": 1906.9100000000035
+    },
+    {
+      "broker": "firstrade",
+      "month": "2025-11",
+      "open": 126169.14,
+      "close": 125549.47,
+      "currency": "USD",
+      "net_external": 0.0,
+      "adj_pnl": -619.6699999999983
+    },
+    {
+      "broker": "firstrade",
+      "month": "2025-12",
+      "open": 125549.47,
+      "close": 125273.08,
+      "currency": "USD",
+      "net_external": 0.0,
+      "adj_pnl": -276.3899999999994
+    },
+    {
+      "broker": "firstrade",
+      "month": "2026-04",
+      "open": 119545.14,
+      "close": 126749.18,
+      "currency": "USD",
+      "net_external": 0.0,
+      "adj_pnl": 7204.039999999994
+    },
+    {
+      "broker": "firstrade",
+      "month": "2026-05",
+      "open": 126749.18,
+      "close": 132183.28,
+      "currency": "USD",
+      "net_external": 0.0,
+      "adj_pnl": 5434.100000000006
+    },
+    {
+      "broker": "firstrade",
+      "month": "2026-06",
+      "open": 132183.28,
+      "close": 131850.34,
+      "currency": "USD",
+      "net_external": 0.0,
+      "adj_pnl": -332.9400000000023
+    },
+    {
+      "broker": "firstrade",
+      "month": "2026-07",
+      "open": 131850.34,
+      "close": 130056.27,
+      "currency": "USD",
+      "net_external": 0.0,
+      "adj_pnl": -1794.0699999999924
+    },
+    {
+      "broker": "firstrade",
+      "month": "2026-08",
+      "open": 130056.27,
+      "close": 131900.44,
+      "currency": "USD",
+      "net_external": 0.0,
+      "adj_pnl": 1844.1699999999983
+    },
+    {
+      "broker": "futu",
+      "month": "2026-05",
+      "open": 623630.91,
+      "close": 473626.43,
+      "currency": "HKD",
+      "net_external": -148000.0,
+      "adj_pnl": -2004.4800000000396
+    },
+    {
+      "broker": "futu",
+      "month": "2026-06",
+      "open": 473626.43,
+      "close": 345595.8,
+      "currency": "HKD",
+      "net_external": -98800.0,
+      "adj_pnl": -29230.630000000005
+    },
+    {
+      "broker": "futu",
+      "month": "2026-07",
+      "open": 345595.8,
+      "close": 351848.05,
+      "currency": "HKD",
+      "net_external": 2000.0,
+      "adj_pnl": 4252.25
+    },
+    {
+      "broker": "futu",
+      "month": "2026-08",
+      "open": 351848.05,
+      "close": 359646.81,
+      "currency": "HKD",
+      "net_external": 4000.0,
+      "adj_pnl": 3798.7600000000093
+    },
+    {
+      "broker": "futu",
+      "month": "2026-09",
+      "open": 359646.81,
+      "close": 351024.47,
+      "currency": "HKD",
+      "net_external": 0,
+      "adj_pnl": -8622.340000000026
+    }
+  ],
+  "months_covered": [
+    "2025-10",
+    "2025-11",
+    "2025-12",
+    "2026-04",
+    "2026-05",
+    "2026-06",
+    "2026-07",
+    "2026-08",
+    "2026-09",
+    "2026-10"
+  ]
+}
